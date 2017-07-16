@@ -20,7 +20,7 @@ Sub main()
     AddProperty "Material", swCustomInfoText, """SW-Material@" & strName & """"
     AddProperty "Thickness", swCustomInfoText, """Thickness@" & strName & """"
     AddProperty "Finish", swCustomInfoText, "None"
-    AddProperty "CompanyName", swCustomInfoText, "Inovatech Engineering"
+    AddProperty "CompanyName", swCustomInfoText, "MCG 4322A"
     AddProperty "DrawnDate", swCustomInfoText, Format$(Now, "mm/dd/yy")
     AddProperty "CheckedDate", swCustomInfoText, Format$(Now, "mm/dd/yy"), True
     AddProperty "DrawnBy", swCustomInfoText, "J.C."
