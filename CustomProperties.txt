@@ -1,0 +1,48 @@
+Option Explicit
+    Dim swApp As SldWorks.SldWorks
+    Dim swModel As ModelDoc2
+    Dim swModelExt As ModelDocExtension
+    Dim swCustProp As CustomPropertyManager
+    Dim swEquationMgr As Object
+
+Sub main()
+    Set swApp = CreateObject("SldWorks.Application")
+    Set swModel = swApp.ActiveDoc
+    Set swModelExt = swModel.Extension
+    Set swCustProp = swModelExt.CustomPropertyManager("")
+    Set swEquationMgr = swModel.GetEquationMgr()
+    
+    Dim strName As String
+    strName = swModel.GetTitle
+    
+    AddProperty "Weight", swCustomInfoText, """SW-Mass@" & strName & """"
+    AddProperty "SurfaceArea", swCustomInfoText, """SW-SurfaceArea@" & strName & """"
+    AddProperty "Material", swCustomInfoText, """SW-Material@" & strName & """"
+    AddProperty "Thickness", swCustomInfoText, """Thickness@" & strName & """"
+    AddProperty "Finish", swCustomInfoText, "None"
+    AddProperty "CompanyName", swCustomInfoText, "Inovatech Engineering"
+    AddProperty "DrawnDate", swCustomInfoText, Format$(Now, "mm/dd/yy")
+    AddProperty "CheckedDate", swCustomInfoText, Format$(Now, "mm/dd/yy"), True
+    AddProperty "DrawnBy", swCustomInfoText, "J.C."
+    AddProperty "CheckedBy", swCustomInfoText, "J.C.", True
+    AddProperty "Qty", swCustomInfoText, "1"
+    AddProperty "Steel Type", swCustomInfoText, "HRS"
+    AddProperty "Description", swCustomInfoText, ""
+    AddProperty "dwgweight", swCustomInfoText, """dwgpounds@" & strName & """"
+    
+    swEquationMgr.Add -1, """dwgpounds""= round(""Weight""/1000*2.205,2)"
+    swEquationMgr.Add -1, """dwgbenddeduction''= round(""SW-Bend Allowance@@@Cut-List-Item1@900-351-003.SLDPRT""/25.4,2)"
+    
+    swModel.FileSummaryInfo
+End Sub
+
+Sub AddProperty(swName As String, swType As swCustomInfoType_e, swValue As String, Optional overwrite As Boolean = False)
+    Dim result As Long
+    result = swCustProp.Add2(swName, swType, swValue)
+    
+    If result = -1 Or result = 0 Then
+        If overwrite Then
+            result = swCustProp.Set(swName, swValue)
+        End If
+    End If
+End Sub
