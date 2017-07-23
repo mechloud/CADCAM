@@ -10,4 +10,4 @@ As with any open source code, please keep in mind that we are not professional e
 * **Justin McLeod** - *is a contributor*
 * **Jonathan Charbonneau** - *Main contributor*
 * **Elizabeth Primeau**
-* ** Alexandre Vendette**
+* **Alexandre Vendette**
