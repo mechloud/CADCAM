@@ -1,0 +1,82 @@
+\documentclass[12pt]{article}
+%\usepackage[utf8x]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tocloft}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{siunitx}
+\usepackage{array} 
+% Used for table
+\usepackage{xfrac}
+\usepackage{pdfpages}
+% Include pdf attachments at the end of report
+\usepackage{setspace}
+\usepackage[margin=1in]{geometry}
+% Package for setting the line spacing
+\newcommand{\listappendicesname}{Appendices}
+\newlistof{appendices}{apc}{\listappendicesname}
+\newcommand{\appendices}[1]{\addcontentsline{apc}{appendices}{#1}}
+
+\newcommand{\newappendix}[1]{\section*{#1}\appendices{#1}}
+\begin{document}
+	% TITLE PAGE BEGINS HERE
+	\begin{titlepage}
+		
+		\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+		
+		\begin{center} % Center everything on the page
+			
+			%----------------------------------------------------------------------------------------
+			%	HEADING SECTIONS
+			%----------------------------------------------------------------------------------------
+			
+			\textsc{\LARGE University of Ottawa}\\[1.5cm] % Name of your university/college
+			\textsc{\Large Department of Mechanical Engineering}\\[1.5cm] % Major heading such as course name
+			\textsc{\large Minor Heading}\\[1.5cm] % Minor heading such as course title
+			
+			%----------------------------------------------------------------------------------------
+			%	TITLE SECTION
+			%----------------------------------------------------------------------------------------
+			
+			\HRule \\[0.4cm]
+			{ \huge \bfseries Literature Review}\\[0.4cm] % Title of your document
+			\HRule \\[3cm]
+			
+			%----------------------------------------------------------------------------------------
+			%	AUTHOR SECTION
+			%----------------------------------------------------------------------------------------
+			
+			\emph{Report written by:}\\[1cm]
+			Jonathan PUT ALL MEMBERS HERE\textsc{Charbonneau} 7199186\\[2cm]
+			\emph{Presented to:}\\[0.5cm]
+			Prof. Éric \textsc{Lanteigne}\\[3cm]
+			
+			
+			%----------------------------------------------------------------------------------------
+			%	DATE SECTION
+			%----------------------------------------------------------------------------------------
+			
+			{\large September 18\textsuperscript{th}, 2017}\\[2cm] % Date, change the \today to a set date if you want to be precise
+			
+			%----------------------------------------------------------------------------------------
+			
+			\vfill % Fill the rest of the page with whitespace
+			
+		\end{center}
+		
+	\end{titlepage}
+	
+	\renewcommand{\thepage}{\roman{page}}
+	\newpage
+	%\frontmatter
+	\tableofcontents
+	\newpage
+	\setstretch{1.5}
+	\listoffigures
+	\newpage
+	% LIST OF TABLES IF NECESSARY UNCOMMENT BELOW
+	% \listoftables
+	%\mainmatter
+\end{document}
