@@ -1,0 +1,9 @@
+
+*.jpg
+Thumbs.db
+*.aux
+*.lof
+*.log
+*.pdf
+*.gz
+*.toc
