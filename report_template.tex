@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[12pt,twoside]{article}
 %\usepackage[utf8x]{inputenc}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -7,11 +7,11 @@
 \usepackage{float}
 \usepackage{indentfirst}
 \usepackage{siunitx}
-\usepackage{array} 
+\usepackage{array}
+\usepackage{fancyhdr} % Used for headers and footers
 % Used for table
 \usepackage{xfrac}
-\usepackage{pdfpages}
-% Include pdf attachments at the end of report
+\usepackage{pdfpages} % Used to include pdf attachments at the end of report
 \usepackage{setspace}
 \usepackage[margin=1in]{geometry}
 % Package for setting the line spacing
@@ -20,63 +20,133 @@
 \newcommand{\appendices}[1]{\addcontentsline{apc}{appendices}{#1}}
 
 \newcommand{\newappendix}[1]{\section*{#1}\appendices{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% HEADER & FOOTER STUFF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{MCG 4322 - BSAE2B}
+\fancyhead[RE,LO]{Literature Review}
+\fancyfoot[LE,RO]{\thepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
-	% TITLE PAGE BEGINS HERE
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% TITLE PAGE STARTS
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\begin{titlepage}
 		
 		\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
 		
 		\begin{center} % Center everything on the page
 			
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			%	HEADING SECTIONS
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
 			\textsc{\LARGE University of Ottawa}\\[1.5cm] % Name of your university/college
-			\textsc{\Large Department of Mechanical Engineering}\\[1.5cm] % Major heading such as course name
-			\textsc{\large Minor Heading}\\[1.5cm] % Minor heading such as course title
+			\textsc{\Large Department of Mechanical Engineering}\\[1.0cm] % Major heading such as course name
+			%\textsc{\large Minor Heading}\\[1.5cm] % Minor heading such as course title
 			
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			%	TITLE SECTION
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
 			\HRule \\[0.4cm]
 			{ \huge \bfseries Literature Review}\\[0.4cm] % Title of your document
 			\HRule \\[3cm]
 			
-			%----------------------------------------------------------------------------------------
+			% TEAM PICTURE GOES HERE
+			%\begin{figure}[H]
+			%	\centering
+			%	\includegraphics[width=0.7\linewidth]{team_pic} % 0.7 times the width of the line
+			%\end{figure}
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			%	AUTHOR SECTION
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
-			\emph{Report written by:}\\[1cm]
-			Jonathan PUT ALL MEMBERS HERE\textsc{Charbonneau} 7199186\\[2cm]
+			\emph{Report written by:}\\[0.5cm]
+			BSAE2B\\
+			Jonathan \textsc{Charbonneau} 7199186\\
+			Justin \textsc{McLeod} 7152573\\
+			Elizabeth \textsc{Primeau} 7193663\\
+			Alexandre \textsc{Vendette} 7301724\\[1cm]
 			\emph{Presented to:}\\[0.5cm]
-			Prof. Éric \textsc{Lanteigne}\\[3cm]
+			Prof. Éric \textsc{Lanteigne}\\[1.5cm]
 			
 			
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			%	DATE SECTION
-			%----------------------------------------------------------------------------------------
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
-			{\large September 18\textsuperscript{th}, 2017}\\[2cm] % Date, change the \today to a set date if you want to be precise
-			
-			%----------------------------------------------------------------------------------------
+			{\large September 18\textsuperscript{th}, 2017}\\
 			
 			\vfill % Fill the rest of the page with whitespace
 			
-		\end{center}
+		\end{center} % End centering
 		
-	\end{titlepage}
+	\end{titlepage} % End the title page
 	
-	\renewcommand{\thepage}{\roman{page}}
-	\newpage
-	%\frontmatter
+	\renewcommand{\thepage}{\roman{page}} % Make page numbers roman numbers
+	\newpage % Start on a new page
 	\tableofcontents
 	\newpage
 	\setstretch{1.5}
 	\listoffigures
 	\newpage
-	% LIST OF TABLES IF NECESSARY UNCOMMENT BELOW
 	% \listoftables
 	%\mainmatter
+	
+	% Turn the \thepage command back to arabic numbers for report body		
+	\renewcommand{\thepage}{\arabic{page}}
+	% Set the counter to 1
+	\setcounter{page}{1}
+		
+	\section{Introduction}
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Claudii libidini, qui tum erat summo ne imperio, dederetur. Cum id fugiunt, re eadem defendunt, quae Peripatetici, verba. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt. Quis enim est, qui non videat haec esse in natura rerum tria? Tollenda est atque extrahenda radicitus. At quicum ioca seria, ut dicitur, quicum arcana, quicum occulta omnia? Duo Reges: constructio interrete. Cur igitur, cum de re conveniat, non malumus usitate loqui? Eaedem enim utilitates poterunt eas labefactare atque pervertere.
+	
+	Longum est enim ad omnia respondere, quae a te dicta sunt. Erat enim res aperta. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Semovenda est igitur voluptas, non solum ut recta sequamini, sed etiam ut loqui deceat frugaliter. Restinguet citius, si ardentem acceperit. Quia dolori non voluptas contraria est, sed doloris privatio. Duae sunt enim res quoque, ne tu verba solum putes. Quacumque enim ingredimur, in aliqua historia vestigium ponimus. Aeque enim contingit omnibus fidibus, ut incontentae sint.
+	
+	Quis suae urbis conservatorem Codrum, quis Erechthei filias non maxime laudat? Cupiditates non Epicuri divisione finiebat, sed sua satietate. Sed tamen intellego quid velit. An est aliquid, quod te sua sponte delectet?
+	
+	Quid est igitur, inquit, quod requiras? Eam stabilem appellas. Est enim effectrix multarum et magnarum voluptatum. Et harum quidem rerum facilis est et expedita distinctio. Eadem nunc mea adversum te oratio est. Eadem fortitudinis ratio reperietur.
+	
+	Bonum negas esse divitias, praeposìtum esse dicis? Sed tempus est, si videtur, et recta quidem ad me. Ergo hoc quidem apparet, nos ad agendum esse natos. Si quicquam extra virtutem habeatur in bonis. Nihil opus est exemplis hoc facere longius. Oculorum, inquit Plato, est in nobis sensus acerrimus, quibus sapientiam non cernimus.
+	
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Claudii libidini, qui tum erat summo ne imperio, dederetur. Cum id fugiunt, re eadem defendunt, quae Peripatetici, verba. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt. Quis enim est, qui non videat haec esse in natura rerum tria? Tollenda est atque extrahenda radicitus. At quicum ioca seria, ut dicitur, quicum arcana, quicum occulta omnia? Duo Reges: constructio interrete. Cur igitur, cum de re conveniat, non malumus usitate loqui? Eaedem enim utilitates poterunt eas labefactare atque pervertere.
+	
+	Longum est enim ad omnia respondere, quae a te dicta sunt. Erat enim res aperta. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Semovenda est igitur voluptas, non solum ut recta sequamini, sed etiam ut loqui deceat frugaliter. Restinguet citius, si ardentem acceperit. Quia dolori non voluptas contraria est, sed doloris privatio. Duae sunt enim res quoque, ne tu verba solum putes. Quacumque enim ingredimur, in aliqua historia vestigium ponimus. Aeque enim contingit omnibus fidibus, ut incontentae sint.
+	
+	Quis suae urbis conservatorem Codrum, quis Erechthei filias non maxime laudat? Cupiditates non Epicuri divisione finiebat, sed sua satietate. Sed tamen intellego quid velit. An est aliquid, quod te sua sponte delectet?
+	
+	Quid est igitur, inquit, quod requiras? Eam stabilem appellas. Est enim effectrix multarum et magnarum voluptatum. Et harum quidem rerum facilis est et expedita distinctio. Eadem nunc mea adversum te oratio est. Eadem fortitudinis ratio reperietur.
+	
+	Bonum negas esse divitias, praeposìtum esse dicis? Sed tempus est, si videtur, et recta quidem ad me. Ergo hoc quidem apparet, nos ad agendum esse natos. Si quicquam extra virtutem habeatur in bonis. Nihil opus est exemplis hoc facere longius. Oculorum, inquit Plato, est in nobis sensus acerrimus, quibus sapientiam non cernimus.
+	
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Claudii libidini, qui tum erat summo ne imperio, dederetur. Cum id fugiunt, re eadem defendunt, quae Peripatetici, verba. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt. Quis enim est, qui non videat haec esse in natura rerum tria? Tollenda est atque extrahenda radicitus. At quicum ioca seria, ut dicitur, quicum arcana, quicum occulta omnia? Duo Reges: constructio interrete. Cur igitur, cum de re conveniat, non malumus usitate loqui? Eaedem enim utilitates poterunt eas labefactare atque pervertere.
+	
+	Longum est enim ad omnia respondere, quae a te dicta sunt. Erat enim res aperta. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Semovenda est igitur voluptas, non solum ut recta sequamini, sed etiam ut loqui deceat frugaliter. Restinguet citius, si ardentem acceperit. Quia dolori non voluptas contraria est, sed doloris privatio. Duae sunt enim res quoque, ne tu verba solum putes. Quacumque enim ingredimur, in aliqua historia vestigium ponimus. Aeque enim contingit omnibus fidibus, ut incontentae sint.
+	
+	Quis suae urbis conservatorem Codrum, quis Erechthei filias non maxime laudat? Cupiditates non Epicuri divisione finiebat, sed sua satietate. Sed tamen intellego quid velit. An est aliquid, quod te sua sponte delectet?
+	
+	Quid est igitur, inquit, quod requiras? Eam stabilem appellas. Est enim effectrix multarum et magnarum voluptatum. Et harum quidem rerum facilis est et expedita distinctio. Eadem nunc mea adversum te oratio est. Eadem fortitudinis ratio reperietur.
+	
+	Bonum negas esse divitias, praeposìtum esse dicis? Sed tempus est, si videtur, et recta quidem ad me. Ergo hoc quidem apparet, nos ad agendum esse natos. Si quicquam extra virtutem habeatur in bonis. Nihil opus est exemplis hoc facere longius. Oculorum, inquit Plato, est in nobis sensus acerrimus, quibus sapientiam non cernimus.
+	
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Claudii libidini, qui tum erat summo ne imperio, dederetur. Cum id fugiunt, re eadem defendunt, quae Peripatetici, verba. Ab his oratores, ab his imperatores ac rerum publicarum principes extiterunt. Quis enim est, qui non videat haec esse in natura rerum tria? Tollenda est atque extrahenda radicitus. At quicum ioca seria, ut dicitur, quicum arcana, quicum occulta omnia? Duo Reges: constructio interrete. Cur igitur, cum de re conveniat, non malumus usitate loqui? Eaedem enim utilitates poterunt eas labefactare atque pervertere.
+	
+	Longum est enim ad omnia respondere, quae a te dicta sunt. Erat enim res aperta. Apud ceteros autem philosophos, qui quaesivit aliquid, tacet; Semovenda est igitur voluptas, non solum ut recta sequamini, sed etiam ut loqui deceat frugaliter. Restinguet citius, si ardentem acceperit. Quia dolori non voluptas contraria est, sed doloris privatio. Duae sunt enim res quoque, ne tu verba solum putes. Quacumque enim ingredimur, in aliqua historia vestigium ponimus. Aeque enim contingit omnibus fidibus, ut incontentae sint.
+	
+	Quis suae urbis conservatorem Codrum, quis Erechthei filias non maxime laudat? Cupiditates non Epicuri divisione finiebat, sed sua satietate. Sed tamen intellego quid velit. An est aliquid, quod te sua sponte delectet?
+	
+	Quid est igitur, inquit, quod requiras? Eam stabilem appellas. Est enim effectrix multarum et magnarum voluptatum. Et harum quidem rerum facilis est et expedita distinctio. Eadem nunc mea adversum te oratio est. Eadem fortitudinis ratio reperietur.
+	
+	Bonum negas esse divitias, praeposìtum esse dicis? Sed tempus est, si videtur, et recta quidem ad me. Ergo hoc quidem apparet, nos ad agendum esse natos. Si quicquam extra virtutem habeatur in bonis. Nihil opus est exemplis hoc facere longius. Oculorum, inquit Plato, est in nobis sensus acerrimus, quibus sapientiam non cernimus.
 \end{document}
