@@ -3,17 +3,24 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{wrapfig} %using for wrapping text around figures
 \usepackage{tocloft}
 \usepackage{float}
 \usepackage{indentfirst}
 \usepackage{siunitx}
 \usepackage{array}
+\usepackage{comment}
 \usepackage{fancyhdr} % Used for headers and footers
 % Used for table
 \usepackage{xfrac}
 \usepackage{pdfpages} % Used to include pdf attachments at the end of report
 \usepackage{setspace}
+\usepackage{subcaption}	% Used to add captions to subfigures
+\usepackage{mwe} % also used for subfigures
+\usepackage{enumitem} % used to control the vertical spacing between items in itemize or enumerate
+\usepackage{textcomp} % For registered, trademark and copyright symbols
 \usepackage[margin=1in]{geometry}
+\usepackage[nottoc,numbib]{tocbibind} %https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
 % Package for setting the line spacing
 \newcommand{\listappendicesname}{Appendices}
 \newlistof{appendices}{apc}{\listappendicesname}
@@ -22,13 +29,27 @@
 \newcommand{\newappendix}[1]{\section*{#1}\appendices{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% HEADER & FOOTER STUFF
+% HEADER & FOOTER SETTINGS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[LE,RO]{MCG 4322 - BSAE2B}
 \fancyhead[RE,LO]{Literature Review}
+\fancyfoot[CE,CO]{\rightmark}
+\fancyfoot[LE,RO]{\thepage}
+\setlength{\headheight}{15pt} 
+\renewcommand{\footrulewidth}{0.5pt} % sets the width of the line above the footer
+\renewcommand{\sectionmark}[1]{\markright{#1}} % removes section number from footer
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% HEADER & FOOTER STUFF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{MCG 4322 - BSAE2B}
+\fancyhead[RE,LO]{Concepts Report}
 \fancyfoot[CE,CO]{\leftmark}
 \fancyfoot[LE,RO]{\thepage}
 \setlength{\headheight}{15pt} 
@@ -68,7 +89,7 @@
 			
 			\begin{figure}[H]
 				\centering
-				\includegraphics[width=0.5\linewidth]{team_picture1.jpg} % 0.7 times the width of the line
+				\includegraphics[width=0.5\linewidth]{_team_picture1.jpg} % 0.7 times the width of the line
 			\end{figure}
 			
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,7 +111,7 @@
 			%	DATE SECTION
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
-			{\large September 18\textsuperscript{th}, 2017}\\
+			{\large September 28\textsuperscript{th}, 2017}\\
 			
 			\vfill % Fill the rest of the page with whitespace
 			
