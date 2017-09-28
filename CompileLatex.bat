@@ -1,28 +1,33 @@
 REM Compile LaTeX File with bibliography and glossary
 
-SET fname=main
+@echo off
+setlocal enabledelayedexpansion
+set /a counter=1
+for /r %%f in (*.tex) do (
 
-pdflatex "%fname%.tex"
-makeglossaries "%fname%.tex"
-REM BibTeX Line below to be uncommented when the time is right
-REM bibtex "%fname%"
-pdflatex "%fname%.tex"
-pdflatex "%fname%.tex"
+	pdflatex %%~nf.tex
+	bibtex %%~nf
+	makeglossaries %%~nf
+	pdflatex %%~nf.tex
+	pdflatex %%~nf.tex
 
-DEL "%fname%.log"
-DEL "%fname%.toc"
-DEL "%fname%.aux"
-DEL "%fname%.out"
-DEL "%fname%.blg"
-DEL "%fname%.bbl"
-DEL "%fname%.acn"
-DEL "%fname%.acr"
-DEL "%fname%.alg"
-DEL "%fname%.glg"
-DEL "%fname%.glo"
-DEL "%fname%.gls"
-DEL "%fname%.ist"
-DEL "%fname%.lof"
-DEL "%fname%.lot"
+	REM DEL %%~nf.log
+	REM DEL %%~nf.toc
+	REM DEL %%~nf.aux
+	REM DEL %%~nf.out
+	REM DEL %%~nf.blg
+	REM REM DEL %%~nf.bbl
+	REM DEL %%~nf.acn
+	REM DEL %%~nf.acr
+	REM DEL %%~nf.alg
+	REM DEL %%~nf.glg
+	REM DEL %%~nf.glo
+	REM REM DEL %%~nf.gls
+	REM DEL %%~nf.ist
+	REM DEL %%~nf.lof
+	REM DEL %%~nf.lot
 
-"%fname%.pdf"
+	%%~nf.pdf
+)
+endlocal
+cmd /k
