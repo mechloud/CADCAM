@@ -21,6 +21,15 @@ rm *.aux
 rm *.log
 rm *.toc
 rm *.lof
+rm *.acn
+rm *.acr
+rm *.blg
+rm *.ist
+rm *.lot
+rm *.alg
+rm *.bbl
+
+evince $1.pdf
 else
 # otherwise give this output line with a list of available tex files
 echo the file doesnt exist butthead! Choose one of these:
