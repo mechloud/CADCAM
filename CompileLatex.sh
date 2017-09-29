@@ -11,7 +11,8 @@ if [ -f $1.tex ]
 then
 # if it exists then latex it twice, dvips, then ps2pdf, then remove all the unneeded files
     pdflatex $1.tex
-    bibtex $1.tex
+    bibtex $1
+    makeglossaries $1
     pdflatex $1.tex
     pdflatex $1.tex
 
