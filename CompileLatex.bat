@@ -12,7 +12,7 @@ for /r %%f in (*.tex) do (
 	pdflatex %%~nf.tex
 
 	REM DEL %%~nf.log
-	REM DEL %%~nf.toc
+	DEL %%~nf.toc
 	REM DEL %%~nf.aux
 	REM DEL %%~nf.out
 	REM DEL %%~nf.blg
