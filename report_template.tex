@@ -179,7 +179,9 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
     \newpage
-    \setstretch{1.0}
+    \setstretch{1.0} % Line spacing 1.0
+
+    % This command allows long URL's to word-wrap when printing references.
     \Urlmuskip=0mu plus 1mu\relax
     \bibliographystyle{IEEEtran}
     \bibliography{bibliography}
@@ -194,15 +196,25 @@
     %   Decision Analysis Table
     % 	Additional Material
 
+    %  Signals the start of appendices
     \appendix
+
+    % Changes the number of figures in appendix to a letter and a number. Example: The first figure in appendix A will be 'Figure A.1'
+    \counterwithin{figure}{subsection}
+
+    % Plain page style: removes headers and footers from pages in appendix. Need to do this for every new page in appendix, unless including PDF as full size page.
     \thispagestyle{plain}
+
+    % Since there are no appendix numbers because of the use of the command \section*{Appendices}, manually add a section to the Table of contents.
     \addcontentsline{toc}{section}{Appendices}
+
+    % Command to renew \subsection command using alphabetical numbering
     \renewcommand{\thesubsection}{\Alph{subsection}}
         		
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %	DATASHEETS
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+    % Leave this line alone
     \section*{Appendices}
+
+    % Use this template to name each appendix
     \subsection{First Appendix}
 
     
