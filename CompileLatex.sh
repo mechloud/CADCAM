@@ -9,7 +9,7 @@ ERROR="Too few arguments : no file name specified"
 # check that the file exists
 if [ -f $1.tex ] 
 then
-# if it exists then latex it twice, dvips, then ps2pdf, then remove all the unneeded files
+# if it exists then latex, bibtex, makeglossaries, then run latex twice again.
     pdflatex $1.tex
     bibtex $1
     makeglossaries $1
