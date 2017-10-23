@@ -1,10 +1,12 @@
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
 function perform_FEA(filename,OD,WT)
-
+tic;
 %%
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
+    clc
+    close all
     filename = "/home/jchar199/Documents/MCG4322/github/FEA/FEAtables.xlsx";
     OD = 25.4; % mm
     WT = 0.120*25.4; % mm
@@ -128,6 +130,30 @@ for k = 1:elements_rows
 end
 
 csvwrite('ka.csv',Ka);
+
+%%
+% Declare Force vector and assign known forces.
+F = zeros(nunknowns*nnodes,1);
+F(12) = 22875;
+
+%%
+% Prepare Ka and F for solution by adding a factor $\beta$ 6 to 12 orders
+% of magnitude larger than the largest entry in Ka. $\beta$ is added to
+% $k_{ii}$ if $u_i$ is prescribed and the RHS of the equation is changed to
+% $\beta$ times the prescribed value.
+beta = (10^8)*max(max(Ka));
+
+%%
+% $u_6$ and $u_7$ are equal to zero (known values), therefore:
+Ka(6,6) = Ka(6,6) + beta;
+Ka(7,7) = Ka(7,7) + beta;
+
+%% Solve System
+% The system can now be solved to find the displacement vector U.
+U = F\Ka;
+
+
+toc;
 
 end % end function
 
