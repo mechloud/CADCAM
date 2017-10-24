@@ -1,7 +1,6 @@
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
-function perform_FEA(filename,OD,WT)
-tic;
+function max_stress = perform_FEA(filename,OD,WT)
 %%
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
@@ -38,8 +37,15 @@ I = (pi/64)*(OD^4 - ID^4);
 nunknowns = 3;
 
 %%
-% Declare an empty cell array for storing element
+% Declare an empty cell array for storing element.
 preproc = num2cell(elements);
+
+%%
+% Declare an empty vector to store the lengths and direction cosines for
+% later use in post-processing.
+L = zeros(nunknowns*nnodes,1);
+l = zeros(nunknowns*nnodes,1);
+m = zeros(nunknowns*nnodes,1);
   
 %%
 % Loop through elements vector. Find Stiffness matrices and store in
@@ -60,31 +66,31 @@ for k = 1:elements_rows
     
     %%
     % Get the length of the element and direction cosines
-    L = get_length(xi,yi,xj,yj);
-    assert(L > 0,'Zero Length Element %i: L = %d',k,L);
+    L(k) = get_length(xi,yi,xj,yj);
+    assert(L(k) > 0,'Zero Length Element %i: L = %d',k,L);
     
     %%
     % Find direction cosines
     if (xj-xi) <= 0
-        l = 0;
+        l(k) = 0;
     else
-        l = (xj-xi)/L;
+        l(k) = (xj-xi)/L(k);
     end
     
     if (yj-yi) <= 0
-        m = 0;
+        m(k) = 0;
     else
-        m = (yj-yi)/L;
+        m(k) = (yj-yi)/L(k);
     end
     
     
     %%
     % Build Rotation Matrix
-    R = build_rotation_matrix(l,m);
+    R = build_rotation_matrix(l(k),m(k));
     
     %%
     % Build Local Stiffness Matrix
-    Ke_prime = build_local_stiffness_matrix(A,E,L,I);
+    Ke_prime = build_local_stiffness_matrix(A,E,L(k),I);
     
     %%
     % Calculate Global Stiffness Matrix
@@ -134,26 +140,73 @@ csvwrite('ka.csv',Ka);
 %%
 % Declare Force vector and assign known forces.
 F = zeros(nunknowns*nnodes,1);
-F(12) = 22875;
+F(12*nunknowns-2) = 22875.0;
+F(13*nunknowns-1) = -110.0*9.81; % 110 kg * g
+F(8*nunknowns-1) = -26.0*9.81; % 26 kg * g
 
 %%
 % Prepare Ka and F for solution by adding a factor $\beta$ 6 to 12 orders
 % of magnitude larger than the largest entry in Ka. $\beta$ is added to
 % $k_{ii}$ if $u_i$ is prescribed and the RHS of the equation is changed to
 % $\beta$ times the prescribed value.
-beta = (10^8)*max(max(Ka));
+beta = (10^6)*max(max(Ka));
 
 %%
 % $u_6$ and $u_7$ are equal to zero (known values), therefore:
-Ka(6,6) = Ka(6,6) + beta;
-Ka(7,7) = Ka(7,7) + beta;
+Ka_sol = Ka;
+Ka_sol(6,6) = Ka(6,6) + beta;
+Ka_sol(7,7) = Ka(7,7) + beta;
+Ka_sol(8,8) = Ka(8,8) + beta;
+
+Ka_sol(9,9) = Ka(9,9) + beta;
+Ka_sol(10,10) = Ka(10,10) + beta;
+Ka_sol(11,11) = Ka(11,11) + beta;
 
 %% Solve System
 % The system can now be solved to find the displacement vector U.
-U = F\Ka;
+U = Ka_sol\F;
 
+%%
+% Solve for unknown forces
+F = Ka*U;
 
-toc;
+%% Post-Processing
+% Declare strains vector
+epsilon = zeros(elements_rows,1);
+
+%%
+% Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
+% and $u'_j = lu_j + mv_j$ and $u'_i = lu_i + mv_i$
+for k = 1:elements_rows
+   
+    %%
+    % Get node numbers
+    ni = elements(k,2);
+    nj = elements(k,3);
+    
+    %%
+    % Find nodal displacements for those nodes
+    ui = U(nunknowns*ni-2);
+    vi = U(nunknowns*ni-1);
+    uj = U(nunknowns*nj-2);
+    vj = U(nunknowns*nj-1);
+    
+    %%
+    % Find $u'_i$ and $u'_j$
+    ui_prime = l(k)*uj + m(k)*vj;
+    uj_prime = l(k)*ui + m(k)*vi;
+    
+    epsilon(k) = uj_prime -ui_prime;
+    
+end
+
+%%
+% Find stresses in elements $\sigma = E\delta$
+sigma = E*epsilon;
+
+%%
+% Find maximum stress
+max_stress = max(sigma);
 
 end % end function
 
