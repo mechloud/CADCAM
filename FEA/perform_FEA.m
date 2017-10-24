@@ -149,29 +149,28 @@ F(8*nunknowns-1) = -26.0*9.81; % 26 kg * g
 % of magnitude larger than the largest entry in Ka. $\beta$ is added to
 % $k_{ii}$ if $u_i$ is prescribed and the RHS of the equation is changed to
 % $\beta$ times the prescribed value.
-beta = (10^6)*max(max(Ka));
+beta = (10^9)*max(max(Ka));
 
 %%
 % $u_6$ and $u_7$ are equal to zero (known values), therefore:
 Ka_sol = Ka;
-Ka_sol(6,6) = Ka(6,6) + beta;
-Ka_sol(7,7) = Ka(7,7) + beta;
-Ka_sol(8,8) = Ka(8,8) + beta;
+Ka_sol(16,16) = Ka(16,16) + beta;
+Ka_sol(17,17) = Ka(17,17) + beta;
+Ka_sol(18,18) = Ka(18,18) + beta;
 
-Ka_sol(9,9) = Ka(9,9) + beta;
-Ka_sol(10,10) = Ka(10,10) + beta;
-Ka_sol(11,11) = Ka(11,11) + beta;
-
+Ka_sol(19,19) = Ka(19,19) + beta;
+Ka_sol(20,20) = Ka(20,20) + beta;
+Ka_sol(21,21) = Ka(21,21) + beta;
 %% Solve System
 % The system can now be solved to find the displacement vector U.
 U = Ka_sol\F;
 
 %%
-% Solve for unknown forces
+% Solve for unknown reaction forces
 F = Ka*U;
 
 %% Post-Processing
-% Declare strains vector
+% Declare displacements and strains vector
 epsilon = zeros(elements_rows,1);
 
 %%
@@ -196,8 +195,10 @@ for k = 1:elements_rows
     ui_prime = l(k)*uj + m(k)*vj;
     uj_prime = l(k)*ui + m(k)*vi;
     
-    epsilon(k) = uj_prime -ui_prime;
-    
+    %%
+    % Find $\delta$ and $\epsilon$
+    delta = uj_prime -ui_prime;
+    epsilon(k) = delta/L(k);
 end
 
 %%
