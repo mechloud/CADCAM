@@ -199,6 +199,12 @@ for k = 1:elements_rows
     % Find $\delta$ and $\epsilon$
     delta = uj_prime -ui_prime;
     epsilon(k) = delta/L(k);
+    
+    %%
+    % Find %\theta_i$ and $\theta_j$
+    theta_i = U(nunknowns*ni);
+    theta_j = U(nunknowns*nj);
+    
 end
 
 %%
