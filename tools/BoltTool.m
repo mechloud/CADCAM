@@ -9,15 +9,15 @@ function BoltTool(b,n)
 if nargin < 2
    b = struct('bdia',12.7,... % Bolt Diameter in mm
               'F',1300,...    % Shearing Force in N
-              't',6.35,...    % Thickness of clamped parts
+              't',127,...    % Thickness of clamped parts
               'mxA',200,...   % Cross sectional area of weakeast connected member
-              'SyM',300);     % Yield Strength of weakest clamped part);
+              'SyM',600);     % Yield Strength of weakest clamped part);
    n = 2.0;
 end
 
 %% Pure Shear Failure Mode
 % Find cross sectional area of bolt
-xA = (pi/4)*b.hdia^4;
+xA = (pi/4)*b.bdia^4;
 
 %%
 % Determine shear stress
@@ -29,15 +29,39 @@ tau = b.F/xA;
 sigmaM = b.F/b.mxA;
 
 %% Crushing (Bearing Failure) of Bolt or Member
-% Determine bearing stress in bolt and member
-% bearing_sigmaB;
+% Determine bearing stress in bolt
+bearing_sigmaB = -b.F/b.bdia;
 
-Sy = [240,4.6;
-      340,4.8;
-      420,5.8;
-      660,8.8;
-      720,9.8;
-      940,10.9;
-      12.9,1100];
+%%
+% Determine bearing stress in member
+bearing_sigmaM = -b.F/(b.bdia*b.t);
 
+%% Safety Factors
+% Calculate safety factor for tensile failure of member
+nMemTensile = b.SyM/sigmaM;
+
+%%
+% Calculate safety factor for bearing load in member
+nMemBearing = b.SyM/bearing_sigmaM;
+
+%%
+% Ensure these safety factors are higher than input safety factor
+assert(abs(nMemTensile) > n,'Possible Tensile Failure of Member');
+assert(abs(nMemBearing) > n,'Possible Bearing Failure of Member');
+
+%%
+% Declare Proof Loads for Grade 4.8 Bolts
+Sp = 310;
+nbB = Sp/abs(bearing_sigmaB);
+ntau = Sp/tau;
+
+if (ntau > n) && (nbB > n)
+    disp('Bolts okay!');
+else
+    disp('Bolts not okay...');
+    fprintf('Safety Factor for shear %d\n',ntau);
+    fprintf('Safety Factor for bearing %d\n',nbB);
 end
+
+end % End function
+
