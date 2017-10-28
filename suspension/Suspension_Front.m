@@ -1,5 +1,6 @@
 close all;
 clear all;
+clc;
 
 %PARAMETRIZED VARIABLES%
 freq = 1.5; %desired natural frequency [Hz]
@@ -46,8 +47,17 @@ sys=ss(A,B,CC,D);       %state-space representation
 [uy,t]=step(sys);       %step response
 [iy,u]=impulse(sys);    %impulse response
 
+save('impulse.mat','iy');
+save('step.mat','uy');
+
+%%
+% Plot Step Response
 figure(2)
 plot(t,uy);
+title('Step Response');
 
+%%
+%
 figure(3)
 plot(u,iy);
+title('Impulse Response');
