@@ -47,8 +47,8 @@ sys=ss(A,B,CC,D);       %state-space representation
 [uy,t]=step(sys);       %step response
 [iy,u]=impulse(sys);    %impulse response
 
-save('impulse.mat','iy');
-save('step.mat','uy');
+save('impulse.mat','iy','t');
+save('step.mat','uy','t');
 
 %%
 % Plot Step Response
