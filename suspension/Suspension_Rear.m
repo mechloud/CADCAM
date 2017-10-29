@@ -51,3 +51,21 @@ plot(t,uy);
 
 figure(3)
 plot(u,iy);
+
+%% Post-Processing
+% Differentiate twice to find acceleration
+acc_imp = diff(diff(iy(:,1)));
+acc_imp_t = u(1:end-2);
+acc_step = diff(diff(uy(:,1)));
+acc_step_t = t(1:end-2);
+
+% figure;
+% plot(acc_imp_t, acc_imp);
+% title('Impulse Acceleration');
+% 
+% figure;
+% plot(acc_step_t,acc_step);
+% title('Step Acceleration');
+
+max_accel = max(max(acc_imp),max(acc_step));
+fprintf('Maximum acceleration is %d m/s^2', max_accel);
