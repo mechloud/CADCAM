@@ -377,11 +377,11 @@ public:
 	  pressure = PDE_type::p(U(edge.cell_r));
 	}
 	
-	force += 2.0 * pressure * edge.fluid_n_hat.x() * edge.l;
+	force += 1.016 * pressure * edge.fluid_n_hat.x() * edge.l;
       }// if statement
     }// for loop
 
-    cd = fabs(force)/(0.5 * fs_rho * fs_ux * fs_ux * frontal_area*2.0);
+    cd = fabs(force)/(0.5 * fs_rho * fs_ux * fs_ux * frontal_area*1.016);
     
     std::ofstream fout("force_output.txt", std::ofstream::app);
     if(!fout){
