@@ -40,24 +40,43 @@ A=[-c2/mc c2/mc -k2/mc k2/mc;
     1 0 0 0;
     0 1 0 0];                           %state matrix
 B=[0; k1/m1; 0; 0];                     %force matrix
-CC=[0 0 1 0; 0 0 0 1; 0 0 1 -1];
+CC=[0 0 1 0; 0 0 0 1; 0 0 1 -1];        %sprung, unsprung, relative
 D=0;
 
 sys=ss(A,B,CC,D);       %state-space representation
-[uy,t]=step(sys);       %step response
-[iy,u]=impulse(sys);    %impulse response
 
-save('impulse.mat','iy','t');
-save('step.mat','uy','t');
+opt = stepDataOptions('StepAmplitude',0.1);
+[uy,t] = step(sys,opt);       %step response
+[iy,u] = impulse(sys);    %impulse response
 
 %%
 % Plot Step Response
 figure(2)
 plot(t,uy);
 title('Step Response');
+legend('Sprung','Unsprung','Relative');
 
 %%
 %
 figure(3)
 plot(u,iy);
 title('Impulse Response');
+legend('Sprung','Unsprung','Relative');
+
+%% Post-Processing
+% Differentiate twice to find acceleration
+acc_imp = diff(diff(iy(:,1)));
+acc_imp_t = u(1:end-2);
+acc_step = diff(diff(uy(:,1)));
+acc_step_t = t(1:end-2);
+
+figure;
+plot(acc_imp_t, acc_imp);
+title('Impulse Acceleration');
+
+figure;
+plot(acc_step_t,acc_step);
+title('Step Acceleration');
+
+max_accel = max(max(acc_imp),max(acc_step));
+fprintf('Maximum acceleration is %d m/s^2', max_accel);
