@@ -1,4 +1,4 @@
-
+# Git Ignore
 *.jpg
 Thumbs.db
 *.aux
@@ -7,3 +7,6 @@ Thumbs.db
 *.pdf
 *.gz
 *.toc
+*#*
+*~*
+*.swp
