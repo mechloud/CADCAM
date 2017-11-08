@@ -55,8 +55,8 @@ Copyright 1984-2013 The MathWorks, Inc.
         <xsl:if test="steptitle">
           <xsl:variable name="headinglevel">
             <xsl:choose>
-              <xsl:when test="steptitle[@style = 'document']">section</xsl:when>
-              <xsl:otherwise>subsection</xsl:otherwise>
+              <xsl:when test="steptitle[@style = 'document']">subsection</xsl:when>
+              <xsl:otherwise>subsubsection</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
 
