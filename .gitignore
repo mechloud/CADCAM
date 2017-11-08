@@ -10,3 +10,10 @@ Thumbs.db
 *#*
 *~*
 *.swp
+euler
+*.xlsx
+*.csv
+FEA/test_script.m
+*.mat
+*.tex
+*.eps
