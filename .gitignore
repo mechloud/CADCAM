@@ -15,3 +15,5 @@ euler
 *.csv
 FEA/test_script.m
 *.mat
+*.tex
+*.eps
