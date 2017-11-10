@@ -2,6 +2,7 @@
 % PERFORM_FEA Performs the FEA for geometry specified in file
 function max_stress = perform_FEA(filename,OD,WT)
 %%
+%%Liz's comment
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
     clc
