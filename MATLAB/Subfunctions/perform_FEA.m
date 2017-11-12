@@ -253,7 +253,7 @@ end
 
 %%
 % Calculate Buckling Safety Factor
-buckling_safety_factor = Sy./max(Scr);
+buckling_safety_factor = min(Scr./abs(sigma));
 
 fprintf('Yielding Safety Factor n = %.2d\n',min_safety_factor);
 fprintf('Buckling Safety Factor n = %.2d\n',buckling_safety_factor);
