@@ -13,7 +13,7 @@ Thumbs.db
 euler
 *.xlsx
 *.csv
-FEA/test_script.m
+FEATables.xlsx
 *.mat
 # test
 *.asv

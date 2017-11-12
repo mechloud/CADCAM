@@ -2,14 +2,24 @@
 % PERFORM_FEA Performs the FEA for geometry specified in file
 function max_stress = perform_FEA(filename,OD,WT)
 %%
-%%Liz's comment
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
     clc
     close all
-    filename = "/home/jchar199/Documents/MCG4322/github/FEA/FEAtables.xlsx";
     OD = 25.4; % mm
     WT = 0.120*25.4; % mm
+    switch getenv('username')
+        case 'jchar199'
+            disp('John - Ubuntu');
+            filename = '/home/jchar199/Documents/MCG4322/github/FEA/FEAtables.xlsx';
+        case 'Jonathan'
+            disp('John - Windows');
+            filename = 'FEATables.xlsx';
+        otherwise
+            warning('Unrecognized computer. Using default file path for frame geometry');
+            filename = 'FEAtables.xlsx';
+    end
+            
 end
 
 %% Pre-Processing
@@ -72,13 +82,13 @@ for k = 1:elements_rows
     
     %%
     % Find direction cosines
-    if (xj-xi) <= 0
+    if abs(xj-xi) <= 1.0e-6
         l(k) = 0;
     else
         l(k) = (xj-xi)/L(k);
     end
     
-    if (yj-yi) <= 0
+    if abs(yj-yi) <= 1.0e-6
         m(k) = 0;
     else
         m(k) = (yj-yi)/L(k);
