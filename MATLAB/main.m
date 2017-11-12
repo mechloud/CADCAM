@@ -83,17 +83,17 @@ if(isempty(handles))
     Wrong_File();
 else
     % Get the values from the GUI
-    frame_width = get(handles.slider_frame_width,'Value')
-    frame_height = get(handles.slider_frame_height,'Value')
-    wheelbase = get(handles.slider_wheelbase,'Value')
+    frame_width = get(handles.slider_frame_width,'Value');
+    frame_height = get(handles.slider_frame_height,'Value');
+    wheelbase = get(handles.slider_wheelbase,'Value');
     frame_length = wheelbase + 8*25.4;
-    track_width = get(handles.slider_trackwidth,'Value')
-    ground_clearance = get(handles.slider_ground_clearance,'Value')
-    front_omegan = get(handles.slider_front_omegan,'Value')
-    rear_omegan = get(handles.slider_rear_omegan,'Value')
-    front_zeta = get(handles.slider_front_zeta,'Value')
-    rear_zeta = get(handles.slider_rear_zeta,'Value')
-    steering_ratio = get(handles.slider_steering_ratio,'Value')
+    track_width = get(handles.slider_trackwidth,'Value');
+    ground_clearance = get(handles.slider_ground_clearance,'Value');
+    front_omegan = get(handles.slider_front_omegan,'Value');
+    rear_omegan = get(handles.slider_rear_omegan,'Value');
+    front_zeta = get(handles.slider_front_zeta,'Value');
+    rear_zeta = get(handles.slider_rear_zeta,'Value');
+    steering_ratio = get(handles.slider_steering_ratio,'Value');
 end
     
 
@@ -104,21 +104,6 @@ function close_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 close gcf;
-
-% function initialize_gui(fig_handle, handles, isreset)
-% 
-% % hObject    handle to BTN_Generate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % If the handles are empty, warn the user. Else, get the data from the UI
-% % and store in variables.
-% if(isempty(handles))
-%     Wrong_File();
-% else
-%     disp('Potatoes');
-%     handles = guidata(gcf);
-% end
 
 % --- Gives out a message that the GUI should not be executed directly from
 % the .fig file. The user should run the .m file instead.
