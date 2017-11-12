@@ -22,7 +22,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 11-Nov-2017 19:46:25
+% Last Modified by GUIDE v2.5 11-Nov-2017 20:37:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,11 +57,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-initialize_gui(hObject, handles, false);
+% Clear the command window
+clc
 
-% UIWAIT makes main wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
-
+% Set the window title
+set(handles.figure1,'Name','Fluent Design - CADCAM 2017');
 
 % --- Outputs from this function are returned to the command line.
 function varargout = main_OutputFcn(hObject, eventdata, handles)
@@ -73,15 +73,29 @@ function varargout = main_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-%% GENERATE does all the work
-% --- Executes on button press in generate.
-function generate_Callback(hObject, eventdata, handles)
-% hObject    handle to generate (see GCBO)
+%% BTN_GENERATE does all the work
+% --- Executes on button press in BTN_generate.
+function BTN_generate_Callback(hObject, eventdata, handles)
+% hObject    handle to BTN_generate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% mass = handles.metricdata.density * handles.metricdata.volume;
-% set(handles.mass, 'String', mass);
+if(isempty(handles))
+    Wrong_File();
+else
+    % Get the values from the GUI
+    frame_width = get(handles.slider_frame_width,'Value')
+    frame_height = get(handles.slider_frame_height,'Value')
+    wheelbase = get(handles.slider_wheelbase,'Value')
+    frame_length = wheelbase + 8*25.4;
+    track_width = get(handles.slider_trackwidth,'Value')
+    ground_clearance = get(handles.slider_ground_clearance,'Value')
+    front_omegan = get(handles.slider_front_omegan,'Value')
+    rear_omegan = get(handles.slider_rear_omegan,'Value')
+    front_zeta = get(handles.slider_front_zeta,'Value')
+    rear_zeta = get(handles.slider_rear_zeta,'Value')
+    steering_ratio = get(handles.slider_steering_ratio,'Value')
+end
+    
 
 % --- Executes on button press in close.
 function close_Callback(hObject, eventdata, handles)
@@ -91,38 +105,20 @@ function close_Callback(hObject, eventdata, handles)
 
 close gcf;
 
-% --------------------------------------------------------------------
-function initialize_gui(fig_handle, handles, isreset)
-
-% hObject    handle to BTN_Generate (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% If the handles are empty, warn the user. Else, get the data from the UI
-% and store in variables.
-if(isempty(handles))
-    Wrong_File();
-else
-    disp('Potatoes');
-    handles = guidata(gcf);
-end
-% DO ANY ERROR CHECKING HERE
-
-% handles.metricdata.density = 0;
-% handles.metricdata.volume  = 0;
+% function initialize_gui(fig_handle, handles, isreset)
 % 
-% set(handles.density, 'String', handles.metricdata.density);
-% set(handles.volume,  'String', handles.metricdata.volume);
-% set(handles.mass, 'String', 0);
+% % hObject    handle to BTN_Generate (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
 % 
-% set(handles.unitgroup, 'SelectedObject', handles.english);
-% 
-% set(handles.text4, 'String', 'lb/cu.in');
-% set(handles.text5, 'String', 'cu.in');
-% set(handles.text6, 'String', 'lb');
-
-% Update handles structure
-guidata(handles.figure1, handles);
+% % If the handles are empty, warn the user. Else, get the data from the UI
+% % and store in variables.
+% if(isempty(handles))
+%     Wrong_File();
+% else
+%     disp('Potatoes');
+%     handles = guidata(gcf);
+% end
 
 % --- Gives out a message that the GUI should not be executed directly from
 % the .fig file. The user should run the .m file instead.
@@ -340,30 +336,6 @@ function slider_steering_ratio_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
-% --- Executes on slider movement.
-function slider_tire_diameter_Callback(hObject, eventdata, handles)
-% hObject    handle to slider_tire_diameter (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-val = get(hObject,'Value');
-set(handles.box_tire_diameter,'String',num2str(val));
-
-% --- Executes during object creation, after setting all properties.
-function slider_tire_diameter_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider_tire_diameter (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
 
 % --- Executes on slider movement.
 function slider_wheelbase_Callback(hObject, eventdata, handles)
@@ -617,30 +589,6 @@ function box_rear_zeta_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-function box_tire_diameter_Callback(hObject, eventdata, handles)
-% hObject    handle to box_tire_diameter (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of box_tire_diameter as text
-%        str2double(get(hObject,'String')) returns contents of box_tire_diameter as a double
-val = str2double(get(hObject,'String'));
-set(handles.slider_tire_diameter,'Value',val);
-
-% --- Executes during object creation, after setting all properties.
-function box_tire_diameter_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to box_tire_diameter (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 
 function box_steering_ratio_Callback(hObject, eventdata, handles)
 % hObject    handle to box_steering_ratio (see GCBO)
