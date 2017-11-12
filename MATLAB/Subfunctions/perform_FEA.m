@@ -1,6 +1,6 @@
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
-function max_stress = perform_FEA(filename,OD,WT)
+function perform_FEA(filename,OD,WT)
 %%
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
@@ -37,6 +37,9 @@ E = 205e3; % 205e3 N/mm^2
 I = (pi/64)*(OD^4 - ID^4);
 
 %%
+% Yield Strength for AISI 4130 Steel ($MPa$)
+Sy = 435; 
+%%
 % Read Excel Spreadsheet
 [nodes,~,~] = xlsread(filename,'Nodal');
 [nnodes,~] = size(nodes);
@@ -54,9 +57,9 @@ preproc = num2cell(elements);
 %%
 % Declare an empty vector to store the lengths and direction cosines for
 % later use in post-processing.
-L = zeros(nunknowns*nnodes,1);
-l = zeros(nunknowns*nnodes,1);
-m = zeros(nunknowns*nnodes,1);
+L = zeros(elements_rows,1);
+l = zeros(elements_rows,1);
+m = zeros(elements_rows,1);
   
 %%
 % Loop through elements vector. Find Stiffness matrices and store in
@@ -176,10 +179,6 @@ Ka_sol(21,21) = Ka(21,21) + beta;
 % The system can now be solved to find the displacement vector U.
 U = Ka_sol\F;
 
-%%
-% Solve for unknown reaction forces
-F = Ka*U;
-
 %% Post-Processing
 % Declare displacements and strains vector
 epsilon = zeros(elements_rows,1);
@@ -219,12 +218,45 @@ for k = 1:elements_rows
 end
 
 %%
-% Find stresses in elements $\sigma = E\delta$
+% Find axial stresses in elements $\sigma = E\epsilon$
 sigma = E*epsilon;
 
 %%
 % Find maximum stress
-max_stress = max(sigma);
+max_stress = max(abs(sigma))*sign(max(sigma));
+assert(max(abs(sigma)) < Sy, 'Yielding occurs in frame members');
+%%
+% Find minimum safety factor
+min_safety_factor = Sy/abs(max_stress);
+
+%% Buckling Analysis
+% Equivalent lengths for both ends fixed as per AISC's Manual of Steel
+% Construction
+Le = L*0.65;
+
+%%
+% Find critical stress $\frac{\pi^2EI}{AL_e^2}$
+critical_stress = ((pi*pi*E*I)./(A*Le.*Le));
+EulerBuckling = critical_stress;
+JohnsonBuckling = Sy*(1-(Sy*A*Le.*Le)./(4*pi*pi*E*I));
+%%
+% Compare with $\frac{S_y}{2}$
+Scr = zeros(length(critical_stress),1);
+Scr(critical_stress <= (Sy/2)) = EulerBuckling(critical_stress <= (Sy/2));
+Scr(critical_stress > (Sy/2)) = JohnsonBuckling(critical_stress > (Sy/2));
+
+%%
+% Check for buckling against previously calculated stresses
+if((sigma < 0) & (abs(sigma) > Scr))
+    error('Buckling occurs in frame members');
+end
+
+%%
+% Calculate Buckling Safety Factor
+buckling_safety_factor = Sy./max(Scr);
+
+fprintf('Yielding Safety Factor n = %.2d\n',min_safety_factor);
+fprintf('Buckling Safety Factor n = %.2d\n',buckling_safety_factor);
 
 end % end function
 
