@@ -1,7 +1,6 @@
 %%% Front Suspension MATLAB code
 
 close all;
-clear all;
 clc;
 
 %% Parametrized Variables
