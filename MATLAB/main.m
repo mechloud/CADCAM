@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 11-Nov-2017 20:37:54
+% Last Modified by GUIDE v2.5 16-Nov-2017 15:26:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -91,8 +91,7 @@ else
     ground_clearance = get(handles.slider_ground_clearance,'Value');
     front_omegan = get(handles.slider_front_omegan,'Value');
     rear_omegan = get(handles.slider_rear_omegan,'Value');
-    front_zeta = get(handles.slider_front_zeta,'Value');
-    rear_zeta = get(handles.slider_rear_zeta,'Value');
+    zeta = get(handles.slider_zeta,'Value');
     steering_ratio = get(handles.slider_steering_ratio,'Value');
 end
     
@@ -255,19 +254,19 @@ end
 
 
 % --- Executes on slider movement.
-function slider_front_zeta_Callback(hObject, eventdata, handles)
-% hObject    handle to slider_front_zeta (see GCBO)
+function slider_zeta_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_zeta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_front_zeta,'String',num2str(val));
+set(handles.box_zeta,'String',num2str(val));
 
 % --- Executes during object creation, after setting all properties.
-function slider_front_zeta_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider_front_zeta (see GCBO)
+function slider_zeta_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_zeta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -275,30 +274,6 @@ function slider_front_zeta_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
-% --- Executes on slider movement.
-function slider_rear_zeta_Callback(hObject, eventdata, handles)
-% hObject    handle to slider_rear_zeta (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-val = get(hObject,'Value');
-set(handles.box_rear_zeta,'String',num2str(val));
-
-% --- Executes during object creation, after setting all properties.
-function slider_rear_zeta_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider_rear_zeta (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
 
 % --- Executes on slider movement.
 function slider_steering_ratio_Callback(hObject, eventdata, handles)
@@ -529,43 +504,19 @@ end
 
 
 
-function box_front_zeta_Callback(hObject, eventdata, handles)
-% hObject    handle to box_front_zeta (see GCBO)
+function box_zeta_Callback(hObject, eventdata, handles)
+% hObject    handle to box_zeta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of box_front_zeta as text
-%        str2double(get(hObject,'String')) returns contents of box_front_zeta as a double
+% Hints: get(hObject,'String') returns contents of box_zeta as text
+%        str2double(get(hObject,'String')) returns contents of box_zeta as a double
 val = str2double(get(hObject,'String'));
-set(handles.slider_front_zeta,'Value',val);
+set(handles.slider_zeta,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
-function box_front_zeta_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to box_front_zeta (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function box_rear_zeta_Callback(hObject, eventdata, handles)
-% hObject    handle to box_rear_zeta (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of box_rear_zeta as text
-%        str2double(get(hObject,'String')) returns contents of box_rear_zeta as a double
-val = str2double(get(hObject,'String'));
-set(handles.slider_rear_zeta,'Value',val);
-
-% --- Executes during object creation, after setting all properties.
-function box_rear_zeta_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to box_rear_zeta (see GCBO)
+function box_zeta_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to box_zeta (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -664,3 +615,4 @@ function box_ground_clearance_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
