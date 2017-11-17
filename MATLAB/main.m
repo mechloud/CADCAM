@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 16-Nov-2017 15:26:12
+% Last Modified by GUIDE v2.5 17-Nov-2017 11:28:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,9 @@ guidata(hObject, handles);
 % Clear the command window
 clc
 
+% Add subfunctions path
+addpath('Subfunctions');
+
 % Set the window title
 set(handles.figure1,'Name','Fluent Design - CADCAM 2017');
 
@@ -83,16 +86,18 @@ if(isempty(handles))
     Wrong_File();
 else
     % Get the values from the GUI
-    frame_width = get(handles.slider_frame_width,'Value');
-    frame_height = get(handles.slider_frame_height,'Value');
-    wheelbase = get(handles.slider_wheelbase,'Value');
-    frame_length = wheelbase + 8*25.4;
-    track_width = get(handles.slider_trackwidth,'Value');
-    ground_clearance = get(handles.slider_ground_clearance,'Value');
-    front_omegan = get(handles.slider_front_omegan,'Value');
-    rear_omegan = get(handles.slider_rear_omegan,'Value');
-    zeta = get(handles.slider_zeta,'Value');
-    steering_ratio = get(handles.slider_steering_ratio,'Value');
+    frame_width = get(handles.slider_frame_width,'Value')
+    frame_height = get(handles.slider_frame_height,'Value')
+    wheelbase = get(handles.slider_wheelbase,'Value')
+    frame_length = wheelbase + 8*25.4
+    track_width = get(handles.slider_trackwidth,'Value')
+    ground_clearance = get(handles.slider_ground_clearance,'Value')
+    front_omegan = get(handles.slider_front_omegan,'Value')
+    rear_omegan = get(handles.slider_rear_omegan,'Value')
+    zeta = get(handles.slider_zeta,'Value')
+    steering_ratio = get(handles.slider_steering_ratio,'Value')
+    Suspension('f',front_omegan,zeta,110);
+    Suspension('r',rear_omegan,zeta,110);
 end
     
 
@@ -146,7 +151,7 @@ function slider_frame_length_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_frame_length,'String',num2str(val));
+set(handles.box_frame_length,'String',num2str(round(val,0)));
 
 
 % --- Executes during object creation, after setting all properties.
@@ -170,7 +175,7 @@ function slider_frame_width_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_frame_width,'String',num2str(val));
+set(handles.box_frame_width,'String',num2str(round(val,0)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_frame_width_CreateFcn(hObject, eventdata, handles)
@@ -193,7 +198,7 @@ function slider_frame_height_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_frame_height,'String',num2str(val));
+set(handles.box_frame_height,'String',num2str(round(val,0)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_frame_height_CreateFcn(hObject, eventdata, handles)
@@ -216,7 +221,7 @@ function slider_front_omegan_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_front_omegan,'String',num2str(val));
+set(handles.box_front_omegan,'String',num2str(round(val,2)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_front_omegan_CreateFcn(hObject, eventdata, handles)
@@ -239,7 +244,7 @@ function slider_rear_omegan_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_rear_omegan,'String',num2str(val));
+set(handles.box_rear_omegan,'String',num2str(round(val,2)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_rear_omegan_CreateFcn(hObject, eventdata, handles)
@@ -262,7 +267,7 @@ function slider_zeta_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_zeta,'String',num2str(val));
+set(handles.box_zeta,'String',num2str(round(val,2)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_zeta_CreateFcn(hObject, eventdata, handles)
@@ -284,7 +289,7 @@ function slider_steering_ratio_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_steering_ratio,'String',num2str(val));
+set(handles.box_steering_ratio,'String',num2str(round(val,2)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_steering_ratio_CreateFcn(hObject, eventdata, handles)
@@ -306,7 +311,7 @@ function slider_wheelbase_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_wheelbase,'String',num2str(val));
+set(handles.box_wheelbase,'String',num2str(round(val,0)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_wheelbase_CreateFcn(hObject, eventdata, handles)
@@ -329,7 +334,7 @@ function slider_trackwidth_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_trackwidth,'String',num2str(val));
+set(handles.box_trackwidth,'String',num2str(round(val,0)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_trackwidth_CreateFcn(hObject, eventdata, handles)
@@ -352,7 +357,7 @@ function slider_ground_clearance_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
-set(handles.box_ground_clearance,'String',num2str(val));
+set(handles.box_ground_clearance,'String',num2str(round(val,0)));
 
 % --- Executes during object creation, after setting all properties.
 function slider_ground_clearance_CreateFcn(hObject, eventdata, handles)
@@ -396,7 +401,7 @@ function box_frame_length_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of box_frame_length as text
 %        str2double(get(hObject,'String')) returns contents of box_frame_length as a double
 val = str2double(get(hObject,'String'));
-set(handles.slider_frame_length,'Value',val);
+set(handles.slider_frame_length,'Value',round(val,0));
 
 % --- Executes during object creation, after setting all properties.
 function box_frame_length_CreateFcn(hObject, eventdata, handles)
@@ -420,7 +425,7 @@ function box_frame_width_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of box_frame_width as text
 %        str2double(get(hObject,'String')) returns contents of box_frame_width as a double
 val = str2double(get(hObject,'String'));
-set(handles.slider_frame_width,'Value',val);
+set(handles.slider_frame_width,'Value',round(val,0));
 
 % --- Executes during object creation, after setting all properties.
 function box_frame_width_CreateFcn(hObject, eventdata, handles)
@@ -442,7 +447,7 @@ function box_frame_height_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of box_frame_height as text
 %        str2double(get(hObject,'String')) returns contents of box_frame_height as a double
 val = str2double(get(hObject,'String'));
-set(handles.slider_frame_height,'Value',val);
+set(handles.slider_frame_height,'Value',round(val,0));
 
 % --- Executes during object creation, after setting all properties.
 function box_frame_height_CreateFcn(hObject, eventdata, handles)
@@ -615,4 +620,3 @@ function box_ground_clearance_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-

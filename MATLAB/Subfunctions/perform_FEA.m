@@ -1,6 +1,6 @@
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
-function perform_FEA(filename,OD,WT)
+function [axial_n,buckling_n] = perform_FEA(filename,OD,WT)
 %%
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 3
@@ -227,7 +227,7 @@ max_stress = max(abs(sigma))*sign(max(sigma));
 assert(max(abs(sigma)) < Sy, 'Yielding occurs in frame members');
 %%
 % Find minimum safety factor
-min_safety_factor = Sy/abs(max_stress);
+axial_n = Sy/abs(max_stress);
 
 %% Buckling Analysis
 % Equivalent lengths for both ends fixed as per AISC's Manual of Steel
@@ -253,9 +253,9 @@ end
 
 %%
 % Calculate Buckling Safety Factor
-buckling_safety_factor = min(Scr./abs(sigma));
+buckling_n = min(Scr./abs(sigma));
 
-fprintf('Yielding Safety Factor n = %.2d\n',min_safety_factor);
+fprintf('Yielding Safety Factor n = %.2d\n',axial_n);
 fprintf('Buckling Safety Factor n = %.2d\n',buckling_safety_factor);
 
 end % end function

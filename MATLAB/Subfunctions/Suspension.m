@@ -51,7 +51,7 @@ mc=(m2+md)*dist/2;
 %%
 % Front Shock Spring Rate [N/m]
 k2=(omega_n^2)*mc;
-fprintf('The desired %s spring rate is %d N/m.\n', string, k2);
+fprintf('The desired %s spring rate is %.2f N/m.\n', string, k2);
 %%
 % Front Damping Coefficient [Ns/m]
 c2 = 2*zeta*sqrt(k2*mc);
@@ -70,13 +70,14 @@ K=[k2 -k2;-k2 k2+k1];
 
 %%
 % Solve System
+tic;
 syms s;
 eqn = det(M*s^2+K) == 0;
 omega_nm = solve(eqn,s);
 omega_nf = abs(vpa(omega_nm));
 omega_nf = double(omega_nf);
 
-fprintf('The obtained %s system natural frequency is %d and %d rad/s.\n', string, max(omega_nf), min(omega_nf));
+fprintf('The obtained %s system natural frequency is %.2f and %.2f rad/s.\n', string, max(omega_nf), min(omega_nf));
 
 x = 0:0.01:120;
 y2 = k1*sqrt(c2.^2*x.^2+k2.^2)./(sqrt((m1*mc*x.^4-k1*mc*x.^2-k2*m1*x.^2-k2*mc*x.^2+k1*k2).^2+(-c2*m1*x.^3-c2*mc*x.^3+c2*k1*x).^2));
@@ -95,7 +96,7 @@ A=[-c2/mc c2/mc -k2/mc k2/mc;
     1 0 0 0;
     0 1 0 0];                           %state matrix
 B=[0; k1/m1; 0; 0];                     %force matrix
-CC=[0 0 1 0; 0 0 0 1; 0 0 1 -1];        %sprung, unsprung, relative
+CC=[0 0 1 0];        %sprung, unsprung, relative
 D=0;
 
 %%
@@ -113,14 +114,14 @@ opt = stepDataOptions('StepAmplitude',0.1);
 figure(2)
 plot(t,uy);
 title('Step Response');
-legend('Sprung','Unsprung','Relative');
+legend('Chassis');
 
 %%
 % Plot Impulse Response
 figure(3)
 plot(u,iy);
 title('Impulse Response');
-legend('Sprung','Unsprung','Relative');
+legend('Chassis');
 
 %% Post-Processing
 % Differentiate twice to find acceleration
@@ -128,6 +129,6 @@ acc_imp = diff(diff(iy(:,1)));
 acc_step = diff(diff(uy(:,1)));
 
 max_accel = max(max(acc_imp),max(acc_step));
-fprintf('Maximum acceleration is %d m/s^2.\n', max_accel);
+fprintf('Maximum acceleration is %.1f m/s^2.\n', max_accel);
 
 end
