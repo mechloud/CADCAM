@@ -74,7 +74,7 @@ tic;
 syms s;
 eqn = det(M*s^2+K) == 0;
 omega_nm = solve(eqn,s);
-omega_nf = abs(vpa(omega_nm));
+omega_nf = abs(imag(omega_nm));
 omega_nf = double(omega_nf);
 
 fprintf('The obtained %s system natural frequency is %.2f and %.2f rad/s.\n', string, max(omega_nf), min(omega_nf));
