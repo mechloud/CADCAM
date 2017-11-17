@@ -14,7 +14,6 @@ euler
 *.xlsx
 *.csv
 FEATables.xlsx
-*.mat
 # test
 *.asv
 *.eps
