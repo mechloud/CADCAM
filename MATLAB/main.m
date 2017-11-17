@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 11:28:24
+% Last Modified by GUIDE v2.5 17-Nov-2017 16:21:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -96,8 +96,26 @@ else
     rear_omegan = get(handles.slider_rear_omegan,'Value')
     zeta = get(handles.slider_zeta,'Value')
     steering_ratio = get(handles.slider_steering_ratio,'Value')
+    
+    %%
+    % Suspension Codes
     Suspension('f',front_omegan,zeta,110);
     Suspension('r',rear_omegan,zeta,110);
+    
+    %%
+    % Frame Codes
+    [OD,WT] = loop_FEA(frame_length,frame_height);
+    if get(handles.rb_ANSYS,'Value') == 1
+        % WAITING FOR 3D FEA Excel Spreadsheet (LIZ)
+        % Load nodal data
+        %nodal = load('2dfea.mat');
+        %nodes = nodal.nodes;
+        %elements = nodal.elements;
+        %create_ANSYS_input(nodes,elements,OD,WT,25.4,0.9);
+    end
+    
+    %%
+    % Steering Codes
 end
     
 
@@ -597,8 +615,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function box_ground_clearance_Callback(hObject, eventdata, handles)
 % hObject    handle to box_ground_clearance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -612,7 +628,7 @@ set(handles.slider_ground_clearance,'Value',val);
 % --- Executes during object creation, after setting all properties.
 function box_ground_clearance_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to box_ground_clearance (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
+% eventdata  reserved - to be defined inhttps://medium.com/@igor_marques/git-basics-adding-more-changes-to-your-last-commit-1629344cb9a8 a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
@@ -620,3 +636,12 @@ function box_ground_clearance_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in rb_ANSYS.
+function rb_ANSYS_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_ANSYS (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_ANSYS

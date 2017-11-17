@@ -43,6 +43,8 @@ end
 OD = OD(ctr - 1);
 WT = WT(ctr - 1);
 
+fprintf('The required primary tube size is %.1f mm OD and %.1f mm wall thickness\n',OD,WT);
+
 
 end
 
