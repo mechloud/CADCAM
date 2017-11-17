@@ -1,26 +1,91 @@
+%% Loop_FEA
+% LOOP_FEA Loops to find appropriate sizes
+function [OD,WT] = loop_FEA(FL,FH)
+
+if nargin < 2
+    FL = 1422;
+    FH = 1220; 
+    addpath('../Database');
+end
+
+%%
+% Declare default safety factor
+SF = 4.0;
+
+%%
+% Load nodal data
+nodal = load('2dfea.mat');
+nodes = nodal.nodes;
+elements = nodal.elements;
+
+%%
+% Load tube size database
+sizes = load('tube_sizes.mat');
+OD = sizes.tube_sizes(:,1);
+WT = sizes.tube_sizes(:,2);
+
+%%
+% Change frame geometry
+nodes = change_frame_geometry(nodes,FL,FH);
+
+%%
+% Perform an initial FEA
+[ASF,BSF] = perform_FEA(nodes,elements,OD(1),WT(1));
+
+%%
+% Increase tube size until safety factors are satisfactory;
+ctr = 1;
+while (ASF < SF && BSF < SF && ctr < length(OD))
+    [ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1));
+    ctr = ctr + 1;
+end
+
+OD = OD(ctr - 1);
+WT = WT(ctr - 1);
+
+
+end
+
+%% change_frame_geometry
+% CHANGE_FRAME_GEOMETRY Changes the size of the frame depending on the
+% desired inputs. Returns nodal coordinate table.
+function nodes = change_frame_geometry(nodes,FL,FH)
+
+xcoords = nodes(:,2);
+ycoords = nodes(:,3);
+
+for k = 1:length(xcoords)
+    if xcoords(k) > 890
+        xcoords(k) = xcoords(k) + FL - 1422;
+    end
+    if ycoords(k) > 1220
+        ycoords(k) = ycoords(k) + FH - 1220;
+    end
+end
+
+nodes(:,2) = xcoords;
+nodes(:,3) = ycoords;
+
+end
+
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
-function [axial_n,buckling_n] = perform_FEA(filename,OD,WT)
+function [axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT)
 %%
 % If the number of input arguments is less than three, declare defaults.
-if nargin < 3
+if nargin < 4
     clc
     close all
-    OD = 25.4; % mm
-    WT = 0.120*25.4; % mm
-    switch getenv('username')
-        case 'jchar199'
-            disp('John - Ubuntu');
-            filename = '/home/jchar199/Documents/MCG4322/github/FEA/FEAtables.xlsx';
-        case 'Jonathan'
-            disp('John - Windows');
-            filename = 'FEATables.xlsx';
-        otherwise
-            warning('Unrecognized computer. Using default file path for frame geometry');
-            filename = 'FEAtables.xlsx';
-    end
-            
+    [nodes,~,~] = xlsread('baja_2D.xlsx','Nodal');
+    [elements,~,~] = xlsread('baja_2D.xlsx','Connectivity');    
+    OD = 25.0;
+    WT = 3.0;
 end
+
+%%
+% Determine size of nodes and elements vectors
+[nnodes,~] = size(nodes);
+[nelements,~] = size(elements);
 
 %% Pre-Processing
 % Calculate Cross-Sectional Area of Tube (assuming all tubes are the same)
@@ -39,12 +104,6 @@ I = (pi/64)*(OD^4 - ID^4);
 %%
 % Yield Strength for AISI 4130 Steel ($MPa$)
 Sy = 435; 
-%%
-% Read Excel Spreadsheet
-[nodes,~,~] = xlsread(filename,'Nodal');
-[nnodes,~] = size(nodes);
-[elements,~,~] = xlsread(filename, 'Connectivity');
-[elements_rows,~] = size(elements);
 
 %%
 % Amount of unknowns per element
@@ -57,14 +116,14 @@ preproc = num2cell(elements);
 %%
 % Declare an empty vector to store the lengths and direction cosines for
 % later use in post-processing.
-L = zeros(elements_rows,1);
-l = zeros(elements_rows,1);
-m = zeros(elements_rows,1);
+L = zeros(nelements,1);
+l = zeros(nelements,1);
+m = zeros(nelements,1);
   
 %%
 % Loop through elements vector. Find Stiffness matrices and store in
 % preproc.
-for k = 1:elements_rows
+for k = 1:nelements
     
     %%
     % Find nodes corresponding to element k
@@ -121,7 +180,7 @@ Ka = zeros(nunknowns*nnodes,nunknowns*nnodes);
 
 %%
 % Loop through preprocessing cell array and build assemblage matrix
-for k = 1:elements_rows
+for k = 1:nelements
    
     %%
     % Extract node numbers
@@ -149,7 +208,7 @@ for k = 1:elements_rows
        
 end
 
-csvwrite('ka.csv',Ka);
+% csvwrite('ka.csv',Ka);
 
 %%
 % Declare Force vector and assign known forces.
@@ -181,12 +240,12 @@ U = Ka_sol\F;
 
 %% Post-Processing
 % Declare displacements and strains vector
-epsilon = zeros(elements_rows,1);
+epsilon = zeros(nelements,1);
 
 %%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
 % and $u'_j = lu_j + mv_j$ and $u'_i = lu_i + mv_i$
-for k = 1:elements_rows
+for k = 1:nelements
    
     %%
     % Get node numbers
@@ -255,8 +314,8 @@ end
 % Calculate Buckling Safety Factor
 buckling_n = min(Scr./abs(sigma));
 
-fprintf('Yielding Safety Factor n = %.2d\n',axial_n);
-fprintf('Buckling Safety Factor n = %.2d\n',buckling_safety_factor);
+% fprintf('Yielding Safety Factor n = %.2d\n',axial_n);
+% fprintf('Buckling Safety Factor n = %.2d\n',buckling_n);
 
 end % end function
 
