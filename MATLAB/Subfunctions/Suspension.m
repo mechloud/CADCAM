@@ -76,7 +76,7 @@ omega_nm = solve(eqn,s);
 omega_nf = abs(vpa(omega_nm));
 omega_nf = double(omega_nf);
 
-fprintf('The obtained %s natural frequency is %d and %d rad/s.\n', string, max(omega_nf), min(omega_nf));
+fprintf('The obtained %s system natural frequency is %d and %d rad/s.\n', string, max(omega_nf), min(omega_nf));
 
 x = 0:0.01:120;
 y2 = k1*sqrt(c2.^2*x.^2+k2.^2)./(sqrt((m1*mc*x.^4-k1*mc*x.^2-k2*m1*x.^2-k2*mc*x.^2+k1*k2).^2+(-c2*m1*x.^3-c2*mc*x.^3+c2*k1*x).^2));
