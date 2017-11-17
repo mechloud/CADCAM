@@ -33,7 +33,7 @@ end
 
 %%
 % Create lines between nodes
-fprintf(fid,'\n! Create lines between nodes');
+fprintf(fid,'\n! Create lines between nodes\n');
 for k = 1:nelements
     fprintf(fid,'LSTR,%i,%i\n',elements(k,2),elements(k,3));
 end
@@ -78,7 +78,7 @@ fprintf(fid,'\n! Apply constraints\n');
 fprintf(fid,'DK,1,,0,,0,ALL\nDK,5,UZ,0,,0\n');
 
 fprintf(fid,'\n! Apply loads\n');
-fprintf(fid,'FK,2,FZ,-100000\nFK,3,FZ,-100000\nFK,4,FZ,-100000\n');
+fprintf(fid,'FK,8,FY,-255.06\nFK,13,FY,-1079.1\nFK,12,FX,22875.0\n');
 
 %%
 % Solve
