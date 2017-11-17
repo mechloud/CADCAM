@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 16:21:34
+% Last Modified by GUIDE v2.5 17-Nov-2017 16:47:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,18 +85,45 @@ function BTN_generate_Callback(hObject, eventdata, handles)
 if(isempty(handles))
     Wrong_File();
 else
+    log_id = fopen('log.txt','w+');
     % Get the values from the GUI
-    frame_width = get(handles.slider_frame_width,'Value')
-    frame_height = get(handles.slider_frame_height,'Value')
-    wheelbase = get(handles.slider_wheelbase,'Value')
-    frame_length = wheelbase + 8*25.4
-    track_width = get(handles.slider_trackwidth,'Value')
-    ground_clearance = get(handles.slider_ground_clearance,'Value')
-    front_omegan = get(handles.slider_front_omegan,'Value')
-    rear_omegan = get(handles.slider_rear_omegan,'Value')
-    zeta = get(handles.slider_zeta,'Value')
-    steering_ratio = get(handles.slider_steering_ratio,'Value')
+    frame_width = get(handles.slider_frame_width,'Value');
+    fprintf(log_id,'Frame Width = %.0f mm\n',frame_width);
     
+    frame_height = get(handles.slider_frame_height,'Value');
+    fprintf(log_id,'Frame Height = %.0f mm\n',frame_height);
+    
+    wheelbase = get(handles.slider_wheelbase,'Value');
+    fprintf(log_id,'Wheelbase = %.0f mm \n',wheelbase);
+    
+    frame_length = wheelbase + 8*25.4;
+    fprintf(log_id,'Frame Length = %.0f mm \n',frame_length);
+    
+    track_width = get(handles.slider_trackwidth,'Value');
+    fprintf(log_id,'Track Width = %.0f mm \n',track_width);
+    
+    ground_clearance = get(handles.slider_ground_clearance,'Value');
+    fprintf(log_id,'Ground Clearance = %.0f mm \n',ground_clearance);
+    
+    front_omegan = get(handles.slider_front_omegan,'Value');
+    fprintf(log_id,'Front Natural Frequency = %.2f rad/s\n',front_omegan);
+    
+    rear_omegan = get(handles.slider_rear_omegan,'Value');
+    fprintf(log_id,'Rear Natural Frequency = %.2f rad/s\n',rear_omegan);
+    
+    zeta = get(handles.slider_zeta,'Value');
+    fprintf(log_id,'Damping Ratio = %.2f\n',zeta);
+    
+    steering_ratio = get(handles.slider_steering_ratio,'Value');
+    fprintf(log_id,'Steering Ratio = %.1f\n',steering_ratio);
+    
+    md = get(handles.box_mass_driver,'Value');
+    if get(handles.rb_lbs,'Value') == 1
+        % if the mass is in lbs, convert to kg
+        md = md/2.2;
+    end
+    
+    fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
     %%
     % Suspension Codes
     Suspension('f',front_omegan,zeta,110);
@@ -104,18 +131,21 @@ else
     
     %%
     % Frame Codes
-    [OD,WT] = loop_FEA(frame_length,frame_height);
+    [OD,WT] = loop_FEA(frame_length,frame_height,md);
     if get(handles.rb_ANSYS,'Value') == 1
         % WAITING FOR 3D FEA Excel Spreadsheet (LIZ)
         % Load nodal data
         %nodal = load('2dfea.mat');
         %nodes = nodal.nodes;
         %elements = nodal.elements;
-        %create_ANSYS_input(nodes,elements,OD,WT,25.4,0.9);
+        %create_ANSYS_input(nodes,elements,OD,WT,25.4,0.9,md);
     end
     
     %%
     % Steering Codes
+    
+    
+    fclose(log_id);
 end
     
 
@@ -645,3 +675,52 @@ function rb_ANSYS_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of rb_ANSYS
+
+
+
+function box_mass_driver_Callback(hObject, eventdata, handles)
+% hObject    handle to box_mass_driver (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of box_mass_driver as text
+%        str2double(get(hObject,'String')) returns contents of box_mass_driver as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function box_mass_driver_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to box_mass_driver (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in rb_lbs.
+function rb_lbs_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_lbs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_lbs
+val = get(hObject,'Value');
+if val == 1
+    set(handles.rb_kg,'Value',0);
+end
+
+
+% --- Executes on button press in rb_kg.
+function rb_kg_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_kg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_kg
+val = get(hObject,'Value');
+if val == 1
+    set(handles.rb_lbs,'Value',0);
+end

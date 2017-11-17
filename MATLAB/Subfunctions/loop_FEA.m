@@ -1,10 +1,11 @@
 %% Loop_FEA
 % LOOP_FEA Loops to find appropriate sizes
-function [OD,WT] = loop_FEA(FL,FH)
+function [OD,WT] = loop_FEA(FL,FH,md)
 
-if nargin < 2
+if nargin < 3
     FL = 1422;
-    FH = 1220; 
+    FH = 1220;
+    md = 110;
     addpath('../Database');
 end
 
@@ -30,13 +31,13 @@ nodes = change_frame_geometry(nodes,FL,FH);
 
 %%
 % Perform an initial FEA
-[ASF,BSF] = perform_FEA(nodes,elements,OD(1),WT(1));
+[ASF,BSF] = perform_FEA(nodes,elements,OD(1),WT(1),md);
 
 %%
 % Increase tube size until safety factors are satisfactory;
 ctr = 1;
 while (ASF < SF && BSF < SF && ctr < length(OD))
-    [ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1));
+    [ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1),md);
     ctr = ctr + 1;
 end
 
@@ -72,7 +73,7 @@ end
 
 %% perform_FEA
 % PERFORM_FEA Performs the FEA for geometry specified in file
-function [axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT)
+function [axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT,md)
 %%
 % If the number of input arguments is less than three, declare defaults.
 if nargin < 4
@@ -210,13 +211,12 @@ for k = 1:nelements
        
 end
 
-% csvwrite('ka.csv',Ka);
 
 %%
 % Declare Force vector and assign known forces.
 F = zeros(nunknowns*nnodes,1);
 F(12*nunknowns-2) = 22875.0;
-F(13*nunknowns-1) = -110.0*9.81; % 110 kg * g
+F(13*nunknowns-1) = -md*9.81; % 110 kg * g
 F(8*nunknowns-1) = -26.0*9.81; % 26 kg * g
 
 %%

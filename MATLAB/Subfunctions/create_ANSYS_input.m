@@ -1,6 +1,6 @@
-function create_ANSYS_input(nodes,elements,POD,PWT,SOD,SWT,meshsize)
+function create_ANSYS_input(nodes,elements,POD,PWT,SOD,SWT,meshsize,md)
 
-if nargin < 6
+if nargin < 7
     filename = '/home/jchar199/Documents/MCG4102/project/vire-labrosse/Tables.xlsx';
     %%
     % Read Excel Spreadsheet
@@ -12,6 +12,7 @@ if nargin < 6
     SOD = 25;
     SWT = 0.9;
     meshsize = 1;
+    md = 110;
 end
 
 %%
@@ -76,9 +77,9 @@ fprintf(fid,'\n! Display elements\n/ESHAPE,1\nEPLOT\n');
 fprintf(fid,'\n/SOLU');
 fprintf(fid,'\n! Apply constraints\n');
 fprintf(fid,'DK,1,,0,,0,ALL\nDK,5,UZ,0,,0\n');
-
+driver_weight = -md*9.81;
 fprintf(fid,'\n! Apply loads\n');
-fprintf(fid,'FK,8,FY,-255.06\nFK,13,FY,-1079.1\nFK,12,FX,22875.0\n');
+fprintf(fid,'FK,8,FY,-255.06\nFK,13,FY,%.1f\nFK,12,FX,22875.0\n',driver_weight);
 
 %%
 % Solve
