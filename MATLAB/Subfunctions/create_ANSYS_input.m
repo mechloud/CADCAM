@@ -27,7 +27,13 @@ end
 
 %%
 % Open a file for writing the ANSYS input code
-output_filename = 'ansys_input.txt';
+switch getenv('username')
+    case ''
+        % Empty string is returned on Ubuntu
+        output_filename = 'ansys_input.txt';
+    otherwise
+        output_filename = 'C:/BAJA2A/ansys_input.txt';
+end
 fid = fopen(output_filename,'w+');
 
 %% Pre-Processing
