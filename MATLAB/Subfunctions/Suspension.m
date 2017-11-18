@@ -84,10 +84,10 @@ y2 = k1*sqrt(c2.^2*x.^2+k2.^2)./(sqrt((m1*mc*x.^4-k1*mc*x.^2-k2*m1*x.^2-k2*mc*x.
 
 %%
 % Plot Frequency Response
-figure(1)
-plot(x,y2,'Red');
-xlabel('Frequency omega [rad/s]')
-ylabel('Magnitude of Y2/Y0')
+% figure(1)
+% plot(x,y2,'Red');
+% xlabel('Frequency omega [rad/s]')
+% ylabel('Magnitude of Y2/Y0')
 
 %% Systems approach
 % Declare State-Space Matrices
@@ -102,33 +102,32 @@ D=0;
 %%
 % Declare as system
 sys=ss(A,B,CC,D);       %state-space representation
-
 %%
 % Calculate Step and Impulse Response
-opt = stepDataOptions('StepAmplitude',0.1);
-[uy,t] = step(sys,opt);
+% opt = stepDataOptions('StepAmplitude',0.1);
+% [uy,t] = step(sys,opt);
 [iy,u] = impulse(sys);
 
 %%
 % Plot Step Response
-figure(2)
-plot(t,uy);
-title('Step Response');
-legend('Chassis');
+% figure(2)
+% plot(t,uy);
+% title('Step Response');
+% legend('Chassis');
 
 %%
 % Plot Impulse Response
-figure(3)
+%figure(3)
 plot(u,iy);
 title('Impulse Response');
 legend('Chassis');
 
 %% Post-Processing
 % Differentiate twice to find acceleration
-acc_imp = diff(diff(iy(:,1)));
-acc_step = diff(diff(uy(:,1)));
-
-max_accel = max(max(acc_imp),max(acc_step));
-fprintf('Maximum acceleration is %.1f m/s^2.\n', max_accel);
+% acc_imp = diff(diff(iy(:,1)));
+% acc_step = diff(diff(uy(:,1)));
+% 
+% max_accel = max(max(acc_imp),max(acc_step));
+% fprintf('Maximum acceleration is %.1f m/s^2.\n', max_accel);
 
 end

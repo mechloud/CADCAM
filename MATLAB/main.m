@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 17-Nov-2017 16:47:25
+% Last Modified by GUIDE v2.5 18-Nov-2017 13:17:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -106,10 +106,10 @@ else
     fprintf(log_id,'Ground Clearance = %.0f mm \n',ground_clearance);
     
     front_omegan = get(handles.slider_front_omegan,'Value');
-    fprintf(log_id,'Front Natural Frequency = %.2f rad/s\n',front_omegan);
+    fprintf(log_id,'Front Natural Frequency = %.2f Hz\n',front_omegan);
     
     rear_omegan = get(handles.slider_rear_omegan,'Value');
-    fprintf(log_id,'Rear Natural Frequency = %.2f rad/s\n',rear_omegan);
+    fprintf(log_id,'Rear Natural Frequency = %.2f Hz\n',rear_omegan);
     
     zeta = get(handles.slider_zeta,'Value');
     fprintf(log_id,'Damping Ratio = %.2f\n',zeta);
@@ -126,12 +126,16 @@ else
     fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
     %%
     % Suspension Codes
-    Suspension('f',front_omegan,zeta,110);
-    Suspension('r',rear_omegan,zeta,110);
-    
+    if get(handles.rb_front,'Value') == 1
+        Suspension('f',front_omegan,zeta,md);
+    elseif get(handles.rb_rear,'Value') == 1
+        Suspension('r',rear_omegan,zeta,md);
+    else
+        Suspension('f',front_omegan,zeta,md);
+    end
     %%
     % Frame Codes
-    [OD,WT] = loop_FEA(frame_length,frame_height,md);
+    %[OD,WT] = loop_FEA(frame_length,frame_height,md);
     if get(handles.rb_ANSYS,'Value') == 1
         % WAITING FOR 3D FEA Excel Spreadsheet (LIZ)
         % Load nodal data
@@ -271,6 +275,18 @@ function slider_front_omegan_Callback(hObject, eventdata, handles)
 val = get(hObject,'Value');
 set(handles.box_front_omegan,'String',num2str(round(val,2)));
 
+    front_omegan = get(handles.slider_front_omegan,'Value');   
+    zeta = get(handles.slider_zeta,'Value');
+    md = get(handles.box_mass_driver,'Value');
+    if get(handles.rb_lbs,'Value') == 1
+        % if the mass is in lbs, convert to kg
+        md = md/2.2;
+    end
+    Suspension('f',front_omegan,zeta,md);
+
+
+
+
 % --- Executes during object creation, after setting all properties.
 function slider_front_omegan_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider_front_omegan (see GCBO)
@@ -293,6 +309,20 @@ function slider_rear_omegan_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
 set(handles.box_rear_omegan,'String',num2str(round(val,2)));
+    
+    front_omegan = get(handles.slider_front_omegan,'Value');
+    rear_omegan = get(handles.slider_rear_omegan,'Value');   
+    zeta = get(handles.slider_zeta,'Value');
+    md = get(handles.box_mass_driver,'Value');
+    if get(handles.rb_lbs,'Value') == 1
+        % if the mass is in lbs, convert to kg
+        md = md/2.2;
+    end
+if get(handles.rb_rear,'Value') == 1 
+    Suspension('r',rear_omegan,zeta,md);
+else 
+    Suspension('f',front_omegan,zeta,md); 
+end
 
 % --- Executes during object creation, after setting all properties.
 function slider_rear_omegan_CreateFcn(hObject, eventdata, handles)
@@ -316,6 +346,24 @@ function slider_zeta_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
 set(handles.box_zeta,'String',num2str(round(val,2)));
+
+    front_omegan = get(handles.slider_front_omegan,'Value');
+    rear_omegan = get(handles.slider_rear_omegan,'Value');   
+    zeta = get(handles.slider_zeta,'Value');
+    md = get(handles.box_mass_driver,'Value');
+    if get(handles.rb_lbs,'Value') == 1
+        % if the mass is in lbs, convert to kg
+        md = md/2.2;
+    end
+%%
+% Suspension Codes
+    if get(handles.rb_front,'Value') == 1
+        Suspension('f',front_omegan,zeta,md);
+    elseif get(handles.rb_rear,'Value') == 1
+        Suspension('r',rear_omegan,zeta,md);
+    else
+        Suspension('f',front_omegan,zeta,md);
+    end
 
 % --- Executes during object creation, after setting all properties.
 function slider_zeta_CreateFcn(hObject, eventdata, handles)
@@ -685,7 +733,23 @@ function box_mass_driver_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_mass_driver as text
 %        str2double(get(hObject,'String')) returns contents of box_mass_driver as a double
-
+    front_omegan = get(handles.slider_front_omegan,'Value');
+    rear_omegan = get(handles.slider_rear_omegan,'Value');   
+    zeta = get(handles.slider_zeta,'Value');
+    md = get(handles.box_mass_driver,'Value');
+    if get(handles.rb_lbs,'Value') == 1
+        % if the mass is in lbs, convert to kg
+        md = md/2.2;
+    end
+%%
+% Suspension Codes
+    if get(handles.rb_front,'Value') == 1
+        Suspension('f',front_omegan,zeta,md);
+    elseif get(handles.rb_rear,'Value') == 1
+        Suspension('r',rear_omegan,zeta,md);
+    else
+        Suspension('f',front_omegan,zeta,md);
+    end
 
 % --- Executes during object creation, after setting all properties.
 function box_mass_driver_CreateFcn(hObject, eventdata, handles)
@@ -724,3 +788,51 @@ val = get(hObject,'Value');
 if val == 1
     set(handles.rb_lbs,'Value',0);
 end
+
+
+% --- Executes on button press in rb_front.
+function rb_front_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_front (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_front
+val = get(hObject,'Value');
+if val == 1
+    set(handles.rb_rear,'Value',0);
+end
+
+front_omegan = get(handles.slider_front_omegan,'Value');
+zeta = get(handles.slider_zeta,'Value');
+md = get(handles.box_mass_driver,'Value');
+if get(handles.rb_lbs,'Value') == 1
+    % if the mass is in lbs, convert to kg
+    md = md/2.2;
+end
+%%
+% Suspension Codes
+Suspension('f',front_omegan,zeta,md);
+   
+
+% --- Executes on button press in rb_rear.
+function rb_rear_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_rear (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_rear
+val = get(hObject,'Value');
+if val == 1
+    set(handles.rb_front,'Value',0);
+end
+
+rear_omegan = get(handles.slider_rear_omegan,'Value');
+zeta = get(handles.slider_zeta,'Value');
+md = get(handles.box_mass_driver,'Value');
+if get(handles.rb_lbs,'Value') == 1
+    % if the mass is in lbs, convert to kg
+    md = md/2.2;
+end
+%%
+% Suspension Codes
+Suspension('r',rear_omegan,zeta,md);
