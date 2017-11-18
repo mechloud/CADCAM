@@ -1,11 +1,16 @@
-function create_ANSYS_input(nodes,elements,POD,PWT,SOD,SWT,meshsize,md)
+function create_ANSYS_input(type,nodes,elements,POD,PWT,SOD,SWT,meshsize,md)
 
-if nargin < 7
-    filename = '/home/jchar199/Documents/MCG4102/project/vire-labrosse/Tables.xlsx';
+if nargin < 9
+    warning('Not enough input arguments, default parameters will be used');
+    
     %%
-    % Read Excel Spreadsheet
-    [nodes,~,~] = xlsread(filename,'Nodal - 2D');
-    [elements,~,~] = xlsread(filename, 'Connectivity - 2D');
+    % Load the geometry
+    addpath('../Database');
+    nodal = load('baja_3D_geometry.mat');
+    nodes = nodal.nodes;
+    elements = nodal.elements;
+    
+    type = 'front';
     
     POD = 25;
     PWT = 3;
@@ -75,11 +80,32 @@ fprintf(fid,'\n! Display elements\n/ESHAPE,1\nEPLOT\n');
 %% Solution
 % Apply constraints and loads
 fprintf(fid,'\n/SOLU');
-fprintf(fid,'\n! Apply constraints\n');
-fprintf(fid,'DK,1,,0,,0,ALL\nDK,5,UZ,0,,0\n');
-driver_weight = -md*9.81;
-fprintf(fid,'\n! Apply loads\n');
-fprintf(fid,'FK,8,FY,-255.06\nFK,13,FY,%.1f\nFK,12,FX,22875.0\n',driver_weight);
+
+switch type
+    case 'front'
+        fprintf(fid,'\n! Apply constraints\n');
+        fprintf(fid,'DK,27,,0,,0,ALL\n');
+        fprintf(fid,'DK,28,,0,,0,ALL\n');
+        fprintf(fid,'DK,8,,0,,0,ALL\n');
+        fprintf(fid,'DK,9,,0,,0,ALL\n');
+        driver_weight = -md*9.81;
+        fprintf(fid,'\n! Apply loads\n');
+        %%
+        % Distribute mass of drivetrain between nodes 11 and 6
+        fprintf(fid,'FK,6,FY,-127.53\n');
+        fprintf(fid,'FK,11,FY,-127.53\n');
+        %%
+        % Distribute mass of driver between nodes 19 and 22
+        fprintf(fid,'FK,19,FY,%.1f\n',driver_weight/2);
+        fprintf(fid,'FK,22,FY,%.1f\n',driver_weight/2);
+        
+        %%
+        % Apply impact load to nodes 1 and 16
+        fprintf(fid,'FK,1,FZ,-11438.0\n');
+        fprintf(fid,'FK,16,FZ,-11438.0\n');
+    otherwise
+        error('Type of simulation not recognized');
+end
 
 %%
 % Solve
