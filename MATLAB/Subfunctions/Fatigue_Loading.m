@@ -1,4 +1,4 @@
-function Fatigue_Loading(sigma_max, sigma_min, S_e, S_ut, S_y)
+function [SF_mod, SF_lan] = Fatigue_Loading(sigma_max, sigma_min, S_e, S_ut, S_y)
 
 %%Calculate alternating and midrange stresses
 sigma_a = (sigma_max - sigma_min)/2;
