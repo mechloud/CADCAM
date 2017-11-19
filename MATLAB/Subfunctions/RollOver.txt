@@ -1,12 +1,32 @@
-Function [track_width] = Rollover(track_width, COG_y, turning_radius)
+Function [track_width] = Rollover(track_width, turning_radius, mass, COG_y, Ks_f, Ks_r, sep_f, sep_r)
 
-%ratio of lateral acceleration to gravitational acceleration
+If nargin < 8
 
-Ratio = (track_width/2) / COG_y;
+COG_y = 1.076;
+Ks_f = 8143.4;
+Ks_r = 17598.7;
+sep_f = 1.016;
+sep_r = 1.016;
+
+End
 
 %% hard coded values
 
 velocity = 15.64; % average velocity of 35 mph
+h_r = 1.016; %roll centre height
+
+%% Roll Stiffness
+
+K_f = 0.5*Ks_f*sep_f^2;
+K_r = 0.5*Ks_r*sep_r^2;
+
+%% Roll rate
+
+Roll_rate = (mass*9.81*h_r)/(K_f + K_r - mass*9.81*h_r);
+
+%ratio of lateral acceleration to gravitational acceleration
+
+Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y)));
 
 %% finding the lateral acceleration
 
