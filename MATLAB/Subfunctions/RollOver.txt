@@ -1,0 +1,22 @@
+Function [track_width] = Rollover(track_width, COG_y, turning_radius)
+
+%ratio of lateral acceleration to gravitational acceleration
+
+Ratio = (track_width/2) / COG_y;
+
+%% hard coded values
+
+velocity = 15.64; % average velocity of 35 mph
+
+%% finding the lateral acceleration
+
+acc = velocity^2 / turning_radius;
+
+while acc > Ratio*9.81
+
+track_width = track_width + 25.4;
+Ratio = (track_width/2) / COG_y;
+
+End %while loop
+
+End %function
