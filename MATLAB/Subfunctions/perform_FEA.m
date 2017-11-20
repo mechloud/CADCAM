@@ -6,6 +6,7 @@ function [axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT,md)
 if nargin < 4
     clc
     close all
+    addpath('../Database');
     [nodes,~,~] = xlsread('2D_FEA_tables.xlsx','Nodal');
     [elements,~,~] = xlsread('2D_FEA_tables.xlsx','Connectivity');    
     OD = 25.0;
@@ -248,6 +249,9 @@ buckling_n = min(Scr./abs(sigma));
 % fprintf('Yielding Safety Factor n = %.2d\n',axial_n);
 % fprintf('Buckling Safety Factor n = %.2d\n',buckling_n);
 
+colour_plot(nodes,elements,sigma);
+
+
 end % end function
 
 %% length
@@ -280,5 +284,40 @@ Ke = [(A*E)/L 0 0 -(A*E)/L 0 0;
     -(A*E)/L 0 0 (A*E)/L 0 0;
     0 -(12*E*I)/L^3 -(6*E*I)/L^2 0 (12*E*I)/L^3 (6*E*I)/L^2;
     0 (6*E*I)/L^2 (2*E*I)/L 0 -(6*E*I)/L^2 (4*E*I)/L];
+
+end
+
+function colour_plot(nodes,elements,sigma)
+
+[nnodes,~,~] = size(nodes);
+[nelements,~,~] = size(elements);
+
+%%
+% Add z-coordinates to the 2D nodes
+nodes(:,4) = zeros(nnodes,1);
+
+%%
+% Create a figure and give it a scatter plot with the nodes
+figure('Name','Axial Stress');
+scatter3(nodes(:,2),nodes(:,3),nodes(:,4),'*');
+cmap = jet(nelements);
+
+index = [1:nelements].';
+sigma = [index sigma];
+sigma = sort(sigma,'ascend');
+
+for k = 1:nelements
+   
+    x = [nodes(elements(k,2),2),nodes(elements(k,3),2)];
+    y = [nodes(elements(k,2),3),nodes(elements(k,3),3)];
+    line(x,y,[0,0],'Color',cmap(sigma(k,1),:),'LineWidth',2.5);
+    
+end
+view(0,90);
+colorbar;
+caxis([min(sigma(:,2)),max(sigma(:,2))]);
+title('Axial Stress (MPa)');
+xlabel('x-coordinate (mm)');
+ylabel('y-coordinate (mm)');
 
 end
