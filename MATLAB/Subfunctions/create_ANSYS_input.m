@@ -31,6 +31,8 @@ switch getenv('username')
     case ''
         % Empty string is returned on Ubuntu
         output_filename = 'ansys_input.txt';
+    case 'Jonathan'
+        output_filename = '2D_FEA_Results.txt';
     otherwise
         output_filename = 'C:/BAJA2A/ansys_input.txt';
 end
@@ -40,7 +42,8 @@ fid = fopen(output_filename,'w+');
 % Create keypoints
 fprintf(fid,'/PREP7\n! Create nodes \n');
 for k = 1:nnodes
-    fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),nodes(k,4));
+    %fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),nodes(k,4));
+    fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),0);
 end
 
 %%
@@ -55,9 +58,10 @@ end
 fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
 fprintf(fid,'\n! Set Section Information\n');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,12);
+    'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,1);
 fprintf(fid,['\nSECTYPE,2,BEAM,CTUBE,Secondary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],SOD-2*SWT,SOD,12);
+    'SECDATA,%.1f,%.1f,%i\n'],SOD-2*SWT,SOD,1);
+% Last parameter in the last two fprintf's used to be 12
 
 %%
 % Assign Material properties
@@ -88,7 +92,19 @@ fprintf(fid,'\n! Display elements\n/ESHAPE,1\nEPLOT\n');
 fprintf(fid,'\n/SOLU');
 
 switch type
+    case '2d'
+        disp('2D Type')
+        fprintf(fid,'\n! Apply constraints\n');
+        fprintf(fid,'DK,6,,0,,0,ALL\n');
+        fprintf(fid,'DK,7,,0,,0,ALL\n');
+        driver_weight = -md*9.81;
+        fprintf(fid,'\n! Apply loads\n');
+        fprintf(fid,'FK,13,FY,%.1f\n',driver_weight);
+        fprintf(fid,'FK,12,FX,22875\n');
+        fprintf(fid,'FK,8,FY,-255.06\n');
+        
     case 'front'
+        disp('Front Type')
         fprintf(fid,'\n! Apply constraints\n');
         fprintf(fid,'DK,27,,0,,0,ALL\n');
         fprintf(fid,'DK,28,,0,,0,ALL\n');
