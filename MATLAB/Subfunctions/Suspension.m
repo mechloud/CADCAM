@@ -104,23 +104,25 @@ D=0;
 sys=ss(A,B,CC,D);       %state-space representation
 %%
 % Calculate Step and Impulse Response
-% opt = stepDataOptions('StepAmplitude',0.1);
-% [uy,t] = step(sys,opt);
-[iy,u] = impulse(sys);
+opt = stepDataOptions('StepAmplitude',0.15);
+[uy,t] = step(sys,opt);
+%[iy,u] = impulse(sys);
 
 %%
 % Plot Step Response
 % figure(2)
-% plot(t,uy);
-% title('Step Response');
-% legend('Chassis');
-
+plot(t,uy);
+title('Step Response');
+legend('Chassis');
+S = stepinfo(sys);
+ST = S.SettlingTime;
+fprintf('The %s settling time is %.2f s.\n', string, ST);
 %%
 % Plot Impulse Response
 %figure(3)
-plot(u,iy);
-title('Impulse Response');
-legend('Chassis');
+% plot(u,0.15*iy);
+% title('Impulse Response');
+% legend('Chassis');
 
 %% Post-Processing
 % Differentiate twice to find acceleration
