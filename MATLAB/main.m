@@ -274,7 +274,7 @@ function slider_front_omegan_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
 set(handles.box_front_omegan,'String',num2str(round(val,2)));
-
+if get(handles.rb_front,'Value') == 1 
     front_omegan = get(handles.slider_front_omegan,'Value');   
     zeta = get(handles.slider_zeta,'Value');
     md = get(handles.box_mass_driver,'Value');
@@ -283,7 +283,7 @@ set(handles.box_front_omegan,'String',num2str(round(val,2)));
         md = md/2.2;
     end
     Suspension('f',front_omegan,zeta,md);
-
+end
 
 
 
@@ -309,7 +309,7 @@ function slider_rear_omegan_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 val = get(hObject,'Value');
 set(handles.box_rear_omegan,'String',num2str(round(val,2)));
-    
+if get(handles.rb_rear,'Value') == 1     
     front_omegan = get(handles.slider_front_omegan,'Value');
     rear_omegan = get(handles.slider_rear_omegan,'Value');   
     zeta = get(handles.slider_zeta,'Value');
@@ -318,10 +318,7 @@ set(handles.box_rear_omegan,'String',num2str(round(val,2)));
         % if the mass is in lbs, convert to kg
         md = md/2.2;
     end
-if get(handles.rb_rear,'Value') == 1 
     Suspension('r',rear_omegan,zeta,md);
-else 
-    Suspension('f',front_omegan,zeta,md); 
 end
 
 % --- Executes during object creation, after setting all properties.
