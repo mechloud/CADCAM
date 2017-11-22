@@ -59,10 +59,10 @@ ycoords = nodes(:,3);
 
 for k = 1:length(xcoords)
     if xcoords(k) > 890
-        xcoords(k) = xcoords(k) + FL - 1422;
+        xcoords(k) = xcoords(k) + FL - 1828.8;
     end
     if ycoords(k) > 1220
-        ycoords(k) = ycoords(k) + FH - 1220;
+        ycoords(k) = ycoords(k) + FH - 1219.2;
     end
 end
 

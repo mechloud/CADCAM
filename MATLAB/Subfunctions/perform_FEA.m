@@ -211,7 +211,7 @@ for k = 1:nelements
     
     %%
     % Calculate moment on element
-    moments(k) = M(nj)-M(ni);
+    moments(k) = M(nj)+M(ni);
         
 end
 
