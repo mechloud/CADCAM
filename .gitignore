@@ -29,3 +29,4 @@ log.txt
 *.stat
 *.png
 /MATLAB/*ANSYS_input.txt
+/MATLAB/Equations.txt
