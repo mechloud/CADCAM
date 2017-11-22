@@ -6,7 +6,8 @@ function [axial,axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT,md)
 if nargin < 4
     clc
     close all
-    load('../Database/2dfea.mat');
+    addpath('Database');
+    load('2dfea.mat');
     OD = 25.0;
     WT = 3.0;
     md = 110;
@@ -179,10 +180,6 @@ epsilon = zeros(nelements,1);
 moments = zeros(nelements,1);
 
 %%
-% Get the moments from the force vector
-M = F(3:3:end);
-
-%%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
 % and $u'_j = lu_j + mv_j$ and $u'_i = lu_i + mv_i$
 for k = 1:nelements
@@ -209,10 +206,22 @@ for k = 1:nelements
     delta = uj_prime -ui_prime;
     epsilon(k) = delta/L(k);
     
+    %% Reconstruct Solution and Force Vectors
+    % Get global element stiffness matrix
+    Ke = preproc{k,4};
+    
     %%
-    % Calculate moment on element
-    moments(k) = M(nj)+M(ni);
-        
+    % Get global element displacement vector
+    Ue = [U(ni*3-2:1:(ni*3));
+          U(nj*3-2:1:(nj*3))];
+      
+    %%
+    % Calculate global element force vector
+    Fe = Ke*Ue;
+    
+    %%
+    % Extract and calculate moments on element
+    moments(k) = Fe(6) - Fe(3);       
 end
 
 %%
@@ -229,7 +238,7 @@ axial = (abs(axial)+bending).*sign(axial);
 %%
 % Find maximum stress
 max_stress = max(abs(axial))*sign(max(axial));
-if(max(abs(axial)) < Sy)
+if(max(abs(axial)) > Sy)
     warning('Yielding occurs in frame members, increasing size...');
 end
 

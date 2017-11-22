@@ -3,10 +3,10 @@
 function [OD,WT] = loop_FEA(FL,FH,md)
 
 if nargin < 3
-    FL = 1422;
-    FH = 1220;
-    md = 110;
-    addpath('../Database');
+    FL = 1828.2;
+    FH = 1219.0;
+    md = 110.0;
+    addpath('Database');
 end
 
 %%
@@ -36,15 +36,21 @@ nodes = change_frame_geometry(nodes,FL,FH);
 %%
 % Increase tube size until safety factors are satisfactory;
 ctr = 1;
-while (ASF < SF && BSF < SF && ctr < length(OD))
+while ((ASF < SF) && (BSF < SF) && (ctr < length(OD)))
     [res,ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1),md);
     ctr = ctr + 1;
+end
+
+if ctr == length(OD)
+    error(['No reasonable tubing size can accomodate the loading',...
+           ', consider different roll cage dimensions']);
 end
 
 OD = OD(ctr - 1);
 WT = WT(ctr - 1);
 colour_plot(nodes,elements,res);
-fprintf('The required primary tube size is %.1f mm OD and %.1f mm wall thickness\n',OD,WT);
+fprintf(['The required primary tube size is ',...
+         '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
 
 
 end
