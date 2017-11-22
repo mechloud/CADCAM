@@ -229,7 +229,9 @@ axial = (abs(axial)+bending).*sign(axial);
 %%
 % Find maximum stress
 max_stress = max(abs(axial))*sign(max(axial));
-assert(max(abs(axial)) < Sy, 'Yielding occurs in frame members');
+if(max(abs(axial)) < Sy)
+    warning('Yielding occurs in frame members, increasing size...');
+end
 
 %%
 % Find minimum safety factor
@@ -260,9 +262,6 @@ end
 %%
 % Calculate Buckling Safety Factor
 buckling_n = min(Scr./abs(axial));
-
-
-
 
 end % end function
 

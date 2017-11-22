@@ -20,7 +20,6 @@ FEATables.xlsx
 ansys_input.txt
 log.txt
 *.ini
-
 *.BCS
 *.esav
 *.full
@@ -29,3 +28,4 @@ log.txt
 *.rst
 *.stat
 *.png
+/MATLAB/*ANSYS_input.txt
