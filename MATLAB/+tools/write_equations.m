@@ -66,7 +66,11 @@ end
 
 %%
 % Open the file
-efid = fopen(fname,'w+');
+try
+    efid = fopen(fname,'w+');
+catch
+    error('Cannot write to %s\n',fname);
+end
 
 %%
 % Print values to file
@@ -76,6 +80,9 @@ end
 
 %%
 % Close the file
-fclose(efid);
-
+try
+    fclose(efid);
+    fprintf('Successfully wrote file %s\n',fname);
+catch
+    error('Not able to close file %s\n',fname);
 end

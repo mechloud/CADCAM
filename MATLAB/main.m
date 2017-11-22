@@ -153,7 +153,7 @@ else
     end
     
     % Frame Codes
-    [OD,WT] = loop_FEA(frame_length,frame_height,md);
+    [POD,PWT] = loop_FEA(frame_length,frame_height,md);
     
     if get(handles.rb_ANSYS,'Value') == 1
         % Load nodal data
@@ -178,8 +178,8 @@ else
         % situations
         for k = 1:4
             if files_to_create{k,1} == 1
-                create_ANSYS_input(files_to_create{k,2},nodes,elements,...
-                                   OD,WT,25.4,0.9,md);
+                tools.create_ANSYS_input(files_to_create{k,2},nodes,elements,...
+                                   POD,PWT,25.4,0.9,md);
             end
         end
     end
@@ -189,6 +189,15 @@ else
     
     % Close the log file
     fclose(log_id);
+    
+    % TEMPORARY: Define undefined variables
+    SOD = 25.0; % Secondary tubing OD
+    SWT = 0.89; % Secondary tubing WT
+    BHS = 13.0; % Bolt Hole Size
+    
+    % Write SolidWorks equations/global variables file
+    tools.write_equations(POD,PWT,SOD,SWT,BHS,frame_length,frame_width,...
+                          frame_height,track_width,ground_clearance);
 end
         
 
