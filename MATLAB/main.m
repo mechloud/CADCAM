@@ -146,17 +146,22 @@ else
         nodal = load('Database/baja_3D_geometry.mat');
         elements = nodal.elements;
         nodes = update_frame_geometry(nodal.nodes,frame_length,frame_height,frame_width);
-                
+        
+        % Get all the handles related to the radio buttons
         f_impact = get(handles.rb_front_impact,'Value');
         r_impact = get(handles.rb_rear_impact,'Value');
         s_impact = get(handles.rb_side_impact,'Value');
         rollover = get(handles.rb_rollover,'Value');
         
+        % Create a cell array with values of radio buttons and tags
+        % (strings)
         files_to_create = {f_impact,'front';
                            r_impact,'rear';
                            s_impact,'side';
                            rollover,'rollover'};
         
+        % Loop through this array and create an output file for selected
+        % situations
         for k = 1:4
             if files_to_create{k,1} == 1
                 create_ANSYS_input(files_to_create{k,2},nodes,elements,...
@@ -165,10 +170,10 @@ else
         end
     end
     
-    %%
     % Steering Codes
     
     
+    % Close the log file
     fclose(log_id);
 end
     
