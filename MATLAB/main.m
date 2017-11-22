@@ -64,6 +64,9 @@ clc
 addpath('Subfunctions');
 addpath('Database');
 
+% Set a radio button on by default
+set(handles.rb_front,'Value',1);
+
 % Set the window title
 set(handles.figure1,'Name','Fluent Design - CADCAM 2017');
 
@@ -125,7 +128,7 @@ else
     end
     
     fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
-    %%
+    
     % Suspension Codes
     if get(handles.rb_front,'Value') == 1
         Suspension('f',front_omegan,zeta,md);
@@ -134,15 +137,16 @@ else
     else
         Suspension('f',front_omegan,zeta,md);
     end
-    %%
+    
     % Frame Codes
     [OD,WT] = loop_FEA(frame_length,frame_height,md);
+    
     if get(handles.rb_ANSYS,'Value') == 1
         % Load nodal data
         nodal = load('Database/baja_3D_geometry.mat');
-        nodes = nodal.nodes;
         elements = nodal.elements;
-        
+        nodes = update_frame_geometry(nodal.nodes,frame_length,frame_height,frame_width);
+                
         f_impact = get(handles.rb_front_impact,'Value');
         r_impact = get(handles.rb_rear_impact,'Value');
         s_impact = get(handles.rb_side_impact,'Value');

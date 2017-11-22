@@ -6,9 +6,7 @@ function [axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT,md)
 if nargin < 4
     clc
     close all
-    addpath('../Database');
-    [nodes,~,~] = xlsread('2D_FEA_tables.xlsx','Nodal');
-    [elements,~,~] = xlsread('2D_FEA_tables.xlsx','Connectivity');    
+    load('../Database/2dfea.mat');
     OD = 25.0;
     WT = 3.0;
     md = 110;
@@ -170,9 +168,19 @@ Ka_sol(21,21) = Ka(21,21) + beta;
 % The system can now be solved to find the displacement vector U.
 U = Ka_sol\F;
 
+%%
+% Find unknown forces and moments
+F = Ka*U;
+
 %% Post-Processing
-% Declare displacements and strains vector
+% Declare displacements and strains vector and vector for moments in
+% elements
 epsilon = zeros(nelements,1);
+moments = zeros(nelements,1);
+
+%%
+% Get the moments from the force vector
+M = F(1:3:end);
 
 %%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
@@ -202,20 +210,27 @@ for k = 1:nelements
     epsilon(k) = delta/L(k);
     
     %%
-    % Find %\theta_i$ and $\theta_j$
-    theta_i = U(nunknowns*ni);
-    theta_j = U(nunknowns*nj);
-    
+    % Calculate moment on element
+    moments(k) = M(nj)-M(ni);
+        
 end
 
 %%
-% Find axial stresses in elements $\sigma = E\epsilon$
-sigma = E*epsilon;
+% Find tensile stresses in elements $\sigma = E\epsilon$
+axial = E*epsilon;
 
 %%
+% Find maximum bending stresses in every element
+bending = abs(moments).*(OD/2)./I;
+
+%%
+% Add bending to axial stresses
+axial = (abs(axial)+bending).*sign(axial);
+%%
 % Find maximum stress
-max_stress = max(abs(sigma))*sign(max(sigma))
-assert(max(abs(sigma)) < Sy, 'Yielding occurs in frame members');
+max_stress = max(abs(axial))*sign(max(axial));
+assert(max(abs(axial)) < Sy, 'Yielding occurs in frame members');
+
 %%
 % Find minimum safety factor
 axial_n = Sy/abs(max_stress);
@@ -238,18 +253,18 @@ Scr(critical_stress > (Sy/2)) = JohnsonBuckling(critical_stress > (Sy/2));
 
 %%
 % Check for buckling against previously calculated stresses
-if((sigma < 0) & (abs(sigma) > Scr))
+if((axial < 0) & (abs(axial) > Scr))
     error('Buckling occurs in frame members');
 end
 
 %%
 % Calculate Buckling Safety Factor
-buckling_n = min(Scr./abs(sigma));
+buckling_n = min(Scr./abs(axial));
 
 % fprintf('Yielding Safety Factor n = %.2d\n',axial_n);
 % fprintf('Buckling Safety Factor n = %.2d\n',buckling_n);
 
-colour_plot(nodes,elements,sigma);
+colour_plot(nodes,elements,axial);
 
 
 end % end function
@@ -315,6 +330,7 @@ for k = 1:nelements
 end
 view(0,90);
 colorbar;
+pbaspect([1.35 1 1]);
 caxis([min(sigma(:,2)),max(sigma(:,2))]);
 title('Axial Stress (MPa)');
 xlabel('x-coordinate (mm)');

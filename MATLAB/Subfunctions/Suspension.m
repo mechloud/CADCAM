@@ -116,7 +116,11 @@ title('Step Response');
 legend('Chassis');
 S = stepinfo(sys);
 ST = S.SettlingTime;
-fprintf('The %s settling time is %.2f s.\n', string, ST);
+if ~isnan(ST)
+    fprintf('The %s settling time is %.2f s.\n', string, ST);
+else
+    fprintf('The %s does not settle.\n',string);
+end
 %%
 % Plot Impulse Response
 %figure(3)
