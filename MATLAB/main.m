@@ -80,6 +80,20 @@ function varargout = main_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+%% range_check
+% RANGE_CHECK compares the obtained value from GUI to min and max and
+% returns a warning if applicable.
+function val = range_check(min,max,val)
+if val > max
+    warning(['Desired value outside of parametrizable range\n',...
+                    'Resetting to maxmimum value of %.1f\n'],max);
+    val = max;
+elseif val < min
+    warning(['Desired value outside of parametrizable range\n',...
+                    'Resetting to minimum value of %.1f\n'],min);
+    val = min;
+end
+
 %% BTN_GENERATE does all the work
 % --- Executes on button press in BTN_generate.
 function BTN_generate_Callback(hObject, eventdata, handles)
@@ -176,7 +190,7 @@ else
     % Close the log file
     fclose(log_id);
 end
-    
+        
 
 % --- Executes on button press in close.
 function close_Callback(hObject, eventdata, handles)
@@ -489,51 +503,27 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --- Executes on selection change in output.
-function output_Callback(hObject, eventdata, handles)
-% hObject    handle to output (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns output contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from output
-
-
-% --- Executes during object creation, after setting all properties.
-function output_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to output (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function box_frame_length_Callback(hObject, eventdata, handles)
-% hObject    handle to box_frame_length (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of box_frame_length as text
-%        str2double(get(hObject,'String')) returns contents of box_frame_length as a double
-val = str2double(get(hObject,'String'));
-set(handles.slider_frame_length,'Value',round(val,0));
-
-% --- Executes during object creation, after setting all properties.
-function box_frame_length_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to box_frame_length (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
+% % --- Executes on selection change in output.
+% function output_Callback(hObject, eventdata, handles)
+% % hObject    handle to output (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: contents = cellstr(get(hObject,'String')) returns output contents as cell array
+% %        contents{get(hObject,'Value')} returns selected item from output
+% 
+% 
+% % --- Executes during object creation, after setting all properties.
+% function output_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to output (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: listbox controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
 
 function box_frame_width_Callback(hObject, eventdata, handles)
 % hObject    handle to box_frame_width (see GCBO)
@@ -542,7 +532,10 @@ function box_frame_width_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_frame_width as text
 %        str2double(get(hObject,'String')) returns contents of box_frame_width as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_frame_width,'Value',round(val,0));
 
 % --- Executes during object creation, after setting all properties.
@@ -564,7 +557,10 @@ function box_frame_height_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_frame_height as text
 %        str2double(get(hObject,'String')) returns contents of box_frame_height as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_frame_height,'Value',round(val,0));
 
 % --- Executes during object creation, after setting all properties.
@@ -588,7 +584,10 @@ function box_front_omegan_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_front_omegan as text
 %        str2double(get(hObject,'String')) returns contents of box_front_omegan as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_front_omegan,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -610,7 +609,10 @@ function box_rear_omegan_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_rear_omegan as text
 %        str2double(get(hObject,'String')) returns contents of box_rear_omegan as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_rear_omegan,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -634,7 +636,10 @@ function box_zeta_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_zeta as text
 %        str2double(get(hObject,'String')) returns contents of box_zeta as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_zeta,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -656,7 +661,10 @@ function box_steering_ratio_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_steering_ratio as text
 %        str2double(get(hObject,'String')) returns contents of box_steering_ratio as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_steering_ratio,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -678,7 +686,10 @@ function box_wheelbase_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_wheelbase as text
 %        str2double(get(hObject,'String')) returns contents of box_wheelbase as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_wheelbase,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -700,7 +711,10 @@ function box_trackwidth_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_trackwidth as text
 %        str2double(get(hObject,'String')) returns contents of box_trackwidth as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_trackwidth,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -722,7 +736,10 @@ function box_ground_clearance_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_ground_clearance as text
 %        str2double(get(hObject,'String')) returns contents of box_ground_clearance as a double
+min = get(hObject,'Min');
+max = get(hObject,'Max');
 val = str2double(get(hObject,'String'));
+val = range_check(min,max,val);
 set(handles.slider_ground_clearance,'Value',val);
 
 % --- Executes during object creation, after setting all properties.
@@ -767,13 +784,26 @@ function box_mass_driver_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of box_mass_driver as text
 %        str2double(get(hObject,'String')) returns contents of box_mass_driver as a double
+
+min = get(hObject,'Min');
+max = get(hObject,'Max');
     front_omegan = get(handles.slider_front_omegan,'Value');
     rear_omegan = get(handles.slider_rear_omegan,'Value');   
     zeta = get(handles.slider_zeta,'Value');
-    md = get(handles.box_mass_driver,'Value');
+    md = str2double(get(handles.box_mass_driver,'String'));
     if get(handles.rb_lbs,'Value') == 1
         % if the mass is in lbs, convert to kg
         md = md/2.2;
+    end
+    if md > max/2.2
+        warning(['Mass of driver exceeds design spec, consider losing weight',...
+                 'or getting a smaller driver. Resetting to maximum value',...
+                 ' of %.0f lbs'],max);
+        md = max;
+    elseif md < min
+        warning(['You should know better than to have negative mass...',...
+                 ' Resetting to 175 lbs']);
+        md = 175;
     end
 %%
 % Suspension Codes

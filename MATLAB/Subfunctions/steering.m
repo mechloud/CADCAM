@@ -1,67 +1,101 @@
-clc;
-clear
+%% steering
+% STEERING Calculations
+function steering(FW,TW,WB,SR,FL)
 
-%% steering calculations
-%
-
-%% 
-% Global variables
-
-%Lkp=4.5*0.0254; %meters  length from middle of tire to pivot point
-WB=64*0.0254; %meters   wheelbase 
-%track=55*0.0254; %meters  track
-maxturn=45;  %maximum tire turn in deg 
-Lknuckle=3*0.0254; %length of arm on knuckle to attach tie rod
-Ltierod=14.92*0.0254; % length of tie rod in meters
-Lfromfront=2*0.0254;  %length from front of roll cage to rack and pinion in meters 
-%steeringratio=4;  % 4-deg input for 1-deg output
-Sy=276*10^6; %Sy of aluminum 6061 in Pa 
-E=68.9*10^9; %E of aluminum 6061 in Pa
-
-function Steering_geometry(track,Lkp,WB,steeringratio,framewidth,lengthfromfront)
-
-if nargin < 6
-    clc
-    close all
-    track = 55*0.0254;   %m
-    Lkp = 4.5*0.0254; %m
-    WB = 64*0.0254; %m
-    steeringratio = 4 
-    framewidth = 12*0.0254 %m
-    lengthfromfront = 5*0.0254 %m
+if nargin < 5
+    warning(['Number of arguments input to function not sufficient,',...
+             ' using default values']);
+    FW = 36*0.0254;
+    TW = 55*0.0254;
+    WB = 64*0.0254;
+    SR = 4;
+    FL = WB + 8*0.0254;
 end
-roffset= 2*0.0254 %m
+
+
+%% Declare global variables
+% Maximum tire turning angle [deg]
+maxturn = 45;
+
 %%
-% ackerman angle
-ackangle=atand((((track/2)-Lkp)/WB))
-%   ** output the ackangle to solidworks **
+% Length of steering arm [m]
+Lknuckle = 3*0.0254;
+
+%%
+% Length from front of roll cage to rack and pinion [m]
+Lfromfront=2*0.0254;
+
+%%
+% Length from center of tire to kingpin pivot point [m]
+Lkp = 4.5*0.0254; %m
+
+%%
+% Material Properties
+Sy = 276*10^6; %Sy of aluminum 6061 in Pa 
+E  = 68.9*10^9; %E of aluminum 6061 in Pa
+
+[ltr,ackangle,Pr] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,maxturn,...
+                                      Lknuckle);
+
+end
+
+
+function [Ltierod,ackangle,Pr] = steering_geometry(track,Lkp,WB,...
+                                                   steeringratio,...
+                                                   framewidth,...
+                                                   lff,... % length from front
+                                                   maxturn,...
+                                                   Lknuckle)
+
+%%
+% Rack Offset [m]
+roffset= 2*0.0254;
+
+%%
+% Ackerman angle
+ackangle = atand((((track/2)-Lkp)/WB));
+% ** OUTPUT TO SOLIDWORKS **
 
 %% 
 % minimum turning radius
-R=(WB/tand(maxturn))+(track/2) %minimum turning radius from center of vehicle
+R = (WB/tand(maxturn))+(track/2); %minimum turning radius from center of vehicle
 
-%% 
-% outer tire turn angle 
-do=atand(WB/(R+(track/2))) %outer tire turning angle
+% %% 
+% % outer tire turn angle 
+% delta_o = atand(WB/(R+(track/2))) %outer tire turning angle
 
 %%
 % Length of the tie rod
-Ltierod = sqrt((track/2-framewidth/2-Lkp-3*sind(ackangle))^2+(abs(lengthfromfront-roffset)^2))
+Ltierod = sqrt((track/2-framewidth/2-Lkp-3*sind(ackangle))^2 ...
+          +(abs(lff-roffset)^2));
 %   ** output length of tie rod to solidworks **
-%% 
-% needed motion from rack 
-La=(Lknuckle*cosd(ackangle-90))+sqrt(Ltierod^2-(abs(Lfromfront-roffset)+(Lknuckle*(cosd(ackangle-90))))^2)
-% distance between rack and pivot point @ ackangle
-Lm=(Lknuckle*cosd(ackangle-45))+sqrt(Ltierod^2-(abs(Lfromfront-roffset)+(Lknuckle*(cosd(ackangle-45))))^2)
-% distance between rack and pivot point @ max turn angle (45deg)
-Lneeded=Lm-La
-%difference between those lengths is the movement required by the rac
 
-%% 
-% required pinion size for desired steering ratio
-Pr=(Lneeded*steeringratio)/(2*pi) %pinion radius
+%% Motion needed from Rack
+% Distance between rack and pivot point @ ackangle
+La = (Lknuckle*cosd(ackangle-90))+sqrt(Ltierod^2-(abs(lff-roffset)...
+    +(Lknuckle*(cosd(ackangle-90))))^2);
+
+%%
+% Distance between rack and pivot point @ max turn angle (45deg)
+Lm = (Lknuckle*cosd(ackangle-45))+sqrt(Ltierod^2-(abs(lff-roffset)...
+    +(Lknuckle*(cosd(ackangle-45))))^2);
+
+%%
+% Difference between those lengths is the movement required by the rack
+Lneeded = Lm - La;
+
+%% Pinion Radius
+% Calculated pinion radius required for desired steering ratio
+Pr = (Lneeded*steeringratio)/(2*pi); 
 %   ** output pinion radius to solidworks
 
+%%
+% Print to log file 
+fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
+
+end
+
+function gear_calculations()
 %%
 %gear wear calculations
 PDi=0.875; % pitch diameter of the gear in inch
@@ -126,7 +160,7 @@ Sf=(St*Yn/1*1.5)/sigmab
 
 end
 
-function Steering_knuckle (Lkp,Lknuckle,Ltierod,Pr,Weight,)
+function Steering_knuckle (Lkp,Lknuckle,Ltierod,Pr,Weight)
 
 if nargin < 5
     clc
