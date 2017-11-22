@@ -1,5 +1,5 @@
 %% BoltTool
-% BOLTTOOL Takes a struct input and ca lculates applicable stresses for
+% BOLTTOOL Takes a struct input and calculates applicable stresses for
 % semi-permanent fasteners
 function BoltTool(b,n)
 
