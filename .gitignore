@@ -20,3 +20,4 @@ FEATables.xlsx
 ansys_input.txt
 log.txt
 *.ini
+*ANSYS_input.txt

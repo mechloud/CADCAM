@@ -22,7 +22,7 @@
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 18-Nov-2017 13:17:03
+% Last Modified by GUIDE v2.5 21-Nov-2017 18:25:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,6 +62,7 @@ clc
 
 % Add subfunctions path
 addpath('Subfunctions');
+addpath('Database');
 
 % Set the window title
 set(handles.figure1,'Name','Fluent Design - CADCAM 2017');
@@ -135,14 +136,29 @@ else
     end
     %%
     % Frame Codes
-    %[OD,WT] = loop_FEA(frame_length,frame_height,md);
+    [OD,WT] = loop_FEA(frame_length,frame_height,md);
     if get(handles.rb_ANSYS,'Value') == 1
-        % WAITING FOR 3D FEA Excel Spreadsheet (LIZ)
         % Load nodal data
-        %nodal = load('2dfea.mat');
-        %nodes = nodal.nodes;
-        %elements = nodal.elements;
-        %create_ANSYS_input(nodes,elements,OD,WT,25.4,0.9,md);
+        nodal = load('Database/baja_3D_geometry.mat');
+        nodes = nodal.nodes;
+        elements = nodal.elements;
+        
+        f_impact = get(handles.rb_front_impact,'Value');
+        r_impact = get(handles.rb_rear_impact,'Value');
+        s_impact = get(handles.rb_side_impact,'Value');
+        rollover = get(handles.rb_rollover,'Value');
+        
+        files_to_create = {f_impact,'front';
+                           r_impact,'rear';
+                           s_impact,'side';
+                           rollover,'rollover'};
+        
+        for k = 1:4
+            if files_to_create{k,1} == 1
+                create_ANSYS_input(files_to_create{k,2},nodes,elements,...
+                                   OD,WT,25.4,0.9,50,md);
+            end
+        end
     end
     
     %%
@@ -720,7 +736,19 @@ function rb_ANSYS_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of rb_ANSYS
-
+if get(hObject,'Value') == 0
+    action = 'off';
+    set(handles.rb_front_impact,'Value',0);
+    set(handles.rb_side_impact,'Value',0);
+    set(handles.rb_rear_impact,'Value',0);
+    set(handles.rb_rollover,'Value',0);
+else
+    action = 'on';
+end
+set(handles.rb_front_impact,'Enable',action);
+set(handles.rb_side_impact,'Enable',action);
+set(handles.rb_rear_impact,'Enable',action);
+set(handles.rb_rollover,'Enable',action);
 
 
 function box_mass_driver_Callback(hObject, eventdata, handles)
@@ -833,3 +861,39 @@ end
 %%
 % Suspension Codes
 Suspension('r',rear_omegan,zeta,md);
+
+
+% --- Executes on button press in rb_front_impact.
+function rb_front_impact_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_front_impact (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_front_impact
+
+
+% --- Executes on button press in rb_side_impact.
+function rb_side_impact_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_side_impact (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_side_impact
+
+
+% --- Executes on button press in rb_rear_impact.
+function rb_rear_impact_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_rear_impact (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_rear_impact
+
+
+% --- Executes on button press in rb_rollover.
+function rb_rollover_Callback(hObject, eventdata, handles)
+% hObject    handle to rb_rollover (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rb_rollover
