@@ -9,9 +9,9 @@ function BoltTool(b,n)
 if nargin < 2
    b = struct('bdia',12.7,... % Bolt Diameter in mm
               'F',1300,...    % Shearing Force in N
-              't',127,...    % Thickness of clamped parts
+              't',0.125,...    % Thickness of member
               'mxA',200,...   % Cross sectional area of weakeast connected member
-              'SyM',600);     % Yield Strength of weakest clamped part);
+              'SyM',600);     % Yield Strength of weakest member
    n = 2.0;
 end
 
