@@ -7,20 +7,34 @@ clear
 %% 
 % Global variables
 
-Lkp=4.5*0.0254; %meters  length from middle of tire to pivot point
+%Lkp=4.5*0.0254; %meters  length from middle of tire to pivot point
 WB=64*0.0254; %meters   wheelbase 
-track=55*0.0254; %meters  track
+%track=55*0.0254; %meters  track
 maxturn=45;  %maximum tire turn in deg 
 Lknuckle=3*0.0254; %length of arm on knuckle to attach tie rod
 Ltierod=14.92*0.0254; % length of tie rod in meters
 Lfromfront=2*0.0254;  %length from front of roll cage to rack and pinion in meters 
-steeringratio=4;  % 4-deg input for 1-deg output
+%steeringratio=4;  % 4-deg input for 1-deg output
 Sy=276*10^6; %Sy of aluminum 6061 in Pa 
 E=68.9*10^9; %E of aluminum 6061 in Pa
 
-%% 
+function Steering_geometry(track,Lkp,WB,steeringratio,framewidth,lengthfromfront)
+
+if nargin < 6
+    clc
+    close all
+    track = 55*0.0254;   %m
+    Lkp = 4.5*0.0254; %m
+    WB = 64*0.0254; %m
+    steeringratio = 4 
+    framewidth = 12*0.0254 %m
+    lengthfromfront = 5*0.0254 %m
+end
+roffset= 2*0.0254 %m
+%%
 % ackerman angle
 ackangle=atand((((track/2)-Lkp)/WB))
+%   ** output the ackangle to solidworks **
 
 %% 
 % minimum turning radius
@@ -30,99 +44,23 @@ R=(WB/tand(maxturn))+(track/2) %minimum turning radius from center of vehicle
 % outer tire turn angle 
 do=atand(WB/(R+(track/2))) %outer tire turning angle
 
+%%
+% Length of the tie rod
+Ltierod = sqrt((track/2-framewidth/2-Lkp-3*sind(ackangle))^2+(abs(lengthfromfront-roffset)^2))
+%   ** output length of tie rod to solidworks **
 %% 
 % needed motion from rack 
-La=(Lknuckle*cosd(ackangle-90))+sqrt(Ltierod^2-(Lfromfront+(Lknuckle*(cosd(ackangle-90))))^2)
+La=(Lknuckle*cosd(ackangle-90))+sqrt(Ltierod^2-(abs(Lfromfront-roffset)+(Lknuckle*(cosd(ackangle-90))))^2)
 % distance between rack and pivot point @ ackangle
-Lm=(Lknuckle*cosd(ackangle-45))+sqrt(Ltierod^2-(Lfromfront+(Lknuckle*(cosd(ackangle-45))))^2)
+Lm=(Lknuckle*cosd(ackangle-45))+sqrt(Ltierod^2-(abs(Lfromfront-roffset)+(Lknuckle*(cosd(ackangle-45))))^2)
 % distance between rack and pivot point @ max turn angle (45deg)
 Lneeded=Lm-La
-%difference between those lengths is the movement required by the rack
+%difference between those lengths is the movement required by the rac
 
 %% 
 % required pinion size for desired steering ratio
 Pr=(Lneeded*steeringratio)/(2*pi) %pinion radius
-%
-
-%%
-% bending in initially curved beams 
-h=1.5*0.0254; %height of cross section on the arm connecting to the tie rod
-b=1*0.0254;     %width of base of the cross section 
-ro=0.0508;  %outer radius of initially curved beam
-ri=0.0254;  %inner radius of initially curved beam 
-Fknuckle=174;  %force acting on arm ((will alter later))
-rn=h/(log(ro/ri)); %radius of the neutral axis
-rc=ri+(h/2); %radius of the centroidal axis
-Ci=rn-ri;  %distance from neutral axis to inner fiber
-Co=ro-rn;  %distance from neutral axis to outer fiber
-e=rc-rn;  %distance from centroidal axis to neutral axis
-A=b*h; %area of cross section 
-
-sigmai=Fknuckle*Ci/(A*e*ri) % inner fiber stress
-sigmao=-Fknuckle*Co/(A*e*ri) %outer fiber stress
-
-ni=sigmai/Sy %safety factor of inner fiber 
-no=sigmao/Sy %safety factor of outer fiber
-
-%% 
-%buckling stress tie rod
-Ftie=174 % force compressing tie rod ((to be changed))
-OD=19.05*0.0254 % outer diameter of tie rod 
-ID=16.1*0.0254 %inner diameter of tie rod
-A=((pi*OD^2)/4)-((pi*ID^2)/4) %cross sectional area
-I=pi/64*(OD^4-ID^4) %momment of inertia 
-Lc=Ltierod %corrected buckling tie rod length (tie rod length)
-ratio=pi^2*E*I/(A*Lc^2) %comparisson to be compared with Sy/2
-
-if (Sy/2>=ratio)
-    Scr=(pi^2*E*I)/(A*Lc^2)
-else  %depending on if its larger or smaller than the ratio Scr will change
-    Scr=Sy*(1-((Sy*A*Lc^2)/(4*pi^2*E*I)))
-end
-
-sigmab=Ftie/A %buckling stress on the tie rod 
-ntie=sigmab/Sy %buckling safety factor of the tie rod 
-% ((need to calculate the tension in the tie rod))
-%% 
-% torsion on steering column part#1
-torin=677.74; %torque in steering column ((need to change this))
-OD=25.4/1000; %m outer diameter of rod
-S=6.35/1000; %m size of slot in rod
-R=OD/2;  %radius of rod 
-J=((pi*OD^4)/32)-(2*(S^4/6)); %polar moment of inertia of rod 
-tau=((torin*R)/J) %torsional stress on rod 
-n=((Sy*.58)/tau) %torsional stress safety factor of rod
-
-%%
-% torsion on steering column part#2
-torin=677.74; %torque in steering column ((need to be changed))
-OD=28.58/1000  %m Outer diameter of steering column sleev%torque in steering column ((need to be changed))e 
-ID=25.63/1000 %m Inner diamter of steering column sleeve
-R=OD/2; %radius of steering column sleeve
-J=((pi*OD^4)/32)-((pi*ID^4)/32); %polar moment of inertia on steering column sleeve
-tau=((torin*R)/J) % torsional stress on steering column upper sleeve
-n=((Sy*.58)/tau) %torsional stress safety factor of rod  
-%%
-% torsion on steering column part#3
-torin=677.74;  %torque in steering column ((need to be changed))
-b=1.48/1000; % bolt hole thickness 
-d=12/1000;  %bolt hole diameter
-OD=(15.88*2)/1000;  %m outer diameter of bigger sleeve
-ID=(14.40*2)/1000; %m inner diameter of bigger sleeve
-R=OD/2; % radius of bigger sleeve
-J=((pi*OD^4)/32)-((pi*ID^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
-tau=((torin*R)/J) %torsional stress on bigger sleeve
-n=((Sy*.58)/tau) %torsional stress on bigger sleeve safety factor 
-%%
-% shear on steering pins
-torin=677.74; %torque in steering column ((need to be changed))
-syb=240*10^6; %Sy of the bolt
-OD=(15.88*2)/1000;  %m outer diameter of bolt 
-R=OD/2;  %of outer tube sleeve
-r=6.35/1000; %m radius of slot 
-A=pi*r^2; % area of cross section of the bolt
-tau=((torin/R)/A) %shear stress on the bolt
-n=((syb*.58)/tau) %coresponding safety factor of the bolt
+%   ** output pinion radius to solidworks
 
 %%
 %gear wear calculations
@@ -183,3 +121,141 @@ simgmab=Wt*Ko*Kv*Ks*(PDi/Facei)*(((Km*Kb)/J));
 St=482.63*10^6;
 Yn=2.5;
 Sf=(St*Yn/1*1.5)/sigmab
+
+
+
+end
+
+function Steering_knuckle (Lkp,Lknuckle,Ltierod,Pr,Weight,)
+
+if nargin < 5
+    clc
+    close all
+    Lkp = 4.5*0.0254;     
+    Lknuckle = 0.0254*3;
+    Ltierod = 14.8*0.0254; %m
+    Pr = 0.875*0.0254; %m
+    Weight = 350; %kg
+end
+
+%%
+% determing the forces acting on the system
+mu = 0.75;
+G = 9.8;
+CG = 0.4;
+assumed_force = 750;
+
+Ftoturn = 174;
+Froad= 500;
+
+%%
+% bending in initially curved beams 
+h=1.5*0.0254; %height of cross section on the arm connecting to the tie rod
+b=1*0.0254;     %width of base of the cross section 
+ro=0.0508;  %outer radius of initially curved beam
+ri=0.0254;  %inner radius of initially curved beam 
+Fknuckle=174;  %force acting on arm ((will alter later))
+rn=h/(log(ro/ri)); %radius of the neutral axis
+rc=ri+(h/2); %radius of the centroidal axis
+Ci=rn-ri;  %distance from neutral axis to inner fiber
+Co=ro-rn;  %distance from neutral axis to outer fiber
+e=rc-rn;  %distance from centroidal axis to neutral axis
+A=b*h; %area of cross section 
+
+sigmai=Fknuckle*Ci/(A*e*ri) % inner fiber stress
+sigmao=-Fknuckle*Co/(A*e*ri) %outer fiber stress
+
+ni=sigmai/Sy %safety factor of inner fiber 
+no=sigmao/Sy %safety factor of outer fiber
+
+end
+
+function Tie_Rod (sdhkb)
+
+if nargin < 4
+    clc
+    close all
+    zeta = 0.3;     
+    freq = 1.6; %Hz
+    md = 110; %kg
+    location = 'f';
+end
+
+%% 
+%buckling stress tie rod
+Ftie=174 % force compressing tie rod ((to be changed))
+OD=19.05*0.0254 % outer diameter of tie rod 
+ID=16.1*0.0254 %inner diameter of tie rod
+A=((pi*OD^2)/4)-((pi*ID^2)/4) %cross sectional area
+I=pi/64*(OD^4-ID^4) %momment of inertia 
+Lc=Ltierod %corrected buckling tie rod length (tie rod length)
+ratio=pi^2*E*I/(A*Lc^2) %comparisson to be compared with Sy/2
+
+if (Sy/2>=ratio)
+    Scr=(pi^2*E*I)/(A*Lc^2)
+else  %depending on if its larger or smaller than the ratio Scr will change
+    Scr=Sy*(1-((Sy*A*Lc^2)/(4*pi^2*E*I)))
+end
+
+sigmab=Ftie/A %buckling stress on the tie rod 
+ntie=sigmab/Sy %buckling safety factor of the tie rod 
+% ((need to calculate the tension in the tie rod))
+
+end
+
+function Steering_column (iubh)
+
+if nargin < 4
+    clc
+    close all
+    zeta = 0.3;     
+    freq = 1.6; %Hz
+    md = 110; %kg
+    location = 'f';
+end
+
+%% 
+% torsion on steering column part#1
+torin=677.74; %torque in steering column ((need to change this))
+OD=25.4/1000; %m outer diameter of rod
+S=6.35/1000; %m size of slot in rod
+R=OD/2;  %radius of rod 
+J=((pi*OD^4)/32)-(2*(S^4/6)); %polar moment of inertia of rod 
+tau=((torin*R)/J) %torsional stress on rod 
+n=((Sy*.58)/tau) %torsional stress safety factor of rod
+
+%%
+% torsion on steering column part#2
+torin=677.74; %torque in steering column ((need to be changed))
+OD=28.58/1000  %m Outer diameter of steering column sleev%torque in steering column ((need to be changed))e 
+ID=25.63/1000 %m Inner diamter of steering column sleeve
+R=OD/2; %radius of steering column sleeve
+J=((pi*OD^4)/32)-((pi*ID^4)/32); %polar moment of inertia on steering column sleeve
+tau=((torin*R)/J) % torsional stress on steering column upper sleeve
+n=((Sy*.58)/tau) %torsional stress safety factor of rod  
+
+%%
+% torsion on steering column part#3
+torin=677.74;  %torque in steering column ((need to be changed))
+b=1.48/1000; % bolt hole thickness 
+d=12/1000;  %bolt hole diameter
+OD=(15.88*2)/1000;  %m outer diameter of bigger sleeve
+ID=(14.40*2)/1000; %m inner diameter of bigger sleeve
+R=OD/2; % radius of bigger sleeve
+J=((pi*OD^4)/32)-((pi*ID^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
+tau=((torin*R)/J) %torsional stress on bigger sleeve
+n=((Sy*.58)/tau) %torsional stress on bigger sleeve safety factor 
+
+%%
+% shear on steering pins
+torin=677.74; %torque in steering column ((need to be changed))
+syb=240*10^6; %Sy of the bolt
+OD=(15.88*2)/1000;  %m outer diameter of bolt 
+R=OD/2;  %of outer tube sleeve
+r=6.35/1000; %m radius of slot 
+A=pi*r^2; % area of cross section of the bolt
+tau=((torin/R)/A) %shear stress on the bolt
+n=((syb*.58)/tau) %coresponding safety factor of the bolt
+
+end
+
