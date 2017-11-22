@@ -136,4 +136,14 @@ end
 % max_accel = max(max(acc_imp),max(acc_step));
 % fprintf('Maximum acceleration is %.1f m/s^2.\n', max_accel);
 
+%% Bolt Size
+% Checking to see if bolt size is correct
+F=k2*0.152; %Spring rate times maximum spring compression of 152 mm (6in)
+n=4.0;
+b = struct('bdia',12.7,... % Bolt Diameter in mm
+              'F',2*F,...    % Shearing Force in N
+              't',127,...    % Thickness of clamped parts
+              'mxA',200,...   % Cross sectional area of weakeast connected member
+              'SyM',600);     % Yield Strength of weakest clamped part);
+tools.BoltTool(b,n);          
 end
