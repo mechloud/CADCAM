@@ -141,9 +141,9 @@ end
 F=k2*0.152; %Spring rate times maximum spring compression of 152 mm (6in)
 n=4.0;
 b = struct('bdia',12.7,... % Bolt Diameter in mm
-              'F',2*F,...    % Shearing Force in N
-              't',127,...    % Thickness of clamped parts
-              'mxA',200,...   % Cross sectional area of weakeast connected member
-              'SyM',600);     % Yield Strength of weakest clamped part);
+              'F',F,...    % Shearing Force in N
+              't',3.04,...    % Thickness of clamped parts
+              'mxA',118.56,...   % Cross sectional area of weakeast connected member
+              'SyM',250);     % Yield Strength of weakest clamped part);
 tools.BoltTool(b,n);          
 end

@@ -21,7 +21,7 @@ xA = (pi/4)*b.bdia^4;
 
 %%
 % Determine shear stress
-tau = b.F/xA;
+tau = b.F/b.mxA;
 
 %% Tensile Failure of Member
 % Determine tensile stress of member using cross-sectional area of attached
