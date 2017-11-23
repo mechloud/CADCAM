@@ -1,4 +1,4 @@
-function create_ANSYS_input(type,nodes,elements,POD,PWT,SOD,SWT,meshsize,md)
+function create_ANSYS_input(type,nodes,elements,POD,PWT,SOD,SWT,md)
 
 if nargin < 9
     warning('Not enough input arguments, default parameters will be used');
@@ -16,7 +16,6 @@ if nargin < 9
     PWT = 3;
     SOD = 25;
     SWT = 0.9;
-    meshsize = 1;
     md = 110;
 end % end nargin
 
@@ -35,8 +34,11 @@ fprintf('Writing ANSYS input file for %s impact case\n',type);
 % Create keypoints
 fprintf(fid,'/PREP7\n! Create nodes \n');
 for k = 1:nnodes
-    %fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),nodes(k,4));
-    fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),0);
+    if strcmp(type,'2d')
+        fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),0);
+    else
+        fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),nodes(k,4));
+    end
 end
 
 %%
@@ -51,9 +53,9 @@ end
 fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
 fprintf(fid,'\n! Set Section Information\n');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,1);
+    'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,12);
 fprintf(fid,['\nSECTYPE,2,BEAM,CTUBE,Secondary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],SOD-2*SWT,SOD,1);
+    'SECDATA,%.1f,%.1f,%i\n'],SOD-2*SWT,SOD,12);
 % Last parameter in the last two fprintf's used to be 12
 
 %%
@@ -73,7 +75,7 @@ end
 %%
 % Select and mesh all lines
 fprintf(fid,'\n! Select All Lines\nALLSELL\n');
-fprintf(fid,'\n! Specifiy size on unmeshed lines\nLESIZE,ALL,,,%i,,1,,,\n',meshsize');
+fprintf(fid,'\n! Specifiy size on unmeshed lines\nLESIZE,ALL,6,,,,1,,,\n');
 fprintf(fid,'\n! Mesh all lines\nLMESH,ALL');
 
 %%
@@ -83,7 +85,6 @@ fprintf(fid,'\n! Display elements\n/ESHAPE,1\nEPLOT\n');
 %% Solution
 % Apply constraints and loads
 fprintf(fid,'\n/SOLU');
-
 switch type
     case '2d'
         % This case shouldn't happen unless this function is run by itself
@@ -197,7 +198,7 @@ fprintf(fid,'\n! Solve\nSOLVE\nFINISH\n');
 
 %% Post-Processing
 % Post-process
-fprintf(fid,'\n! Post-Processing\n/POST1\nETABLE,\nFINISH\n');
+fprintf(fid,'\n! Post-Processing\n/POST1\n/GLINE,ALL,-1\nETABLE,\nFINISH\n');
 
 %%
 % Close the file

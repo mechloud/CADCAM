@@ -21,3 +21,10 @@ ansys_input.txt
 log.txt
 *.ini
 
+*.BCS
+*.esav
+*.full
+*.mntr
+*.page
+*.rst
+*.stat

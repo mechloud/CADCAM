@@ -124,6 +124,8 @@ ET,1,BEAM188
 
 ! Set Section Information
 
+! Last entry on SECDATA is number of cells around circumference
+
 SECTYPE,1,BEAM,CTUBE,Primary
 SECDATA,19.0,25.0,12
 
@@ -371,7 +373,7 @@ LATT,1,,1,,,,2
 ALLSELL
 
 ! Specifiy size on unmeshed lines
-LESIZE,ALL,,,25,,1,,,
+LESIZE,ALL,6,,,,1,,,
 
 ! Mesh all lines
 LMESH,ALL
@@ -391,10 +393,10 @@ FK,6,FY,-127.53
 FK,11,FY,-127.53
 FK,19,FY,-539.6
 FK,22,FY,-539.6
-FK,1,FZ,-22875.0
-FK,16,FZ,-22875.0
-FK,24,FZ,-22875.0
-FK,31,FZ,-22875.0
+FK,1,FZ,-45750.0
+FK,16,FZ,-45750.0
+FK,24,FZ,-45750.0
+FK,31,FZ,-45750.0
 
 ! Solve
 SOLVE
@@ -402,5 +404,6 @@ FINISH
 
 ! Post-Processing
 /POST1
+/GLINE,ALL,-1
 ETABLE,
 FINISH

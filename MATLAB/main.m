@@ -165,7 +165,7 @@ else
         for k = 1:4
             if files_to_create{k,1} == 1
                 create_ANSYS_input(files_to_create{k,2},nodes,elements,...
-                                   OD,WT,25.4,0.9,50,md);
+                                   OD,WT,25.4,0.9,md);
             end
         end
     end
