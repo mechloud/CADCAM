@@ -1,6 +1,6 @@
 function create_ANSYS_input(type,nodes,elements,POD,PWT,SOD,SWT,md)
 
-if nargin < 9
+if nargin < 8
     warning('Not enough input arguments, default parameters will be used');
     
     %%
@@ -10,7 +10,7 @@ if nargin < 9
     nodes = nodal.nodes;
     elements = nodal.elements;
     
-    type = 'front';
+    type = 'rollover';
     
     POD = 25;
     PWT = 3;
