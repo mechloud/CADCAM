@@ -180,7 +180,7 @@ moments = zeros(nelements,1);
 
 %%
 % Get the moments from the force vector
-M = F(1:3:end);
+M = F(3:3:end);
 
 %%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
