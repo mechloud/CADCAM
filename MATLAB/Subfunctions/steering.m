@@ -10,17 +10,13 @@ if nargin < 7
     WB = 64*0.0254;
     SR = 4;
     FL = WB + 8*0.0254;
-    Weight = 350; %kg
+    Weight = 305; %kg
     CG=0.4;
 end
 
 addpath('../Database');
 
 %% Declare global variables
-% Maximum tire turning angle [deg]
-maxturn = 45;
-
-%%
 % Length of steering arm [m]
 Lknuckle = 3*0.0254;
 
@@ -38,9 +34,9 @@ Sy = 276*10^6; %Sy of aluminum 6061 in Pa
 E  = 68.9*10^9; %E of aluminum 6061 in Pa
 syb = 240*10^6; %sy of bolt in Pa
 
-[ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,maxturn,...
+[ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
                                       Lknuckle);
-[Ft,Fr,torin,torr] = steering_forces(Weight,CG);
+[Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
 
 h = steering_knuckle(Fr,Ft,Sy) 
 %sends back new value of cross section height for steering arm
@@ -48,32 +44,32 @@ h = steering_knuckle(Fr,Ft,Sy)
 %%
 % Calculates forces on ties rods. Returns safety factors, OD and ID of
 % tie-rod tubes.
-[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
+%[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
 
 %%
 % Calculates the shear on the bolts in the steering column and returns
 % safety factors and slot size
-[slotsize,~,~] = column_bolt_shear(torin,torr,Sy);
+%[slotsize,~,~] = column_bolt_shear(torin,torr,Sy);
     
 %%
 % Calculates the torsional stress on the inner rod in the steering column
 % and returns ID and safety factors
-[ir_d,~,~] = column_inner(torin,torr,Sy,slotsize);
+%[ir_d,~,~] = column_inner(torin,torr,Sy,slotsize);
 % ir_d = inner rod outside diameter
 
 %%
 % Calculates the torsional stress on the outer tube in the steering column
 % and returns OD, ID and safety factors
-[ot_OD,ot_ID,~,~] = column_outer(torin,torr,Sy,ir_d);
+%[ot_OD,ot_ID,~,~] = column_outer(torin,torr,Sy,ir_d);
 
 %%
 % Calculates the torsional stress on the outer tube sleeve in the steering 
 % column and returns OD, ID and safety factors
-[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
+%[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
 
 %%
 % Temporary call to gear calculations function
-gear_loop(Pr);
+[gearsize]= gear_loop(Pr,torin,torr);
 end
 
 function [Ltierod,...
@@ -84,7 +80,6 @@ function [Ltierod,...
                                                    steeringratio,...
                                                    framewidth,...
                                                    lff,... % length from front
-                                                   maxturn,...
                                                    Lknuckle,...
                                                    firewalllength)
 
@@ -95,6 +90,8 @@ firewalllength = 1.500;
 % Rack Offset [m]
 roffset= 2*0.0254;
 
+% Maximum tire turning angle [deg]
+maxturn = 45;
 %%
 % Ackerman angle
 ackangle = atand((((track/2)-Lkp)/WB));
@@ -130,7 +127,7 @@ Lneeded = Lm - La;
 
 %% Pinion Radius
 % Calculated pinion radius required for desired steering ratio
-Pr = (Lneeded*steeringratio)/(2*pi); 
+Pr = (Lneeded/((maxturn*steeringratio)/360)*(2*pi)); 
 %   ** output pinion radius to solidworks
 
 %%
@@ -150,42 +147,58 @@ end
 % **need to find max and min gear radius to create and use database** %
 % *** also need to fix the values i use here *** %
 
-function gear_loop(Pr)
+function [gearsize] = gear_loop(Pr,torin,torr)
 
-gears = xlsread('gears.xlsx');
+% gears = xlsread('gears.xlsx');
+% 
+% desired_PD = Pr * 2/0.0254;
+% 
+% nteeth = gears(:,1);
+% PDi = gears(:,2);
+% Bore = gears(:,3);
+% Facei = gears(:,4);
+% OD = gears(:,4);
 
-desired_PD = Pr * 2/0.0254;
-
-nteeth = gears(:,1);
-PDi = gears(:,2);
-Bore = gears(:,3);
-Facei = gears(:,4);
-OD = gears(:,4);
-
+%%
+% temporary variables
+N = 16;
+PD = 0.875;
+F = 0.75;
 Pa=20; %pressure angle in deg
 DP=16; %diametral pitch of the gear 
+wt = torr*0.224809; % force transfered through the gear in foot pounds
+wt2 = torin; %just temporary use to compare with torr
+ctr=1;
+
+[sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa);
+while SF < SFhardcoded
+    %increase size
+    [sf,sh] = gear_calculations();
+    ctr = ctr+1;
+end
+
+
+end
+
+function [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa)
 
 Mn = 1;   % constant for spur gears
-V  = 2;   % m/s max velocity of gear 
+V  = 2*196.85;   % m/s max velocity of gear 
 Qv = 7;   % type of gearing constant 
-Wt = 320; % force transfered through the gear in newtons i guess
-Cp = 191;
-%Cp=sqrt((1/(pi*(2*(1-.3^2)/(200*10^9)))))
-
-
+Cp = 2300;
 I=((cosd(Pa)*sind(Pa))/(2*Mn)); %contact ratio 
 
-B=0.25*((12-Qv)^(2/3));
-A=50+(56*(1-B));
-Kv=((A+sqrt(200*V))/A)^B; %metric constant
+B1=0.25*((12-Qv)^(2/3));
+A1=50+(56*(1-B1));
+Kv=((A1+sqrt(V))/A1)^B1; %metric constant
 
-Cpf=(Facei/(10*PDi))-0.025;
+Cpf=(F/(10*PD))-0.025;
 Cmc=1; %uncrowned teeth
 Cpm=1; %constant
-A=0.127;
-B=0.0158;   %values found froom a table for comercial enclosed units
-C=-0.93*10^(-4);
-Cma=A+B*Facei+(C*Facei^2);
+A2=0.127;
+B2=0.0158;   %values found froom a table for comercial enclosed units
+C=-0.93e-4;
+Cma=A2+B2*F+(C*F^2);
 Ce=1; %constant
 Km=1+(Cmc*((Cpf*Cpm)+(Cma*Ce)));
 
@@ -193,10 +206,10 @@ Ko=1.5;
 Ks=1;
 Cf=1;
 
-sigmaw=Cp*(sqrt(Wt*Ko*Kv*Ks*(Km/((PDi*25.4)*(Facei*25.4)))*(Cf/I)))
+sigmaw=Cp*(sqrt(wt*Ko*Kv*Ks*(Km/(PD*F))*(Cf/I)))
 
 Zn=1.5;
-Sc=1896;
+Sc=225000;
 Kt=1;
 Kr=1.5;
 Ch=1;
@@ -207,28 +220,16 @@ Sh=((Sc*Zn*Ch)/(Kt*Kr))/sigmaw
 % bending stress in gear
 J=0.22;
 Kb=1;
-Wt=7.106;
-simgmab=Wt*Ko*Kv*Ks*(PDi/Facei)*(((Km*Kb)/J));
+
+sigmab = wt*Ko*Kv*Ks*(PD/F)*(((Km*Kb)/J));
 St=482.63*10^6;
 Yn=2.5;
-Sf=(St*Yn/1*1.5)/sigmab
-
-
-
-% outputs = calculation_function(inputs,inputs,inputs);
-% while SF < SFhardcoded
-%     increase size
-%     outputs = calculation_function(inputs...);
-%     increment counter
-% end
-
+Sf=((St*Yn)/(1*1.5))/sigmab
 
 end
 
 
-
-
-function [Ft,Fr,torin,torr] = steering_forces(Weight,CG)
+function [Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle)
 %%
 % determing the forces acting on the system
 mu = 0.75; %friction coefficient between tire and track surface
@@ -238,10 +239,10 @@ assumed_force = 750; %set impact force hitting the side of the tire
 %math
 
 % ** outputed values **
-Ft = 174;
-Fr = (2225*(11*0.0254))/(4.5*0.0254);
-torin = 7.1;
-torr = 7.1;
+Ft = ((Weight*CG*G*mu*Lkp)/Lknuckle);
+Fr = (2225*(11*0.0254))/(Lkp); %2225 N is a set value that i chose 
+torin = Ft*(Pr*0.0254);
+torr = (Pr*0.0254)*Fr;
 
 end
 
@@ -302,31 +303,64 @@ end
 function [nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
 %% 
 %buckling stress tie rod
-OD = 19.05/1000; % outer diameter of tie rod 
-ID = 16.1/1000; %inner diameter of tie rod
-A = ((pi*OD^2)/4)-((pi*ID^2)/4); %cross sectional area
-I = pi/64*(OD^4-ID^4); %momment of inertia 
+tubes = load('tube_sizes.mat');
+tube_sizes = tubes.tube_sizes;
+ODs = tube_sizes(:,1)/1000;
+IDs = ODs - 0.002*tube_sizes(:,2);
+
+od = OD(1);
+id = ID(1);
+%OD = 19.05/1000; % outer diameter of tie rod 
+%ID = 16.1/1000; %inner diameter of tie rod
+
+A = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
+I = pi/64*(od^4-id^4); %momment of inertia 
 Lc = Ltierod; %corrected buckling tie rod length (tie rod length)
 E = 68.9e9;
 ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
 
 
 if (Sy/2 >= ratio)
-    Scr = (pi^2*E*I)/(A*Lc^2)
+    Scr = (pi^2*E*I)/(A*Lc^2);
 else  %depending on if its larger or smaller than the ratio Scr will change
-    Scr = Sy*(1-((Sy*A*Lc^2)/(4*pi^2*E*I)))
+    Scr = Sy*(1-((Sy*A*Lc^2)/(4*pi^2*E*I)));
 end
 
-sigmat = Ft/A %buckling stress on the tie rod 
-sigmar = Fr/A
-nt = sigmat/Sy %buckling safety factor of the tie rod 
-nr = sigmar/Sy
-% ((need to calculate the tension in the tie rod))
+sigmat = Ft/A; %buckling stress on the tie rod 
+sigmar = Fr/A;
+nt = sigmat/Scr; %buckling safety factor of the tie rod 
+nr = sigmar/Scr;
 
+ctr = 1
+while nt < 2 && nr < 2 && ctr < length(ID)
+    
+    od = OD(ctr+1);
+    id = ID(ctr+1);
+    
+    A     = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
+    I     = pi/64*(od^4-id^4); %momment of inertia 
+    Lc    = Ltierod; %corrected buckling tie rod length (tie rod length)
+    E     = 68.9e9;
+    ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
+
+
+    if  (Sy/2 >= ratio)
+        Scr = (pi^2*E*I)/(A*Lc^2);
+    else  %depending on if its larger or smaller than the ratio Scr will change
+        Scr = Sy*(1-((Sy*A*Lc^2)/(4*pi^2*E*I)));
+    end
+
+    sigmat = Ft/A; %buckling stress on the tie rod 
+    sigmar = Fr/A;
+    nt = sigmat/Scr; %buckling safety factor of the tie rod 
+    nr = sigmar/Scr;
+    
+    ctr = ctr + 1;
+end
 
 end
 
-
+    
 
 
 function [OD,nin,nr] = column_inner(torin,torr,Sy,slotsize)
@@ -392,7 +426,7 @@ while nr < 2 && nin < 2 && ctr < length(ID)
 end % end while
 
 
-end % end function
+end 
 
 
 
