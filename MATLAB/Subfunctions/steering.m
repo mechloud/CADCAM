@@ -19,6 +19,8 @@ end
 
 addpath('../Database');
 
+fdiff = FL - 1828.2;
+
 %% Declare global variables
 % Length of steering arm [m]
 Lknuckle = 3*0.0254;
@@ -38,7 +40,7 @@ E  = 68.9*10^9; %E of aluminum 6061 in Pa
 syb = 240*10^6; %sy of bolt in Pa
 
 [ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
-                                      Lknuckle);
+                                      Lknuckle,fdiff);
 [Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
 
 h = steering_knuckle(Fr,Ft,Sy) 
@@ -85,11 +87,11 @@ function [Ltierod,...
                                                    framewidth,...
                                                    lff,... % length from front
                                                    Lknuckle,...
-                                                   firewalllength)
+                                                   fdiff)
 
                                                
 % TEMPORARY VARIABLE
-firewalllength = 1.500;
+firewalllength = 1309.54 - fdiff;
 %%
 % Rack Offset [m]
 roffset= 2*0.0254;
