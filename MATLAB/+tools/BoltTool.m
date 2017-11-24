@@ -1,7 +1,7 @@
 %% BoltTool
 % BOLTTOOL Takes a struct input and calculates applicable stresses for
 % semi-permanent fasteners
-function BoltTool(b,n)
+function bdia = BoltTool(b,n)
 
 %%
 % If the number of input arguments is less than 2, declare defaults. This
@@ -15,21 +15,21 @@ if nargin < 2
 end
 
 sizes = load('Bolt_Sizes.mat');
-size = sizes.Bolt_Sizes(:,1);
-i = 1; %counter
+bolt_size = sizes.Bolt_Sizes(:,1);
+k = 1; %counter
 
-nbB = 0;
-ntau = 0;
+nbB = 2;
+ntau = 4;
 
 while (nbB < n) || (ntau < n)
-bdia = size(i);    
+bdia = bolt_size(k);    
 %% Pure Shear Failure Mode
 % Find cross sectional area of bolt
-xA = (pi/4)*bdia^4;
+xA = (pi/4)*bdia^2;
 
 %%
 % Determine shear stress
-tau = b.F/b.mxA;
+tau = b.F/xA;
 
 %% Tensile Failure of Member
 % Determine tensile stress of member using cross-sectional area of attached
@@ -38,7 +38,7 @@ sigmaM = b.F/b.mxA;
 
 %% Crushing (Bearing Failure) of Bolt or Member
 % Determine bearing stress in bolt
-bearing_sigmaB = -b.F/bdia;
+bearing_sigmaB = -b.F/(bdia*b.t);
 
 %%
 % Determine bearing stress in member
@@ -52,18 +52,14 @@ nMemTensile = b.SyM/sigmaM;
 % Calculate safety factor for bearing load in member
 nMemBearing = b.SyM/bearing_sigmaM;
 
-assert(abs(nMemTensile) > n,'Possible Tensile Failure of Member');
-assert(abs(nMemBearing) > n,'Possible Bearing Failure of Member');
 %%
 % Declare Proof Loads for Grade 4.8 Bolts
 Sp = 310;
 nbB = Sp/abs(bearing_sigmaB);
 ntau = Sp/tau;
 
-i = i + 1;
+k = k + 1;
 end
-
-fprintf('Bolt Diameter is %d mm.\n',size(i-1));
 
 end % End function
 

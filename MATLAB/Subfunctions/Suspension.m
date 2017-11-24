@@ -1,7 +1,7 @@
 %% Suspension
 % Suspension determines all the characteristics of the front and rear
 % suspension
-function Suspension(location,freq,zeta,md)
+function bdia = Suspension(tag,log_id,location,freq,zeta,md)
 %% Constant Variables
 % Mass Single Wheel [kg]
 mw=14;
@@ -51,7 +51,12 @@ mc=(m2+md)*dist/2;
 %%
 % Front Shock Spring Rate [N/m]
 k2=(omega_n^2)*mc;
-fprintf('The desired %s spring rate is %.2f N/m.\n', string, k2);
+
+if ~strcmp(tag,'gui') && log_id ~= 0
+    fprintf(log_id,'The desired %s spring rate is %.2f N/m.\n', string, k2);
+else
+    fprintf('The desired %s spring rate is %.2f N/m.\n', string, k2);
+end
 %%
 % Front Damping Coefficient [Ns/m]
 c2 = 2*zeta*sqrt(k2*mc);
@@ -77,8 +82,12 @@ omega_nm = solve(eqn,s);
 omega_nf = abs(imag(omega_nm));
 omega_nf = double(omega_nf);
 
-fprintf('The obtained %s system natural frequency is %.2f and %.2f rad/s.\n', string, max(omega_nf), min(omega_nf));
-
+if ~strcmp(tag,'gui') && log_id ~= 0
+    fprintf(log_id,['The obtained %s system natural frequency',...
+                    'is %.2f and %.2f rad/s.\n'], string, max(omega_nf), min(omega_nf));
+else
+    fprintf('The obtained %s system natural frequency is %.2f and %.2f rad/s.\n', string, max(omega_nf), min(omega_nf));
+end
 x = 0:0.01:120;
 y2 = k1*sqrt(c2.^2*x.^2+k2.^2)./(sqrt((m1*mc*x.^4-k1*mc*x.^2-k2*m1*x.^2-k2*mc*x.^2+k1*k2).^2+(-c2*m1*x.^3-c2*mc*x.^3+c2*k1*x).^2));
 
@@ -116,11 +125,21 @@ title('Step Response');
 legend('Chassis');
 S = stepinfo(sys);
 ST = S.SettlingTime;
-if ~isnan(ST)
-    fprintf('The %s settling time is %.2f s.\n', string, ST);
+
+if ~strcmp(tag,'gui') && log_id ~= 0
+    if ~isnan(ST)
+        fprintf(log_id,'The %s settling time is %.2f s.\n', string, ST);
+    else
+        fprintf(log_id,'The %s does not settle.\n',string);
+    end
 else
-    fprintf('The %s does not settle.\n',string);
+    if ~isnan(ST)
+        fprintf('The %s settling time is %.2f s.\n', string, ST);
+    else
+        fprintf('The %s does not settle.\n',string);
+    end
 end
+
 %%
 % Plot Impulse Response
 %figure(3)
@@ -144,5 +163,8 @@ b = struct(   'F',F,...    % Shearing Force in N
               't',6.08,...    % Thickness of clamped parts
               'mxA',237.12,...   % Cross sectional area of weakeast connected member
               'SyM',250);     % Yield Strength of weakest clamped part);
-tools.BoltTool(b,n);          
+bdia = tools.BoltTool(b,n);
+if ~strcmp(tag,'gui') && log_id ~= 0
+    fprintf(log_id,'Required Suspension Mounting Bolt Diameter = %.1f mm\n',bdia);
+end
 end

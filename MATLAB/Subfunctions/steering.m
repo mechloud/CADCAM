@@ -1,23 +1,27 @@
 %% steering
 % STEERING Calculations
 
-function steering(FW,TW,WB,SR,FL,Weight,CG)%add weight and center of mass 
-clc;
-clear
+function steering(FW,TW,WB,SR,FL,Weight)%add weight and center of mass 
 
-if nargin < 7
+if nargin < 6
+    
+    clc
+    clear
+    
     warning(['Number of arguments input to function not sufficient,',...
              ' using default values']);
+         
     FW = 36*0.0254;
     TW = 55*0.0254;
     WB = 64*0.0254;
     SR = 4;
     FL = WB + 8*0.0254;
     Weight = 305; %kg
-    CG=0.4;
+    
+    addpath('../Database');
 end
 
-addpath('../Database');
+CG=0.4;
 
 fdiff = FL - 1828.2;
 
@@ -43,7 +47,7 @@ syb = 240*10^6; %sy of bolt in Pa
                                       Lknuckle,fdiff);
 [Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
 
-h = steering_knuckle(Fr,Ft,Sy) 
+steering_knuckle(Fr,Ft,Sy) ;
 %sends back new value of cross section height for steering arm
 
 %%
@@ -171,6 +175,13 @@ big_G = PD(PD > desired_PD);
 
 L = length(small_G);
 L2 = length(big_G);
+
+if isempty(L)
+    L = small_G(1);
+end
+if isempty(L2)
+    L2 = big_G(1);
+end
 
 if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
   PD = small_G(end);

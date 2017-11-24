@@ -1,8 +1,9 @@
-function create_ANSYS_input(type,nodes,elements,POD,PWT,SOD,SWT,md)
+function create_ANSYS_input(log_id,type,nodes,elements,POD,PWT,SOD,SWT,md)
 
 if nargin < 8
     warning('Not enough input arguments, default parameters will be used');
     
+    log_id = 0;
     %%
     % Load the geometry
     addpath('../Database');
@@ -202,6 +203,11 @@ fprintf(fid,'\n! Post-Processing\n/POST1\n/GLINE,ALL,-1\nETABLE,\nFINISH\n');
 
 %%
 % Close the file
-fclose(fid);
+try
+    fclose(fid);
+    fprintf(log_id,'\nWrote ANSYS input file for %s impact case\n',type);
+catch
+    fprintf(log_id,'\nCould not successfully write ANSYS input file\n');
+end
 
 end

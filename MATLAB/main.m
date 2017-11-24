@@ -103,7 +103,15 @@ function BTN_generate_Callback(hObject, eventdata, handles)
 if(isempty(handles))
     Wrong_File();
 else
-    log_id = fopen('log.txt','w+');
+    logfname = 'log.txt';
+    log_id = fopen(logfname,'w+');
+    
+    fprintf(log_id,['|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n',...
+                    '|                Inputs to Code                  |\n',...
+                    '|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n\n']);
+                
     % Get the values from the GUI
     frame_width = get(handles.slider_frame_width,'Value');
     fprintf(log_id,'Frame Width = %.0f mm\n',frame_width);
@@ -143,17 +151,31 @@ else
     
     fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
     
+    fprintf(log_id,['\n\n|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n',...
+                    '|                  Suspension                    |\n',...
+                    '|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n\n']);
+    
     % Suspension Codes
     if get(handles.rb_front,'Value') == 1
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'f',front_omegan,zeta,md);
     elseif get(handles.rb_rear,'Value') == 1
-        Suspension('r',rear_omegan,zeta,md);
-    else
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'r',rear_omegan,zeta,md);   
     end
     
+    fbdia = Suspension('main',log_id,'f',front_omegan,zeta,md);
+    rbdia = Suspension('main',log_id,'r',rear_omegan,zeta,md);
+    
+    
+    fprintf(log_id,['\n\n|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n',...
+                    '|                      Frame                     |\n',...
+                    '|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n\n']);
+    
     % Frame Codes
-    [POD,PWT] = loop_FEA(frame_length,frame_height,md);
+    [POD,PWT] = loop_FEA(log_id,frame_length,frame_height,md);
     
     if get(handles.rb_ANSYS,'Value') == 1
         % Load nodal data
@@ -178,17 +200,22 @@ else
         % situations
         for k = 1:4
             if files_to_create{k,1} == 1
-                tools.create_ANSYS_input(files_to_create{k,2},nodes,elements,...
+                tools.create_ANSYS_input(log_id,files_to_create{k,2},nodes,elements,...
                                    POD,PWT,25.4,0.9,md);
             end
         end
     end
     
-    % Steering Codes
+    fprintf(log_id,['\n\n|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n',...
+                    '|                   Steering                     |\n',...
+                    '|------------------------------------------------|\n',...
+                    '|------------------------------------------------|\n\n']);
     
+    % Steering Codes - NEED TO RETURN VALUES TO WRITE IN FILE
+    steering(frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
     
-    % Close the log file
-    fclose(log_id);
+   
     
     % TEMPORARY: Define undefined variables
     SOD = 25.0; % Secondary tubing OD
@@ -196,8 +223,16 @@ else
     BHS = 13.0; % Bolt Hole Size
     
     % Write SolidWorks equations/global variables file
-    tools.write_equations(POD,PWT,SOD,SWT,BHS,frame_length,frame_width,...
+    tools.write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,frame_length,frame_width,...
                           frame_height,track_width,ground_clearance);
+                      
+    % Close the log file
+    try
+        fclose(log_id);
+        fprintf('Successfully wrote log file %s\n',logfname);
+    catch
+        fprintf('Unable to write log file\n');
+    end
 end
         
 
@@ -330,7 +365,7 @@ if get(handles.rb_front,'Value') == 1
         % if the mass is in lbs, convert to kg
         md = md/2.2;
     end
-    Suspension('f',front_omegan,zeta,md);
+    Suspension('gui',0,'f',front_omegan,zeta,md);
 end
 
 
@@ -366,7 +401,7 @@ if get(handles.rb_rear,'Value') == 1
         % if the mass is in lbs, convert to kg
         md = md/2.2;
     end
-    Suspension('r',rear_omegan,zeta,md);
+    Suspension('gui',0,'r',rear_omegan,zeta,md);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -403,11 +438,11 @@ set(handles.box_zeta,'String',num2str(round(val,2)));
 %%
 % Suspension Codes
     if get(handles.rb_front,'Value') == 1
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'f',front_omegan,zeta,md);
     elseif get(handles.rb_rear,'Value') == 1
-        Suspension('r',rear_omegan,zeta,md);
+        Suspension('gui',0,'r',rear_omegan,zeta,md);
     else
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'f',front_omegan,zeta,md);
     end
 
 % --- Executes during object creation, after setting all properties.
@@ -817,11 +852,11 @@ max = get(hObject,'Max');
 %%
 % Suspension Codes
     if get(handles.rb_front,'Value') == 1
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'f',front_omegan,zeta,md);
     elseif get(handles.rb_rear,'Value') == 1
-        Suspension('r',rear_omegan,zeta,md);
+        Suspension('gui',0,'r',rear_omegan,zeta,md);
     else
-        Suspension('f',front_omegan,zeta,md);
+        Suspension('gui',0,'f',front_omegan,zeta,md);
     end
 
 % --- Executes during object creation, after setting all properties.
@@ -884,7 +919,7 @@ if get(handles.rb_lbs,'Value') == 1
 end
 %%
 % Suspension Codes
-Suspension('f',front_omegan,zeta,md);
+Suspension('gui',0,'f',front_omegan,zeta,md);
    
 
 % --- Executes on button press in rb_rear.
@@ -908,7 +943,7 @@ if get(handles.rb_lbs,'Value') == 1
 end
 %%
 % Suspension Codes
-Suspension('r',rear_omegan,zeta,md);
+Suspension('gui',0,'r',rear_omegan,zeta,md);
 
 
 % --- Executes on button press in rb_front_impact.

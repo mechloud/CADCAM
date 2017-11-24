@@ -1,11 +1,12 @@
 %% Loop_FEA
 % LOOP_FEA Loops to find appropriate sizes
-function [OD,WT] = loop_FEA(FL,FH,md)
+function [OD,WT] = loop_FEA(log_id,FL,FH,md)
 
-if nargin < 3
+if nargin < 4
     FL = 1828.2;
     FH = 1219.0;
     md = 110.0;
+    log_id = 0;
     addpath('Database');
 end
 
@@ -42,16 +43,18 @@ while ((ASF < SF) && (BSF < SF) && (ctr < length(OD)))
 end
 
 if ctr == length(OD)
-    error(['No reasonable tubing size can accomodate the loading',...
+    warning(['No reasonable tubing size can accomodate the loading',...
            ', consider different roll cage dimensions']);
+    fprintf(log_id,['The 2D FEA concluded that the roll cage could not ',...
+                    ' withstand the Front Impact forces subjected to it',...
+                    ' with tube sizes up to 50.8 mm OD and 6.35 mm WT.']);
+else
+    OD = OD(ctr - 1);
+    WT = WT(ctr - 1);
+    colour_plot(nodes,elements,res);
+    fprintf(log_id,['The required primary tube size is ',...
+             '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
 end
-
-OD = OD(ctr - 1);
-WT = WT(ctr - 1);
-colour_plot(nodes,elements,res);
-fprintf(['The required primary tube size is ',...
-         '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
-
 
 end
 
