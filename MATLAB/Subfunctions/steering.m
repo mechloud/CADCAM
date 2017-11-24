@@ -47,33 +47,33 @@ h = steering_knuckle(Fr,Ft,Sy)
 %%
 % Calculates forces on ties rods. Returns safety factors, OD and ID of
 % tie-rod tubes.
-%[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
+[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
 
 %%
 % Calculates the shear on the bolts in the steering column and returns
 % safety factors and slot size
-%[slotsize,~,~] = column_bolt_shear(torin,torr,Sy);
+[slotsize,~,~] = column_bolt_shear(torin,torr,Sy);
     
 %%
 % Calculates the torsional stress on the inner rod in the steering column
 % and returns ID and safety factors
-%[ir_d,~,~] = column_inner(torin,torr,Sy,slotsize);
-% ir_d = inner rod outside diameter
+[ir_d,~,~] = column_inner(torin,torr,Sy,slotsize);
+%ir_d = inner rod outside diameter
 
 %%
 % Calculates the torsional stress on the outer tube in the steering column
 % and returns OD, ID and safety factors
-%[ot_OD,ot_ID,~,~] = column_outer(torin,torr,Sy,ir_d);
+[ot_OD,ot_ID,~,~] = column_outer(torin,torr,Sy,ir_d);
 
 %%
 % Calculates the torsional stress on the outer tube sleeve in the steering 
 % column and returns OD, ID and safety factors
-%[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
+[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
 
 %%
 % calculates the bending and wear stress on the gear and returns the safe
 % gear size 
-%[N,PD,bore,F]= gear_loop(Pr,torin,torr);
+[N,PD,bore,F]= gear_loop(Pr,torin,torr);
 end
 
 function [Ltierod,...
@@ -153,12 +153,14 @@ end
 
 function [N,PD,bore,F] = gear_loop(Pr,torin,torr)
 
-gears = xlsread('gears.xlsx');
+Gears = load('gears.mat');
+gears = Gears.gears;
 
-desired_PD = Pr * 2/0.0254;
+
+desired_PD = Pr * 2;
 N = gears(:,1);
 PD = gears(:,2);
-Bore = gears(:,3);
+bore = gears(:,3);
 %F = gears(:,4);
 OD = gears(:,5);
 
@@ -193,7 +195,7 @@ wt = torr*0.224809; % force transfered through the gear in foot pounds
 ctr=1;
 
 [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa);
-while Sh < 2 && sf < 2
+while sh < 2 && sf < 2
     if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
         PD = big_G(ctr);
         Bore = gears(L+1,3);
@@ -244,7 +246,7 @@ Kt=1;
 Kr=1.5;
 Ch=1;
 
-Sh=((Sc*Zn*Ch)/(Kt*Kr))/sigmaw;
+sh=((Sc*Zn*Ch)/(Kt*Kr))/sigmaw;
 
 %%
 % bending stress in gear
@@ -254,7 +256,7 @@ Kb=1;
 sigmab = wt*Ko*Kv*Ks*(PD/F)*(((Km*Kb)/J));
 St=65000;
 Yn=2.5;
-Sf=((St*Yn)/(1*1.5))/sigmab;
+sf=((St*Yn)/(1*1.5))/sigmab;
 
 end
 
@@ -333,18 +335,18 @@ end
 function [nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
 %% 
 %buckling stress tie rod
-tubes = load('tube_sizes.mat');
-tube_sizes = tubes.tube_sizes;
-ODs = tube_sizes(:,1)/1000;
-IDs = ODs - 0.002*tube_sizes(:,2);
+% tubes = load('tube_sizes.mat');
+% tube_sizes = tubes.tube_sizes;
+% OD = tube_sizes(:,1)/1000;
+% ID = OD - 0.002*tube_sizes(:,2);
+% 
+% od = OD(1);
+% id = ID(1);
+OD = 19.05/1000; % outer diameter of tie rod 
+ID = 16.1/1000; %inner diameter of tie rod
 
-od = OD(1);
-id = ID(1);
-%OD = 19.05/1000; % outer diameter of tie rod 
-%ID = 16.1/1000; %inner diameter of tie rod
-
-A = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
-I = pi/64*(od^4-id^4); %momment of inertia 
+A = ((pi*OD^2)/4)-((pi*ID^2)/4); %cross sectional area
+I = pi/64*(OD^4-ID^4); %momment of inertia 
 Lc = Ltierod; %corrected buckling tie rod length (tie rod length)
 E = 68.9e9;
 ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
@@ -361,7 +363,7 @@ sigmar = Fr/A;
 nt = sigmat/Scr; %buckling safety factor of the tie rod 
 nr = sigmar/Scr;
 
-ctr = 1
+ctr = 1;
 while nt < 2 && nr < 2 && ctr < length(ID)
     
     od = OD(ctr+1);
