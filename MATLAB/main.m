@@ -213,7 +213,7 @@ else
                     '|------------------------------------------------|\n\n']);
     
     % Steering Codes - NEED TO RETURN VALUES TO WRITE IN FILE
-    turning_radius = steering(frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
+    turning_radius = steering(log_id,frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
     
     [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f, Ks_r,md,ground_clearance);
     
