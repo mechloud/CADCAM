@@ -19,7 +19,7 @@ if nargin < 4
     clc
     close all
     zeta = 0.3;     
-    freq = 1.6; %Hz
+    freq = 1.5; %Hz
     md = 110; %kg
     location = 'f';
 end
