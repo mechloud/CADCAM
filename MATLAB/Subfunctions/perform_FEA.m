@@ -177,7 +177,6 @@ F = Ka*U;
 % Declare displacements and strains vector and vector for moments in
 % elements
 epsilon = zeros(nelements,1);
-moments = zeros(nelements,1);
 
 %%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
@@ -205,36 +204,13 @@ for k = 1:nelements
     % Find $\delta$ and $\epsilon$
     delta = uj_prime -ui_prime;
     epsilon(k) = delta/L(k);
-    
-    %% Reconstruct Solution and Force Vectors
-    % Get global element stiffness matrix
-    Ke = preproc{k,4};
-    
-    %%
-    % Get global element displacement vector
-    Ue = [U(ni*3-2:1:(ni*3));
-          U(nj*3-2:1:(nj*3))];
-      
-    %%
-    % Calculate global element force vector
-    Fe = Ke*Ue;
-    
-    %%
-    % Extract and calculate moments on element
-    moments(k) = Fe(6) - Fe(3);       
+       
 end
 
 %%
 % Find tensile stresses in elements $\sigma = E\epsilon$
 axial = E*epsilon;
 
-%%
-% Find maximum bending stresses in every element
-bending = abs(moments).*(OD/2)./I;
-
-%%
-% Add bending to axial stresses
-axial = (abs(axial)+bending).*sign(axial);
 %%
 % Find maximum stress
 max_stress = max(abs(axial))*sign(max(axial));

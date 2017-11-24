@@ -1,20 +1,46 @@
-function [track_width] = Rollover(track_width, turning_radius, mass, COG_y, Ks_f, Ks_r, sep_f, sep_r)
+function [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f, Ks_r,md,gc)
 
-if nargin < 8
-    COG_y = 1.076;
+if nargin < 7
+    log_id = 0;
+    md = 110;
+    track_width = 55*25.4;
+    turning_radius = 2.3;
     Ks_f = 8143.4;
     Ks_r = 17598.7;
-    sep_f = 1.016;
-    sep_r = 1.016;
+    gc = 0.252;
 end
 
+%%
+% Convert to meters
+track_width = track_width/1000;
+turning_radius = turning_radius/100;
+gc = gc/1000;
+
+
 %% Declare initial values
-% average velocity of 35 mph
+% Average velocity of 35 mph
 velocity = 15.64;
 
 %%
+% Mass of vehicle
+mv = 195.0; % [kg]
+
+%%
+% Total mass
+mass = mv + md; % [kg]
+
+%%
+% Height of centre of gravity
+COG_y = 1.076 + gc - 0.252;
+
+%%
 % Roll Centre height
-h_r = 1.016; 
+h_r = 1.016 + gc - 0.252; 
+
+%%
+% Front and rear separation
+sep_f = 1.016;
+sep_r = 1.016;
 
 %% 
 % Find front and back roll stiffness
@@ -33,9 +59,16 @@ Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y))));
 % finding the lateral acceleration
 acc = velocity^2 / turning_radius;
 
-while acc > Ratio*9.81
-    track_width = track_width + 25.4;
-    Ratio = (track_width/2) / COG_y;
+%%
+% Define gravitational acceleration
+g = 9.81;
+
+while acc/g < Ratio
+    warning('Vehicle could rollover. Increasing track width');
+    track_width = track_width + 0.025;
+    Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y))));
 end %while loop
+
+fprintf(log_id,'Maximum lateral acceleration %.1f g\n',acc/g);
 
 end %function

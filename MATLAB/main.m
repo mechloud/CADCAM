@@ -164,8 +164,8 @@ else
         Suspension('gui',0,'r',rear_omegan,zeta,md);   
     end
     
-    fbdia = Suspension('main',log_id,'f',front_omegan,zeta,md);
-    rbdia = Suspension('main',log_id,'r',rear_omegan,zeta,md);
+    [fbdia,Ks_f] = Suspension('main',log_id,'f',front_omegan,zeta,md);
+    [rbdia,Ks_r] = Suspension('main',log_id,'r',rear_omegan,zeta,md);
     
     
     fprintf(log_id,['\n\n|------------------------------------------------|\n',...
@@ -213,14 +213,13 @@ else
                     '|------------------------------------------------|\n\n']);
     
     % Steering Codes - NEED TO RETURN VALUES TO WRITE IN FILE
-    steering(frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
+    turning_radius = steering(frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
     
-   
+    [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f, Ks_r,md,ground_clearance);
     
     % TEMPORARY: Define undefined variables
     SOD = 25.0; % Secondary tubing OD
     SWT = 0.89; % Secondary tubing WT
-    BHS = 13.0; % Bolt Hole Size
     
     % Write SolidWorks equations/global variables file
     tools.write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,frame_length,frame_width,...
@@ -844,10 +843,14 @@ max = get(hObject,'Max');
                  'or getting a smaller driver. Resetting to maximum value',...
                  ' of %.0f lbs'],max);
         md = max;
+        set(handles.box_mass_driver,'Value',md);
+        set(handles.rb_lbs,'Value',1);
     elseif md < min
         warning(['You should know better than to have negative mass...',...
                  ' Resetting to 175 lbs']);
         md = 175;
+        set(handles.box_mass_driver,'Value',md);
+        set(handles.rb_lbs,'Value',1);
     end
 %%
 % Suspension Codes

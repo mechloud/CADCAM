@@ -1,7 +1,7 @@
 %% Suspension
 % Suspension determines all the characteristics of the front and rear
 % suspension
-function bdia = Suspension(tag,log_id,location,freq,zeta,md)
+function [bdia,k2] = Suspension(tag,log_id,location,freq,zeta,md)
 %% Constant Variables
 % Mass Single Wheel [kg]
 mw=14;
@@ -84,7 +84,7 @@ omega_nf = double(omega_nf);
 
 if ~strcmp(tag,'gui') && log_id ~= 0
     fprintf(log_id,['The obtained %s system natural frequency',...
-                    'is %.2f and %.2f rad/s.\n'], string, max(omega_nf), min(omega_nf));
+                    ' is %.2f and %.2f rad/s.\n'], string, max(omega_nf), min(omega_nf));
 else
     fprintf('The obtained %s system natural frequency is %.2f and %.2f rad/s.\n', string, max(omega_nf), min(omega_nf));
 end
@@ -165,6 +165,6 @@ b = struct(   'F',F,...    % Shearing Force in N
               'SyM',250);     % Yield Strength of weakest clamped part);
 bdia = tools.BoltTool(b,n);
 if ~strcmp(tag,'gui') && log_id ~= 0
-    fprintf(log_id,'Required Suspension Mounting Bolt Diameter = %.1f mm\n',bdia);
+    fprintf(log_id,'Minimum Required %s Suspension Mounting Bolt Diameter = %.1f mm\n',string,bdia);
 end
 end

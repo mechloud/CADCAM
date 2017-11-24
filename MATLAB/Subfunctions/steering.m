@@ -1,7 +1,7 @@
 %% steering
 % STEERING Calculations
 
-function steering(FW,TW,WB,SR,FL,Weight)%add weight and center of mass 
+function turning_radius = steering(FW,TW,WB,SR,FL,Weight)%add weight and center of mass 
 
 if nargin < 6
     
@@ -43,7 +43,7 @@ Sy = 276*10^6; %Sy of aluminum 6061 in Pa
 E  = 68.9*10^9; %E of aluminum 6061 in Pa
 syb = 240*10^6; %sy of bolt in Pa
 
-[ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
+[turning_radius,ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
                                       Lknuckle,fdiff);
 [Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
 
@@ -82,7 +82,7 @@ steering_knuckle(Fr,Ft,Sy) ;
 [N,PD,bore,F]= gear_loop(Pr,torin,torr);
 end
 
-function [Ltierod,...
+function [R,Ltierod,...
           ackangle,...
           Pr,stclength,...
           racklength,...
@@ -142,7 +142,7 @@ Pr = (Lneeded/((maxturn*steeringratio)/360)*(2*pi));
 
 %%
 % Print to log file 
-fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
+fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R/1000);
 
 %%
 %length of steering column
@@ -176,24 +176,22 @@ big_G = PD(PD > desired_PD);
 L = length(small_G);
 L2 = length(big_G);
 
-if isempty(L)
-    L = small_G(1);
-end
-if isempty(L2)
-    L2 = big_G(1);
-end
-
-if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
+if desired_PD > PD(end)
+    PD = PD(end);
+    Bore = gears(end,3);
+    N = gears(end,1);
+elseif desired_PD < PD(1)
+    PD = PD(1);
+    Bore = gears(1,3);
+    N = gears(1,1);
+elseif abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
   PD = small_G(end);
   Bore = gears(L,3);
   N = gears(L,1);
-
 elseif abs(small_G(end)-desired_PD) > abs(big_G(1)-desired_PD)
-
   PD = big_G(1);
   Bore = gears(L+1,3);
   N = gears(L+1,1);
-
 elseif any(desired_PD == PD)
   PD = desired_PD;
 end
