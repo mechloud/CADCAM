@@ -56,12 +56,13 @@ output{17,2} = 'atn (9in /(("TrackWidth"/2)-10in) )';
 
 %% Write to file
 % Determine user
+
 switch getenv('username')
     case ''
         % John - Ubuntu
         fname = 'Equations.txt';
     otherwise
-        fname = 'Z:\2017\MCG4322A\Digital Files\BAJA2B\Solidworks\Equations.txt';
+        fname = 'C:\Users\just-\Google Drive\University\8 - Fall 2017\MCG4322\GrabCAD\CADCAM\Equations.txt';
 end
 
 %%
