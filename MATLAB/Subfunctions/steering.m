@@ -1,6 +1,9 @@
 %% steering
 % STEERING Calculations
+
 function steering(FW,TW,WB,SR,FL,Weight,CG)%add weight and center of mass 
+clc;
+clear
 
 if nargin < 7
     warning(['Number of arguments input to function not sufficient,',...
@@ -68,8 +71,9 @@ h = steering_knuckle(Fr,Ft,Sy)
 %[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
 
 %%
-% Temporary call to gear calculations function
-[gearsize]= gear_loop(Pr,torin,torr);
+% calculates the bending and wear stress on the gear and returns the safe
+% gear size 
+%[N,PD,bore,F]= gear_loop(Pr,torin,torr);
 end
 
 function [Ltierod,...
@@ -147,37 +151,63 @@ end
 % **need to find max and min gear radius to create and use database** %
 % *** also need to fix the values i use here *** %
 
-function [gearsize] = gear_loop(Pr,torin,torr)
+function [N,PD,bore,F] = gear_loop(Pr,torin,torr)
 
-% gears = xlsread('gears.xlsx');
-% 
-% desired_PD = Pr * 2/0.0254;
-% 
-% nteeth = gears(:,1);
-% PDi = gears(:,2);
-% Bore = gears(:,3);
-% Facei = gears(:,4);
-% OD = gears(:,4);
+gears = xlsread('gears.xlsx');
+
+desired_PD = Pr * 2/0.0254;
+N = gears(:,1);
+PD = gears(:,2);
+Bore = gears(:,3);
+%F = gears(:,4);
+OD = gears(:,5);
+
+small_G = PD(PD < desired_PD);
+big_G = PD(PD > desired_PD);
+
+L = length(small_G);
+L2 = length(big_G);
+
+if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
+  PD = small_G(end);
+  Bore = gears(L,3);
+  N = gears(L,1);
+
+elseif abs(small_G(end)-desired_PD) > abs(big_G(1)-desired_PD)
+
+  PD = big_G(1);
+  Bore = gears(L+1,3);
+  N = gears(L+1,1);
+
+elseif any(desired_PD == PD)
+  PD = desired_PD;
+end
 
 %%
 % temporary variables
-N = 16;
-PD = 0.875;
 F = 0.75;
 Pa=20; %pressure angle in deg
 DP=16; %diametral pitch of the gear 
 wt = torr*0.224809; % force transfered through the gear in foot pounds
-wt2 = torin; %just temporary use to compare with torr
+
 ctr=1;
 
 [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa);
-while SF < SFhardcoded
-    %increase size
-    [sf,sh] = gear_calculations();
+while Sh < 2 && sf < 2
+    if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
+        PD = big_G(ctr);
+        Bore = gears(L+1,3);
+        N = gears(L+1,1);
+    elseif abs(small_G(end)-desired_PD) > abs(big_G(1)-desired_PD)
+        PD = big_G(1+ctr);
+        Bore = gears(L+1+ctr,3);
+        N = gears(L+1+ctr,1);
+    elseif any(desired_PD == PD)
+        PD = big_G(ctr);
+    end
+    [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa);
     ctr = ctr+1;
 end
-
-
 end
 
 function [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa)
@@ -206,7 +236,7 @@ Ko=1.5;
 Ks=1;
 Cf=1;
 
-sigmaw=Cp*(sqrt(wt*Ko*Kv*Ks*(Km/(PD*F))*(Cf/I)))
+sigmaw=Cp*(sqrt(wt*Ko*Kv*Ks*(Km/(PD*F))*(Cf/I)));
 
 Zn=1.5;
 Sc=225000;
@@ -214,7 +244,7 @@ Kt=1;
 Kr=1.5;
 Ch=1;
 
-Sh=((Sc*Zn*Ch)/(Kt*Kr))/sigmaw
+Sh=((Sc*Zn*Ch)/(Kt*Kr))/sigmaw;
 
 %%
 % bending stress in gear
@@ -222,9 +252,9 @@ J=0.22;
 Kb=1;
 
 sigmab = wt*Ko*Kv*Ks*(PD/F)*(((Km*Kb)/J));
-St=482.63*10^6;
+St=65000;
 Yn=2.5;
-Sf=((St*Yn)/(1*1.5))/sigmab
+Sf=((St*Yn)/(1*1.5))/sigmab;
 
 end
 
