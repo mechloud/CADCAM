@@ -337,18 +337,18 @@ end
 function [nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
 %% 
 %buckling stress tie rod
-% tubes = load('tube_sizes.mat');
-% tube_sizes = tubes.tube_sizes;
-% OD = tube_sizes(:,1)/1000;
-% ID = OD - 0.002*tube_sizes(:,2);
-% 
-% od = OD(1);
-% id = ID(1);
-OD = 19.05/1000; % outer diameter of tie rod 
-ID = 16.1/1000; %inner diameter of tie rod
+ tietubes = load('tie_rod_tube.mat');
+ tietube_sizes = tietubes.tie_rod_tube;
+ OD = tietube_sizes(:,1);
+ ID = tietube_sizes(:,2);
+ 
+ od = OD(5)*0.0254
+ id = ID(5)*0.0254
+%OD = 19.05/1000; % outer diameter of tie rod 
+%ID = 16.1/1000; %inner diameter of tie rod
 
-A = ((pi*OD^2)/4)-((pi*ID^2)/4); %cross sectional area
-I = pi/64*(OD^4-ID^4); %momment of inertia 
+A = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
+I = pi/64*(od^4-id^4); %momment of inertia 
 Lc = Ltierod; %corrected buckling tie rod length (tie rod length)
 E = 68.9e9;
 ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
@@ -368,8 +368,8 @@ nr = sigmar/Scr;
 ctr = 1;
 while nt < 2 && nr < 2 && ctr < length(ID)
     
-    od = OD(ctr+1);
-    id = ID(ctr+1);
+    od = OD(5+ctr)*0.0254;
+    id = ID(ctr+5)*0.0254;
     
     A     = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
     I     = pi/64*(od^4-id^4); %momment of inertia 
