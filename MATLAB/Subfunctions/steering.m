@@ -14,6 +14,7 @@ if nargin < 7
     CG=0.4;
 end
 
+addpath('../Database');
 
 %% Declare global variables
 % Maximum tire turning angle [deg]
@@ -37,26 +38,49 @@ Sy = 276*10^6; %Sy of aluminum 6061 in Pa
 E  = 68.9*10^9; %E of aluminum 6061 in Pa
 syb = 240*10^6; %sy of bolt in Pa
 
-[ltr,ackangle,Pr] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,maxturn,...
+[ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,maxturn,...
                                       Lknuckle);
-[Ft,Fr] = steering_forces(Weight,CG);
+[Ft,Fr,torin,torr] = steering_forces(Weight,CG);
 
-[ni,no,h] = steering_knuckle(Fr,Ft,Sy) 
+h = steering_knuckle(Fr,Ft,Sy) 
 %sends back new value of cross section height for steering arm
 
-[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
+%%
+% Calculates forces on ties rods. Returns safety factors, OD and ID of
+% tie-rod tubes.
+[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
 
-[slotsize,nt,nr] = Steering_column_part4 (torin,torr,Sy)
+%%
+% Calculates the shear on the bolts in the steering column and returns
+% safety factors and slot size
+[slotsize,~,~] = column_bolt_shear(torin,torr,Sy);
+    
+%%
+% Calculates the torsional stress on the inner rod in the steering column
+% and returns ID and safety factors
+[ir_d,~,~] = column_inner(torin,torr,Sy,slotsize);
+% ir_d = inner rod outside diameter
 
-[tubesize,nt,nr] = Steering_column_part2 (torin,torr,Sy)
+%%
+% Calculates the torsional stress on the outer tube in the steering column
+% and returns OD, ID and safety factors
+[ot_OD,ot_ID,~,~] = column_outer(torin,torr,Sy,ir_d);
 
-[tubesize,nt,nr] = steering_column_part3 (torin,torr,Sy)
+%%
+% Calculates the torsional stress on the outer tube sleeve in the steering 
+% column and returns OD, ID and safety factors
+[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
 
-[tubesize,nt,nr] = steering_column_part1 (torin,torr,Sy,slotsize)
-
+%%
+% Temporary call to gear calculations function
+gear_loop(Pr);
 end
 
-function [Ltierod,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(track,Lkp,WB,...
+function [Ltierod,...
+          ackangle,...
+          Pr,stclength,...
+          racklength,...
+          rackboxlength] = steering_geometry(track,Lkp,WB,...
                                                    steeringratio,...
                                                    framewidth,...
                                                    lff,... % length from front
@@ -64,6 +88,9 @@ function [Ltierod,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geo
                                                    Lknuckle,...
                                                    firewalllength)
 
+                                               
+% TEMPORARY VARIABLE
+firewalllength = 1.500;
 %%
 % Rack Offset [m]
 roffset= 2*0.0254;
@@ -116,31 +143,33 @@ stclength = sqrt((firewalllength-(36*0.0254))^2+((48*0.0254)^2));
 
 %%
 % rack length 
-racklength = framewidth + (2*0.0254);
+racklength = framewidth + 2*0.0254;
 rackboxlength = framewidth;
 
 end
 % **need to find max and min gear radius to create and use database** %
 % *** also need to fix the values i use here *** %
 
-function gear_calculations()
-%%
-%gear wear calculations
-PDi=0.875; % pitch diameter of the gear in inch
-PDm=0.875*0.0254; % pitch diamter of the gear in m
-Bore=0.375*0.0254; %bore of the gear
-DP=16; %diametral pitch of the gear 
-%Module = something (metric)
-Facei=0.75; %face width of gear in inch
-Facem=0.75*0.0254; %face width of gear in m
-OD=(PDi+0.125); %outer diameter of gear
-Pa=20; %pressure angle in deg
+function gear_loop(Pr)
 
-Mn=1; % constant for spur gears
-V=2;  %m/s max velocity of gear 
-Qv=7; %type of gearing constant 
-Wt=320; %force transfered through the gear in newtons i guess
-Cp=191;
+gears = xlsread('gears.xlsx');
+
+desired_PD = Pr * 2/0.0254;
+
+nteeth = gears(:,1);
+PDi = gears(:,2);
+Bore = gears(:,3);
+Facei = gears(:,4);
+OD = gears(:,4);
+
+Pa=20; %pressure angle in deg
+DP=16; %diametral pitch of the gear 
+
+Mn = 1;   % constant for spur gears
+V  = 2;   % m/s max velocity of gear 
+Qv = 7;   % type of gearing constant 
+Wt = 320; % force transfered through the gear in newtons i guess
+Cp = 191;
 %Cp=sqrt((1/(pi*(2*(1-.3^2)/(200*10^9)))))
 
 
@@ -186,12 +215,20 @@ Sf=(St*Yn/1*1.5)/sigmab
 
 
 
+% outputs = calculation_function(inputs,inputs,inputs);
+% while SF < SFhardcoded
+%     increase size
+%     outputs = calculation_function(inputs...);
+%     increment counter
+% end
+
+
 end
 
 
 
 
-function [Ft,Fr] = steering_forces(Weight,CG)
+function [Ft,Fr,torin,torr] = steering_forces(Weight,CG)
 %%
 % determing the forces acting on the system
 mu = 0.75; %friction coefficient between tire and track surface
@@ -201,17 +238,17 @@ assumed_force = 750; %set impact force hitting the side of the tire
 %math
 
 % ** outputed values **
-Ftoturn = 174;
-Froad= (2225*(11*0.0254))/(4.5*0.0254);
-torquein = 
-torqueroad = 
+Ft = 174;
+Fr = (2225*(11*0.0254))/(4.5*0.0254);
+torin = 7.1;
+torr = 7.1;
 
 end
 
 
 
 
-function [ni,no,h] = Steering_knuckle (Fr,Ft,Sy)
+function h = steering_knuckle (Fr,Ft,Sy)
 
 %%
 % bending in initially curved beams 
@@ -221,41 +258,41 @@ ro = 0.0508;  %outer radius of initially curved beam
 ri = 0.0254;  %inner radius of initially curved beam 
 Ft = 174;  %force acting on arm ((will alter later))
 Fr = 200;
-rn = h/(log(ro/ri)); %radius of the neutral axis
-rc = ri+(h/2); %radius of the centroidal axis
+rn = b/(log(ro/ri)); %radius of the neutral axis
+rc = ri+(b/2); %radius of the centroidal axis
 Ci = rn-ri;  %distance from neutral axis to inner fiber
 Co = ro-rn;  %distance from neutral axis to outer fiber
 e = rc-rn;  %distance from centroidal axis to neutral axis
 
 A = b*h; %area of cross section 
 
-sigmait = Ft*Ci/(A*e*ri) % inner fiber stress
-sigmaot = -Ft*Co/(A*e*ri) %outer fiber stress
+sigmait = Ft*Ci/(A*e*ri); % inner fiber stress
+sigmaot = -Ft*Co/(A*e*ro); %outer fiber stress
 
-sigmair = Fr*Ci/(A*e*ri)
-sigmaor = -Fr*Co/(A*e*ri)
+sigmair = Fr*Ci/(A*e*ri);
+sigmaor = -Fr*Co/(A*e*ro);
 
-nit = sigmait/Sy %safety factor of inner fiber 
-not = sigmaot/Sy %safety factor of outer fiber
+nit = abs(Sy/sigmait); %safety factor of inner fiber 
+not = abs(Sy/sigmaot); %safety factor of outer fiber
 
-nir = sigmair/Sy
-nor = sigmaor/Sy
+nir = abs(Sy/sigmair);
+nor = abs(Sy/sigmaor);
 
-while nir<2 && nor<2 && nit<2 && not<2
-h=h+(0.125*0.0254)
-A=b*h
+while nir < 2 && nor < 2 && nit < 2 && not < 2 
+    h=h+(0.125*0.0254);
+    A=b*h;
 
-sigmait = Ft*Ci/(A*e*ri) % inner fiber stress
-sigmaot = -Ft*Co/(A*e*ri) %outer fiber stress
-
-sigmair = Fr*Ci/(A*e*ri)
-sigmaor = -Fr*Co/(A*e*ri)
-
-nit = sigmait/Sy %safety factor of inner fiber 
-not = sigmaot/Sy %safety factor of outer fiber
-
-nir = sigmair/Sy
-nor = sigmaor/Sy
+    sigmaid = Ft*Ci/(A*e*ri); % inner fiber stress
+    sigmaod = -Ft*Co/(A*e*ri); %outer fiber stress
+    
+    sigmair = Fr*Ci/(A*e*ri);
+    sigmaor = -Fr*Co/(A*e*ri);
+    
+    nid = sigmaid/Sy; %safety factor of inner fiber 
+    nod = sigmaod/Sy; %safety factor of outer fiber
+    
+    nir = sigmair/Sy;
+    nor = sigmaor/Sy;
 end
 end
 
@@ -265,14 +302,14 @@ end
 function [nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
 %% 
 %buckling stress tie rod
-Ft = 174; % force compressing tie rod ((to be changed))
-Fr = 200;
 OD = 19.05/1000; % outer diameter of tie rod 
 ID = 16.1/1000; %inner diameter of tie rod
-A = ((pi*OD^2)/4)-((pi*ID^2)/4) %cross sectional area
-I = pi/64*(OD^4-ID^4) %momment of inertia 
-Lc = Ltierod %corrected buckling tie rod length (tie rod length)
-ratio = pi^2*E*I/(A*Lc^2) %comparisson to be compared with Sy/2
+A = ((pi*OD^2)/4)-((pi*ID^2)/4); %cross sectional area
+I = pi/64*(OD^4-ID^4); %momment of inertia 
+Lc = Ltierod; %corrected buckling tie rod length (tie rod length)
+E = 68.9e9;
+ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
+
 
 if (Sy/2 >= ratio)
     Scr = (pi^2*E*I)/(A*Lc^2)
@@ -282,8 +319,8 @@ end
 
 sigmat = Ft/A %buckling stress on the tie rod 
 sigmar = Fr/A
-ntiet = sigmat/Sy %buckling safety factor of the tie rod 
-ntier = sigmar/Sy
+nt = sigmat/Sy %buckling safety factor of the tie rod 
+nr = sigmar/Sy
 % ((need to calculate the tension in the tie rod))
 
 
@@ -292,108 +329,132 @@ end
 
 
 
-function [tubesize,nt,nr] = Steering_column_part1 (torin,torr,Sy,slotsize)
+function [OD,nin,nr] = column_inner(torin,torr,Sy,slotsize)
 %% 
 % torsion on steering column part#1
 OD = 25.4/1000; %m outer diameter of rod
 R = OD/2;  %radius of rod 
 J = ((pi*OD^4)/32)-(2*(slotsize^4/6)); %polar moment of inertia of rod 
-tauin = ((torin*R)/J) %torsional stress on rod 
-nin = ((Sy*.58)/tauin) %torsional stress safety factor of rod
-taur = ((torr*R)/J) %torsional stress on rod 
-nr = ((Sy*.58)/taur) %torsional stress safety factor of rod
+tauin = ((torin*R)/J); %torsional stress on rod 
+nin = ((Sy*.58)/tauin); %torsional stress safety factor of rod
+taur = ((torr*R)/J); %torsional stress on rod 
+nr = ((Sy*.58)/taur); %torsional stress safety factor of rod
 
-while nin<2 && nr<2
+while nin < 2 && nr < 2
     
-    %OD = increase rod size 
+    OD = OD + 0.001;
     R = OD/2;  %radius of rod 
     J = ((pi*OD^4)/32)-(2*(slotsize^4/6)); %polar moment of inertia of rod 
-    tauin = ((torin*R)/J) %torsional stress on rod 
-    nin = ((Sy*.58)/tauin) %torsional stress safety factor of rod
-    taur = ((torr*R)/J) %torsional stress on rod 
-    nr = ((Sy*.58)/taur) %torsional stress safety factor of rod
+    tauin = ((torin*R)/J); %torsional stress on rod 
+    nin = ((Sy*.58)/tauin); %torsional stress safety factor of rod
+    taur = ((torr*R)/J); %torsional stress on rod 
+    nr = ((Sy*.58)/taur); %torsional stress safety factor of rod
 end
 
 end
 
 
-function [tubesize,nt,nr] = Steering_column_part2 (torin,torr,Sy)
+function [od,id,nin,nr] = column_outer(torin,torr,Sy,rod_dia)
+
 %%
 % torsion on steering column part#2
-OD = 28.58/1000;  %m Outer diameter of steering column sleev%torque in steering column ((need to be changed))e 
-ID = 25.63/1000; %m Inner diamter of steering column sleeve
-R = OD/2; %radius of steering column sleeve
-J = ((pi*OD^4)/32)-((pi*ID^4)/32); %polar moment of inertia on steering column sleeve
+tubes = load('tube_sizes.mat');
+tube_sizes = tubes.tube_sizes;
+ODs = tube_sizes(:,1)/1000;
+IDs = ODs - 0.002*tube_sizes(:,2);
+
+ID = IDs(IDs > rod_dia);
+OD = ODs(IDs > rod_dia);
+
+od = OD(1);
+id = ID(1);
+
+R = OD(1)/2; %radius of steering column sleeve
+J = ((pi*OD(1)^4)/32)-((pi*ID(1)^4)/32); %polar moment of inertia on steering column sleeve
 taur = ((torin*R)/J); % torsional stress on steering column upper sleeve
 nr = ((Sy*.58)/taur); %torsional stress safety factor of rod  
 tauin = ((torin*R)/J); % torsional stress on steering column upper sleeve
 nin = ((Sy*.58)/tauin); %torsional stress safety factor of rod  
 
-while nt<2 && nr<2
-    %OD = increase tube size %
-    %ID = increase tube size %
-    R = OD/2;
-    J = ((pi*OD^4)/32)-((pi*ID^4)/32);
+ctr = 1;
+
+while nr < 2 && nin < 2 && ctr < length(ID)
+    od = OD(ctr + 1);
+    id = ID(ctr + 1);
+    R = od/2;
+    J = ((pi*od^4)/32)-((pi*id^4)/32);
     taur = ((torin*R)/J);
     nr = ((Sy*.58)/taur);
     tauin = ((torr*R)/J);
     nin = ((Sy*.58)/tauin);
-end    
+    
+    ctr = ctr + 1;
+end % end while
 
-end
+
+end % end function
 
 
-function [tubesize,nt,nr] = steering_column_part3 (torin,torr,Sy)
+
+function [OD,ID,nin,nr] = column_sleeve(torin,torr,Sy,ot_od)
 %%
 % torsion on steering column part#3
-b=1.48/1000; % bolt hole thickness 
-d=12/1000;  %bolt hole diameter
-OD=(15.88*2)/1000;  %m outer diameter of bigger sleeve
-ID=(14.40*2)/1000; %m inner diameter of bigger sleeve
-R=OD/2; % radius of bigger sleeve
-J=((pi*OD^4)/32)-((pi*ID^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
+tubes = load('tube_sizes.mat');
+tube_sizes = tubes.tube_sizes;
+ODs = tube_sizes(:,1)/1000;
+IDs = ODs - 0.002*tube_sizes(:,2);
 
-tauin=((torin*R)/J) %torsional stress on bigger sleeve
-nin=((Sy*.58)/tauin) %torsional stress on bigger sleeve safety factor 
-taur=((torr*R)/J) %torsional stress on bigger sleeve
-nr=((Sy*.58)/taur) %torsional stress on bigger sleeve safety factor 
+ID = IDs(IDs > ot_od);
+OD = ODs(IDs > ot_od);
 
-while nin<2 && nr<2
-    %OD = increase tube size %
-    %ID = increase tube size %
+b  = 1.48/1000; % bolt hole thickness 
+d  = 12/1000;  %bolt hole diameter
+R  = OD(1)/2; % radius of bigger sleeve
+J  = ((pi*OD(1)^4)/32)-((pi*ID(1)^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
+
+tauin = ((torin*R)/J); %torsional stress on bigger sleeve
+nin   = ((Sy*.58)/tauin); %torsional stress on bigger sleeve safety factor 
+taur  = ((torr*R)/J); %torsional stress on bigger sleeve
+nr    = ((Sy*.58)/taur); %torsional stress on bigger sleeve safety factor 
+
+ctr = 1;
+while nin < 2 && nr < 2 && ctr < length(ID)
+    od = OD(ctr + 1);
+    id = ID(ctr + 1);
     R = OD/2;
-    J = ((pi*OD^4)/32)-((pi*ID^4)/32);
+    J = ((pi*od^4)/32)-((pi*id^4)/32);
     tauin = ((torin*R)/J);
     nin = ((Sy*.58)/tauin);
     taur = ((torr*R)/J);
     nr = ((Sy*.58)/taur);
+    
+    ctr = ctr +1;
 end    
-
-
+ 
 end
 
 
-function [slotsize,nt,nr] = steering_column_part4 (torin,torr,syb)
+function [r,nin,nr] = column_bolt_shear(torin,torr,syb)
 %%
 % shear on steering pins
 OD=10/1000;  %m outer diameter of bolt 
 R=OD/2;  %of outer tube sleeve
 r=6.35/1000; %m radius of slot 
 A=pi*r^2; % area of cross section of the bolt
-tauin=((torin/R)/A) %shear stress on the bolt
-nin=((syb*.58)/tauin) %coresponding safety factor of the bolt
-taur=((torr/R)/A) %shear stress on the bolt
-nr=((syb*.58)/taur) %coresponding safety factor of the bolt
+tauin=((torin/R)/A); %shear stress on the bolt
+nin=((syb*.58)/tauin); %coresponding safety factor of the bolt
+taur=((torr/R)/A); %shear stress on the bolt
+nr=((syb*.58)/taur); %coresponding safety factor of the bolt
 
-while nin<2 && nr<2
+while nin < 2 && nr < 2
     %increase slot size
-    r=6.35/1000; %m radius of slot 
-    A=pi*r^2; % area of cross section of the bolt
+    r = r + 0.001; %m radius of slot 
+    A = pi * r^2; % area of cross section of the bolt
     
-    tauin=((torin/R)/A) %shear stress on the bolt
-    nin=((syb*.58)/tauin) %coresponding safety factor of the bolt
-    taur=((torr/R)/A) %shear stress on the bolt
-    nr=((syb*.58)/taur) %coresponding safety factor of the bolt
+    tauin = ((torin/R)/A); %shear stress on the bolt
+    nin   = ((syb*.58)/tauin); %coresponding safety factor of the bolt
+    taur  = ((torr/R)/A); %shear stress on the bolt
+    nr    = ((syb*.58)/taur); %coresponding safety factor of the bolt
 end
 
 end
