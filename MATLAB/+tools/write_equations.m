@@ -1,9 +1,11 @@
 %% write_equations
 % WRITE_EQUATIONS This function takes all the inputs after processing from
 % the GUI and writes the Equations file for use in Solidworks
-function write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,FL,FW,FH,TW,RH)
+function write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,FL,FW,FH,TW,RH,...
+			 ack,h,odt,idt,ltr,rbl,pr,N,PD,bore,RL,ir_d,...
+			 ss,stcl,otod,otid,osid,osod)
 
-if nargin < 11
+if nargin < 28
     warning('Not enough input arguments, using default values');
     POD = 25.0;
     PWT = 3.0;
@@ -17,10 +19,6 @@ if nargin < 11
     TW  = 1397.0;
     RH  = 250.0;
 end
-
-%%
-% Declare cell array to hold strings and values
-output = cell(18,2);
 
 %% Populate cell array
 % Variables that will change with parametrization
@@ -55,6 +53,63 @@ output{17,2} = 'abs(atn (5.5in /(("TrackWidth"/2)-10in) ))';
 
 output{18,1} = 'Omega';
 output{18,2} = 'abs(atn (9in /(("TrackWidth"/2)-10in) ))';
+			    
+output{19,1} = 'ackangle';
+output{19,2} = num2str(ack);
+
+output{20,1} = 'ODtie';
+output{20,2} = [num2str(odt) 'm'];
+
+output{21,1} = 'IDtie';
+output{21,2} = [num2str(idt) 'm'];
+
+output{22,1} = 'Ltie';
+output{22,2} = [num2str(ltr) 'm'];
+
+output{23,1} = 'BoxLength';
+output{23,2} = [num2str(rbl) 'm'];
+
+output{24,1} = 'Pr';
+output{24,2} = [num2str(pr) 'in'];
+
+output{25,1} = 'N';
+output{25,2} = num2str(N);
+
+output{26,1} = 'PD';
+output{26,2} = num2str(PD);
+
+output{27,1} = 'bore';
+output{27,2} = [num2str(bore) 'in'];
+
+output{28,1} = 'RL';
+output{28,2} = [num2str(RL) 'm'];
+
+output{29,1} = 'D-inner';
+output{29,2} = [num2str(ir_d) 'm'];
+
+output{30,1} = 's';
+output{30,2} = [num2str(ss) 'm'];
+
+output{31,1} = 'L-steering_column';
+output{31,2} = [num2str(stcl) 'm'];
+
+output{32,1} = 'OD-outer';
+output{32,2} = [num2str(otod) 'm'];
+
+output{33,1} = 'ID-outer';
+output{33,2} = [num2str(otid) 'm'];
+
+output{34,1} = 'ID-sleeve';
+output{34,2} = [num2str(osid) 'm'];
+
+output{35,1} = 'OD-sleeve';
+output{35,2} = [num2str(osod) 'm'];
+
+output{36,1} = 'hknuckle';
+output{36,2} = [num2str(h) 'm'];
+
+output{37,1} = 'H';
+output{37,2} = [num2str(191.7) 'mm'];
 
 %% Write to file
 % Determine user
@@ -80,7 +135,8 @@ end
 
 %%
 % Print values to file
-for k = 1:18
+[n,~] = size(output);
+for k = 1:n
     fprintf(efid,'"%s" = %s\n',output{k,1},output{k,2});
 end
 
