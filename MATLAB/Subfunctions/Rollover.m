@@ -63,12 +63,12 @@ acc = velocity^2 / turning_radius;
 % Define gravitational acceleration
 g = 9.81;
 
-while acc/g < Ratio
+while acc/g < Ratio && track_width < 1.397
     warning('Vehicle could rollover. Increasing track width');
     track_width = track_width + 0.025;
     Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y))));
 end %while loop
 
 fprintf(log_id,'Maximum lateral acceleration %.1f g\n',acc/g);
-
+track_width = track_width*1000;
 end %function

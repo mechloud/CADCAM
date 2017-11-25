@@ -20,7 +20,7 @@ end
 
 %%
 % Declare cell array to hold strings and values
-output = cell(17,2);
+output = cell(18,2);
 
 %% Populate cell array
 % Variables that will change with parametrization
@@ -33,14 +33,14 @@ output{6,1}  = 'rbdia';             output{6,2}  = num2str(rbdia);
 output{7,1}  = 'FrameLength';       output{7,2}  = num2str(FL);
 output{8,1}  = 'FrameWidth';        output{8,2}  = num2str(FW);
 output{9,1}  = 'FrameHeight';       output{9,2}  = num2str(FH);
-output{10,1}  = 'BendingRadius';     output{10,2}  = num2str(114.3);
+output{10,1} = 'BendingRadius';     output{10,2} = num2str(114.3);
 output{11,1} = 'TrackWidth';        output{11,2} = num2str(TW);
 output{12,1} = 'RideHeight';        output{12,2} = num2str(RH);
 
 %%
 % Equations and variables that do not change with parametrization
 output{13,1} = 'Alpha';
-output{13,2} = 'atn ( ( "RideHeight" - 152 ) / "SuspWidth" )';
+output{13,2} = 'abs(atn ( ( "RideHeight" - 152 ) / "SuspWidth" ))';
 
 output{14,1} = 'SuspWidth';
 output{14,2} = '( "TrackWidth" / 2 ) - 7in - ( "FrameWidth" - 24in ) / 2';
@@ -48,13 +48,13 @@ output{14,2} = '( "TrackWidth" / 2 ) - 7in - ( "FrameWidth" - 24in ) / 2';
 output{15,1} = 'ShockAngle';        output{15,2} = '60';
 
 output{16,1} = 'Beta';              
-output{16,2} = 'atn ( (("TrackWidth"/2)-20in)/11in)';
+output{16,2} = 'abs(atn ( (("TrackWidth"/2)-20in)/11in))';
 
 output{17,1} = 'Theta';
-output{17,2} = 'atn (5.5in /(("TrackWidth"/2)-10in) )';
+output{17,2} = 'abs(atn (5.5in /(("TrackWidth"/2)-10in) ))';
 
 output{18,1} = 'Omega';
-output{18,2} = 'atn (9in /(("TrackWidth"/2)-10in) )';
+output{18,2} = 'abs(atn (9in /(("TrackWidth"/2)-10in) ))';
 
 %% Write to file
 % Determine user
@@ -80,7 +80,7 @@ end
 
 %%
 % Print values to file
-for k = 1:17
+for k = 1:18
     fprintf(efid,'"%s" = %s\n',output{k,1},output{k,2});
 end
 

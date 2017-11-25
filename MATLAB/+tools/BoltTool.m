@@ -7,7 +7,7 @@ function bdia = BoltTool(b,n)
 % If the number of input arguments is less than 2, declare defaults. This
 % is used for debugging and testing.
 if nargin < 2
-   b = struct('F',700,...    % Shearing Force in N
+   b = struct('F',3000,...    % Shearing Force in N
               't',6.08,...    % Thickness of member
               'mxA',240,...   % Cross sectional area of weakeast connected member
               'SyM',250);     % Yield Strength of weakest member
