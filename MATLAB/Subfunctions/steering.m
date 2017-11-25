@@ -3,7 +3,7 @@
 
 function [turning_radius,ackangle,h,odt,idt,ltr,rackboxlength,Pr,N,PD,bore,...
           racklength,ir_d,slotsize,stclength,ot_OD,ot_ID,os_ID,os_OD]...
-          = steering(log_id,FW,TW,WB,SR,FL,Weight)
+          = steering(log_id,FW,TW,WB,SR,FL,Weight,stcangle)
 
 if nargin < 7
     clc
@@ -24,7 +24,7 @@ end
 
 CG = 0.4;
 
-fdiff = FL/1000 - 1.8282;
+fdiffz = FL/1000 - 1.8282;
 
 %% Declare global variables
 % Length of steering arm [m]
@@ -46,8 +46,8 @@ syb = 240*10^6; %sy of bolt in Pa
 
 %%
 % Calculate Steering Geometry
-[turning_radius,ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
-                                      Lknuckle,fdiff);
+[turning_radius,ltr,ackangle,Pr,stclength,racklength,rackboxlength,stcangle] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
+                                      Lknuckle,fdiffz,stcangle);
                                   
 %%
 % Print to log file
@@ -101,17 +101,17 @@ function [R,Ltierod,...
           ackangle,...
           Pr,stclength,...
           racklength,...
-          rackboxlength] = steering_geometry(track,Lkp,WB,...
+          rackboxlength,stcangle] = steering_geometry(track,Lkp,WB,...
                                                    steeringratio,...
                                                    framewidth,...
                                                    lff,... % length from front
                                                    Lknuckle,...
-                                                   fdiff)
+                                                   fdiffz)
 
                                                
 %%
 % Length between front plane and firewall
-firewalllength = 1.30954 - abs(fdiff);
+firewalllength = 1.30954 - abs(fdiffz);
 
 %%
 % Rack Offset [m]
@@ -130,18 +130,17 @@ R = (WB/tand(maxturn))+(track/2); %minimum turning radius from center of vehicle
 
 %%
 % Length of the tie rod
-Ltierod = sqrt((track/2-(12*0.0254 + framewidth/1000 - 0.9144)/2-Lkp-3*sind(ackangle))^2 ...
+Ltierod1 = sqrt((track/2-(12*0.0254 + framewidth/1000 - 0.9144)/2-Lkp-3*sind(ackangle))^2 ...
           +(abs(lff-roffset)^2));
-%   ** output length of tie rod to solidworks **
 
 %% Motion needed from Rack
 % Distance between rack and pivot point @ ackangle
-La = (Lknuckle*cosd(ackangle-90))+sqrt(Ltierod^2-(abs(lff-roffset)...
+La = (Lknuckle*cosd(ackangle-90))+sqrt(Ltierod1^2-(abs(lff-roffset)...
     +(Lknuckle*(cosd(ackangle-90))))^2);
 
 %%
 % Distance between rack and pivot point @ max turn angle (45deg)
-Lm = (Lknuckle*cosd(ackangle-45))+sqrt(Ltierod^2-(abs(lff-roffset)...
+Lm = (Lknuckle*cosd(ackangle-45))+sqrt(Ltierod1^2-(abs(lff-roffset)...
     +(Lknuckle*(cosd(ackangle-45))))^2);
 
 %%
@@ -157,15 +156,22 @@ Pr = (Lneeded/((maxturn*steeringratio)/360)*(2*pi));
 % Print to log file 
 fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
 
+fdiffx = framewidth/1000 - 0.9144;
+
 %%
 % Length of steering column
-stclength = sqrt((firewalllength-(36*0.0254))^2+((48*0.0254)^2));
+stclength = (sqrt((0.70229+(fdiffz))^2+((0.32766)^2))/2);
+stcangle = atand(0.32766/(0.70229+fdiffz));
 
 %%
 % Length of rack
 rackboxlength = 12*0.0254 + framewidth/1000 - 0.9144;
-racklength = rackboxlength + 2*0.0254;
+racklength = rackboxlength + 4*0.0254;
 
+%%
+%outputed length of tie rod 
+tdiff = (TW-(55*25.4))/2;
+Ltierod = sqrt((38.61)^2+(260.17+tdiff)^2);
 
 end
 
