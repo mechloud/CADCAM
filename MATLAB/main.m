@@ -214,7 +214,7 @@ else
     
     % Steering Codes - NEED TO RETURN VALUES TO WRITE IN FILE
     [turning_radius,ackangle,h,odt,idt,ltr,rbl,Pr,N,PD,bore,...
-    racklength,ir_d,slotsize,stclength,ot_OD,ot_ID,os_ID,os_OD] = steering(log_id,frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
+    racklength,ir_d,slotsize,stclength,stcangle,ot_OD,ot_ID,os_ID,os_OD] = steering(log_id,frame_width,track_width,wheelbase,steering_ratio,frame_length,md);
     
     [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f,...
                Ks_r,md,ground_clearance);
@@ -227,7 +227,7 @@ else
     tools.write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,frame_length,frame_width,...
                           frame_height,track_width,ground_clearance,ackangle,...
                           h,odt,idt,ltr,rbl,Pr,N,PD,bore,racklength,ir_d,...
-                          slotsize,stclength,ot_OD,ot_ID,os_ID,os_OD);
+                          slotsize,stclength,stcangle,ot_OD,ot_ID,os_ID,os_OD);
                       
     % Close the log file
     try

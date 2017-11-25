@@ -2,7 +2,7 @@
 % STEERING Calculations
 
 function [turning_radius,ackangle,h,odt,idt,ltr,rackboxlength,Pr,N,PD,bore,...
-          racklength,ir_d,slotsize,stclength,ot_OD,ot_ID,os_ID,os_OD]...
+          racklength,ir_d,slotsize,stclength,stcangle,ot_OD,ot_ID,os_ID,os_OD]...
           = steering(log_id,FW,TW,WB,SR,FL,Weight,stcangle)
 
 if nargin < 7
@@ -47,7 +47,7 @@ syb = 240*10^6; %sy of bolt in Pa
 %%
 % Calculate Steering Geometry
 [turning_radius,ltr,ackangle,Pr,stclength,racklength,rackboxlength,stcangle] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
-                                      Lknuckle,fdiffz,stcangle);
+                                      Lknuckle,fdiffz);
                                   
 %%
 % Print to log file
@@ -170,7 +170,7 @@ racklength = rackboxlength + 4*0.0254;
 
 %%
 %outputed length of tie rod 
-tdiff = (TW-(55*25.4))/2;
+tdiff = (track-(55*25.4))/2;
 Ltierod = sqrt((38.61)^2+(260.17+tdiff)^2);
 
 end

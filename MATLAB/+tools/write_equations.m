@@ -3,7 +3,7 @@
 % the GUI and writes the Equations file for use in Solidworks
 function write_equations(POD,PWT,SOD,SWT,fbdia,rbdia,FL,FW,FH,TW,RH,...
 			 ack,h,odt,idt,ltr,rbl,pr,N,PD,bore,RL,ir_d,...
-			 ss,stcl,otod,otid,osid,osod)
+			 ss,stcl,stcangle,otod,otid,osid,osod)
 
 if nargin < 28
     warning('Not enough input arguments, using default values');
@@ -76,7 +76,7 @@ output{25,1} = 'N';
 output{25,2} = num2str(N);
 
 output{26,1} = 'PD';
-output{26,2} = num2str(PD);
+output{26,2} = [num2str(PD) 'in'];
 
 output{27,1} = 'bore';
 output{27,2} = [num2str(bore) 'in'];
@@ -110,6 +110,9 @@ output{36,2} = [num2str(h) 'm'];
 
 output{37,1} = 'H';
 output{37,2} = [num2str(191.7) 'mm'];
+
+output{38,1} = 'steering_column_angle';
+output{38,2} = num2str(stcangle);
 
 %% Write to file
 % Determine user
