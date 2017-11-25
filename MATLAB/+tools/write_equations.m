@@ -64,7 +64,7 @@ output{21,1} = 'IDtie';
 output{21,2} = [num2str(idt) 'm'];
 
 output{22,1} = 'Ltie';
-output{22,2} = [num2str(ltr) 'm'];
+output{22,2} = [num2str(ltr) 'mm'];
 
 output{23,1} = 'BoxLength';
 output{23,2} = [num2str(rbl) 'm'];
