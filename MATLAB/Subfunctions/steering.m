@@ -1,10 +1,11 @@
 %% steering
 % STEERING Calculations
 
-function turning_radius = steering(log_id,FW,TW,WB,SR,FL,Weight)%add weight and center of mass 
+function [turning_radius,ackangle,h,odt,idt,ltr,rackboxlength,Pr,N,PD,bore,...
+          racklength,ir_d,slotsize,stclength,ot_OD,ot_ID,os_ID,os_OD]...
+          = steering(log_id,FW,TW,WB,SR,FL,Weight)
 
 if nargin < 7
-    
     clc
     clear
     
@@ -23,7 +24,7 @@ end
 
 CG = 0.4;
 
-fdiff = FL - 1828.2;
+fdiff = FL/1000 - 1.8282;
 
 %% Declare global variables
 % Length of steering arm [m]
@@ -43,20 +44,31 @@ Sy = 276*10^6; %Sy of aluminum 6061 in Pa
 E  = 68.9*10^9; %E of aluminum 6061 in Pa
 syb = 240*10^6; %sy of bolt in Pa
 
+%%
+% Calculate Steering Geometry
 [turning_radius,ltr,ackangle,Pr,stclength,racklength,rackboxlength] = steering_geometry(TW,Lkp,WB,SR,FW,Lfromfront,...
                                       Lknuckle,fdiff);
-fprintf(log_id,'The minimum turning radius of the vehicle is %.1f [m]\n',...
-                turning_radius/1000);
-fprintf(log_id,'The Ackerman Angle is %.1f degrees\n',ackangle);
-[Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
-
-steering_knuckle(Fr,Ft,Sy) ;
-%sends back new value of cross section height for steering arm
+                                  
+%%
+% Print to log file
+if log_id ~= 0
+    fprintf(log_id,'The minimum turning radius of the vehicle is %.1f [m]\n',...
+                    turning_radius/1000);
+    fprintf(log_id,'The Ackerman Angle is %.1f degrees\n',ackangle);
+end
 
 %%
-% Calculates forces on ties rods. Returns safety factors, OD and ID of
+% Estimate the forces acting on the steering system
+[Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle);
+
+%%
+% Calculate required thickness of steering arm on knuckle
+h = steering_knuckle(Fr,Ft,Sy) ;
+
+%%
+% Calculates forces on tie rods. Returns safety factors, OD and ID of
 % tie-rod tubes.
-[nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,ltr);
+[~,~,odt,idt] = Tie_Rod(Fr,Ft,Sy,ltr);
 
 %%
 % Calculates the shear on the bolts in the steering column and returns
@@ -77,12 +89,12 @@ steering_knuckle(Fr,Ft,Sy) ;
 %%
 % Calculates the torsional stress on the outer tube sleeve in the steering 
 % column and returns OD, ID and safety factors
-[os_OD,os_ID,nt,nr] = column_sleeve(torin,torr,Sy,ot_OD);
+[os_OD,os_ID,~,~] = column_sleeve(torin,torr,Sy,ot_OD);
 
 %%
 % calculates the bending and wear stress on the gear and returns the safe
 % gear size 
-[N,PD,bore,F]= gear_loop(Pr,torin,torr);
+[N,PD,bore]= gear_loop(Pr,torin,torr);
 end
 
 function [R,Ltierod,...
@@ -99,7 +111,7 @@ function [R,Ltierod,...
                                                
 %%
 % Length between front plane and firewall
-firewalllength = 1309.54 - fdiff;
+firewalllength = 1.30954 - abs(fdiff);
 
 %%
 % Rack Offset [m]
@@ -118,7 +130,7 @@ R = (WB/tand(maxturn))+(track/2); %minimum turning radius from center of vehicle
 
 %%
 % Length of the tie rod
-Ltierod = sqrt((track/2-framewidth/2-Lkp-3*sind(ackangle))^2 ...
+Ltierod = sqrt((track/2-(12*0.0254 + framewidth/1000 - 0.9144)/2-Lkp-3*sind(ackangle))^2 ...
           +(abs(lff-roffset)^2));
 %   ** output length of tie rod to solidworks **
 
@@ -143,7 +155,7 @@ Pr = (Lneeded/((maxturn*steeringratio)/360)*(2*pi));
 
 %%
 % Print to log file 
-fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R/1000);
+fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
 
 %%
 % Length of steering column
@@ -151,12 +163,13 @@ stclength = sqrt((firewalllength-(36*0.0254))^2+((48*0.0254)^2));
 
 %%
 % Length of rack
-racklength = framewidth + 2*0.0254;
-rackboxlength = framewidth;
+rackboxlength = 12*0.0254 + framewidth/1000 - 0.9144;
+racklength = rackboxlength + 2*0.0254;
+
 
 end
 
-function [N,PD,bore,F] = gear_loop(Pr,torin,torr)
+function [N,PD,bore] = gear_loop(Pr,torin,torr)
 
 Gears = load('gears.mat');
 gears = Gears.gears;
@@ -176,23 +189,25 @@ L2 = length(big_G);
 
 if desired_PD > PD(end)
     PD = PD(end);
-    Bore = gears(end,3);
+    bore = gears(end,3);
     N = gears(end,1);
 elseif desired_PD < PD(1)
     PD = PD(1);
-    Bore = gears(1,3);
+    bore = gears(1,3);
     N = gears(1,1);
 elseif abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
     PD = small_G(end);
-    Bore = gears(L,3);
+    bore = gears(L,3);
     N = gears(L,1);
 elseif abs(small_G(end)-desired_PD) > abs(big_G(1)-desired_PD)
     PD = big_G(1);
-    Bore = gears(L+1,3);
+    bore = gears(L+1,3);
     N = gears(L+1,1);
 elseif any(desired_PD == PD)
     PD = desired_PD;
 end
+
+% ALEX VENDETTE: RECALCULATE STEERING RATIO WITH NEW PINION DIAMETER
 
 %%
 % Initialize variables
@@ -212,11 +227,11 @@ ctr=1;
 while sh < 2 && sf < 2
     if abs(small_G(end)-desired_PD) < abs(big_G(1)-desired_PD)
         PD = big_G(ctr);
-        Bore = gears(L+1,3);
+        bore = gears(L+1,3);
         N = gears(L+1,1);
     elseif abs(small_G(end)-desired_PD) > abs(big_G(1)-desired_PD)
         PD = big_G(1+ctr);
-        Bore = gears(L+1+ctr,3);
+        bore = gears(L+1+ctr,3);
         N = gears(L+1+ctr,1);
     elseif any(desired_PD == PD)
         PD = big_G(ctr);
@@ -283,7 +298,6 @@ sf = ((St*Yn)/(1*1.5))/sigmab;
 
 end
 
-
 function [Ft,Fr,torin,torr] = steering_forces(Weight,CG,Pr,Lkp,Lknuckle)
 %%
 % Determing the forces acting on the system
@@ -301,14 +315,11 @@ torr    = (Pr * 0.0254) * Fr;
 
 end
 
-
-
-
-function h = steering_knuckle (Fr,Ft,Sy)
+function h = steering_knuckle(Fr,Ft,Sy)
 
 %% Bending in Initially Curved Beams
 % Declare variables
-h  = 1.5*0.0254;        %height of cross section on the arm connecting to the tie rod
+h  = 1.25*0.0254;        %height of cross section on the arm connecting to the tie rod
 b  = 1*0.0254;          %width of base of the cross section 
 ro = 0.0508;            %outer radius of initially curved beam
 ri = 0.0254;            %inner radius of initially curved beam 
@@ -367,19 +378,19 @@ while nir < 2 && nor < 2 && nit < 2 && not < 2
 end
 end
 
-function [nt,nr,OD,ID] = Tie_Rod (Fr,Ft,Sy,Ltierod)
+function [nt,nr,od,id] = Tie_Rod (Fr,Ft,Sy,Ltierod)
 %% Buckling Stress in Tie-Rods
 % Load standard tube size library
 tietubes = load('tie_rod_tube.mat');
-tietube_sizes = tietubes.tie_rod_tube;
+tietube_sizes = tietubes.tietube_sizes;
 
 %%
 % Extract required information
 OD = tietube_sizes(:,1);
 ID = tietube_sizes(:,2);
 
-od = OD(5)*0.0254
-id = ID(5)*0.0254
+od = OD(5)*0.0254;
+id = ID(5)*0.0254;
 
 %%
 % Calculate ratio for buckling
@@ -408,7 +419,7 @@ ctr = 1;
 %%
 % If safety factors are not acceptable, loop through and increase tube size
 % until they are acceptable
-while nt < 2 && nr < 2 && ctr < length(ID)
+while nt < 2 && nr < 2 && ctr < length(ID)-5
     
     od = OD(5+ctr)*0.0254;
     id = ID(ctr+5)*0.0254;
@@ -436,9 +447,6 @@ end
 
 end
 
-    
-
-
 function [OD,nin,nr] = column_inner(torin,torr,Sy,slotsize)
 %% Torsion on Inner Part of Steering Column
 % Declare variables 
@@ -465,7 +473,6 @@ while nin < 2 && nr < 2
 end
 
 end
-
 
 function [od,id,nin,nr] = column_outer(torin,torr,Sy,rod_dia)
 %% Torsion on Outer Part of Steering Column
@@ -514,9 +521,7 @@ end % end while
 
 end 
 
-
-
-function [OD,ID,nin,nr] = column_sleeve(torin,torr,Sy,ot_od)
+function [od,id,nin,nr] = column_sleeve(torin,torr,Sy,ot_od)
 %% Torsion on Steering Column Sleeve
 % Load standard tube size database
 tubes = load('tube_sizes.mat');
@@ -527,12 +532,15 @@ IDs = ODs - 0.002*tube_sizes(:,2);
 ID = IDs(IDs > ot_od);
 OD = ODs(IDs > ot_od);
 
+od = OD(1);
+id = ID(1);
+
 %%
 % Calculate variables
 b  = 1.48/1000; % bolt hole thickness 
 d  = 12/1000;  %bolt hole diameter
 R  = OD(1)/2; % radius of bigger sleeve
-J  = ((pi*OD(1)^4)/32)-((pi*ID(1)^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
+J  = ((pi*od^4)/32)-((pi*id^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
 
 tauin = ((torin*R)/J); %torsional stress on bigger sleeve
 nin   = ((Sy*.58)/tauin); %torsional stress on bigger sleeve safety factor 
@@ -557,7 +565,6 @@ while nin < 2 && nr < 2 && ctr < length(ID)
 end    
  
 end
-
 
 function [r,nin,nr] = column_bolt_shear(torin,torr,syb)
 %% Shear on Steering Pins

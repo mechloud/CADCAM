@@ -1,6 +1,7 @@
 function [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f, Ks_r,md,gc)
 
 if nargin < 7
+    warning('Not enough input arguments, using default settings.');
     log_id = 0;
     md = 110;
     track_width = 55*25.4;
@@ -69,6 +70,17 @@ while acc/g < Ratio && track_width < 1.397
     Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y))));
 end %while loop
 
-fprintf(log_id,'Maximum lateral acceleration %.1f g\n',acc/g);
+if track_width >= 1.397 && acc/g < Ratio
+    msg = ['The vehicle is at risk of tipping over in high speed corners.',...
+           ' Maximum track width set by Baja SAE rules has been reached. ',...
+           ' Consider lowering the ground clearance or increasing the ',...
+           'natural frequency of the springs.'];
+    msgbox(msg,'WARNING','warn');
+end
+
+if log_id ~= 0 
+    fprintf(log_id,'Maximum lateral acceleration %.1f g\n',acc/g);
+end
+
 track_width = track_width*1000;
 end %function
