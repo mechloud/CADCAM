@@ -165,13 +165,13 @@ stcangle = atand(0.32766/(0.70229+fdiffz));
 
 %%
 % Length of rack
-rackboxlength = 12*0.0254 + framewidth/1000 - 0.9144;
+rackboxlength = 12*0.0254 + fdiffx;
 racklength = rackboxlength + 4*0.0254;
 
 %%
 %outputed length of tie rod 
 tdiff = (track-(55*25.4))/2;
-Ltierod = sqrt((38.61)^2+(260.17+tdiff)^2);
+Ltierod = sqrt((38.61)^2+(260.17+tdiff+fdiffx)^2);
 
 end
 
