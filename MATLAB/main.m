@@ -94,6 +94,19 @@ elseif val < min
     val = min;
 end
 
+%%mass_check
+%check to see if mass out of range and readjusts
+function md = mass_check(min,max,val)
+    if val > max/2.2
+        warning(['Mass of driver exceeds design spec, consider losing weight ',...
+                 'or getting a smaller driver. Resetting to maximum value',...
+                 ' of %.0f lbs'],max);
+        md = max/2.2;
+    elseif val < 0
+        warning(['You should know better than to have negative mass...',...
+                 ' Resetting to 175 lbs']);
+        md = 175/2.2;
+    end
 %% BTN_GENERATE does all the work
 % --- Executes on button press in BTN_generate.
 function BTN_generate_Callback(hObject, eventdata, handles)
@@ -145,8 +158,10 @@ else
     
     md = get(handles.box_mass_driver,'Value');
     if get(handles.rb_lbs,'Value') == 1
-        % if the mass is in lbs, convert to kg
+        %if the mass is in lbs, convert to kg
         md = md/2.2;
+    elseif get(handles.rb_kg,'Value') == 1
+        md = mass_check(0,250,md); 
     end
     
     fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
@@ -305,7 +320,7 @@ end
 
 
 % --- Executes on slider movement.
-function slider_frame_width_Callback(hObject, eventdata, handles)
+function slider_frame_width_Callback(hObject, ~, handles)
 % hObject    handle to slider_frame_width (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -834,26 +849,16 @@ function box_mass_driver_Callback(hObject, eventdata, handles)
 
 min = get(hObject,'Min');
 max = get(hObject,'Max');
-    md = str2double(get(handles.box_mass_driver,'String'));
-    if get(handles.rb_lbs,'Value') == 1
-        % if the mass is in lbs, convert to kg
-        md = md/2.2;
-    end
-    if md > max/2.2
-        warning(['Mass of driver exceeds design spec, consider losing weight',...
-                 'or getting a smaller driver. Resetting to maximum value',...
-                 ' of %.0f lbs'],max);
-        md = max;
-        set(handles.box_mass_driver,'Value',md);
-        set(handles.rb_lbs,'Value',1);
-    elseif md < min
-        warning(['You should know better than to have negative mass...',...
-                 ' Resetting to 175 lbs']);
-        md = 175;
-        set(handles.box_mass_driver,'Value',md);
-        set(handles.rb_lbs,'Value',1);
-    end
+val = str2double(get(hObject,'String'));
+if get(handles.rb_lbs,'Value') == 1
+    % if the mass is in lbs, convert to kg/.
+    val = val/2.2;
+    set(handles.rb_lbs,'Value',0);
+end
+val = mass_check(min,max,val);  
+set(handles.box_mass_driver,'Value',val);
 
+ 
 
 % --- Executes during object creation, after setting all properties.
 function box_mass_driver_CreateFcn(hObject, eventdata, handles)

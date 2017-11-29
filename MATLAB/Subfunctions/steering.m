@@ -154,7 +154,7 @@ Pr = (Lneeded/((maxturn*steeringratio)/360)*(2*pi));
 
 %%
 % Print to log file 
-fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
+%fprintf('The minimum turning radius of the vehicle is %.1f [m]\n',R);
 
 fdiffx = framewidth/1000 - 0.9144;
 
