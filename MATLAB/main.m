@@ -158,11 +158,11 @@ else
                     '|--------------------------------------------------------------|\n\n']);
     
     % Suspension Codes
-    if get(handles.rb_front,'Value') == 1
-        Suspension('gui',0,'f',front_omegan,zeta,md);
-    elseif get(handles.rb_rear,'Value') == 1
-        Suspension('gui',0,'r',rear_omegan,zeta,md);   
-    end
+%     if get(handles.rb_front,'Value') == 1
+%         Suspension('gui',0,'f',front_omegan,zeta,md);
+%     elseif get(handles.rb_rear,'Value') == 1
+%         Suspension('gui',0,'r',rear_omegan,zeta,md);   
+%     end
     
     [fbdia,Ks_f] = Suspension('main',log_id,'f',front_omegan,zeta,md);
     [rbdia,Ks_r] = Suspension('main',log_id,'r',rear_omegan,zeta,md);
@@ -834,9 +834,6 @@ function box_mass_driver_Callback(hObject, eventdata, handles)
 
 min = get(hObject,'Min');
 max = get(hObject,'Max');
-    front_omegan = get(handles.slider_front_omegan,'Value');
-    rear_omegan = get(handles.slider_rear_omegan,'Value');   
-    zeta = get(handles.slider_zeta,'Value');
     md = str2double(get(handles.box_mass_driver,'String'));
     if get(handles.rb_lbs,'Value') == 1
         % if the mass is in lbs, convert to kg
@@ -856,15 +853,7 @@ max = get(hObject,'Max');
         set(handles.box_mass_driver,'Value',md);
         set(handles.rb_lbs,'Value',1);
     end
-%%
-% Suspension Codes
-    if get(handles.rb_front,'Value') == 1
-        Suspension('gui',0,'f',front_omegan,zeta,md);
-    elseif get(handles.rb_rear,'Value') == 1
-        Suspension('gui',0,'r',rear_omegan,zeta,md);
-    else
-        Suspension('gui',0,'f',front_omegan,zeta,md);
-    end
+
 
 % --- Executes during object creation, after setting all properties.
 function box_mass_driver_CreateFcn(hObject, eventdata, handles)
