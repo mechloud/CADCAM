@@ -54,6 +54,27 @@ for k = 1:nnodes
 end
 
 %%
+% Sort array for faster processing by ANSYS
+elements = sortrows(elements,4);
+
+%%
+% Extract elements depending on material flag
+primaries = elements((elements(:,4) == 1),:);
+secondaries = elements((elements(:,4) == 2),:);
+[rp,~] = size(primaries);
+[rs,~] = size(secondaries);
+
+%%
+% Renumber the elements
+primaries(:,1) = 1:1:rp;
+secondaries(:,1) = (rp+1):1:(rs+rp);
+
+%%
+% Reconstruct elements vector
+elements = [primaries;
+            secondaries];
+
+%%
 % Create lines between nodes
 fprintf(fid,'\n! Create lines between nodes\n');
 for k = 1:nelements
@@ -78,13 +99,11 @@ fprintf(fid,'MP,PRXY,1,0.29\n');
 
 %%
 % Assign Properties to Lines
-% TODO: Check to sort array using sort(A,dim) for potentially faster
-% computing
-fprintf(fid,'\n! Assign Properties to Lines\n');
-for k = 1:nelements
-    fprintf(fid,['LSEL,S,LINE,,%i,,,0\n',...
-        'LATT,1,,1,,,,%i\n!\n'],k,elements(k,4));
-end
+fprintf(fid,'\n! Attribute line properties to elements\n');
+fprintf(fid,['LSEL,S,LINE,,1,%i,,0\n',...
+             'LATT,1,,1,,,,1\n!\n'],rp);
+fprintf(fid,['LSEL,S,LINE,,%i,%i,,0\n',...
+             'LATT,1,,1,,,,2\n!\n'],rp+1,rs+rp);
 
 %%
 % Select and mesh all lines
