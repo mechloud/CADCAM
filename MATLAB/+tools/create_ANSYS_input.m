@@ -6,18 +6,20 @@ if nargin < 8
     log_id = 0;
     %%
     % Load the geometry
-    addpath('../Database');
+    addpath('Database');
     nodal = load('baja_3D_geometry.mat');
     nodes = nodal.nodes;
     elements = nodal.elements;
     
     type = 'rollover';
     
-    POD = 25;
-    PWT = 3;
-    SOD = 25;
-    SWT = 0.9;
+    POD = 28.575;
+    PWT = 4.7752;
+    SOD = 25.4;
+    SWT = 0.12*25.4;
     md = 110;
+    
+    
 end % end nargin
 
 %%
@@ -27,12 +29,21 @@ end % end nargin
 
 %%
 % Create filename 
-output_filename = sprintf('%s_ANSYS_input.txt',type);
+if strcmp(getenv('username'),'Jonathan')
+    output_filename = sprintf('C:\\Users\\Jonathan\\Documents\\UOttawa\\MCG4322 - CADCAM\\GitHub\\CADCAM\\ANSYS\\%s_ANSYS_input.txt',type);
+    warning('Writing file to path on Jonathan`s computer');
+else
+    output_filename = sprintf('%s_ANSYS_input.txt',type);
+end
+
 fid = fopen(output_filename,'w+');
+
+
 fprintf('Writing ANSYS input file for %s impact case\n',type);
 
 %% Pre-Processing
 % Create keypoints
+fprintf(fid,'/TITLE, 3D Analysis of Vehicle for %s impact\n',type);
 fprintf(fid,'/PREP7\n! Create nodes \n');
 for k = 1:nnodes
     if strcmp(type,'2d')
@@ -67,6 +78,8 @@ fprintf(fid,'MP,PRXY,1,0.29\n');
 
 %%
 % Assign Properties to Lines
+% TODO: Check to sort array using sort(A,dim) for potentially faster
+% computing
 fprintf(fid,'\n! Assign Properties to Lines\n');
 for k = 1:nelements
     fprintf(fid,['LSEL,S,LINE,,%i,,,0\n',...
@@ -167,10 +180,12 @@ switch type
         fprintf(fid,'FK,29,FX,-22875.0\n');
     case 'rollover'
         fprintf(fid,'\n! Apply constraints\n');
-        fprintf(fid,'DK,34,,0,,0,ALL\n');
-        fprintf(fid,'DK,35,,0,,0,ALL\n');
-        fprintf(fid,'DK,36,,0,,0,ALL\n');
-        fprintf(fid,'DK,37,,0,,0,ALL\n');
+        fprintf(fid,'DK,34,UX,0,,0\n');
+        fprintf(fid,'DK,34,UY,0,,0\n');
+        fprintf(fid,'DK,35,ALL,0,,0\n');
+        fprintf(fid,'DK,36,ALL,0,,0\n');
+        fprintf(fid,'DK,37,UX,0,,0\n');
+        fprintf(fid,'DK,37,UY,0,,0\n');
         driver_weight = -md*9.81;
         fprintf(fid,'\n! Apply loads\n');
         %%
@@ -179,15 +194,15 @@ switch type
         fprintf(fid,'FK,11,FY,127.53\n');
         %%
         % Distribute mass of driver between nodes 19 and 22
-        fprintf(fid,'FK,19,FY,-%.1f\n',driver_weight/2);
-        fprintf(fid,'FK,22,FY,-%.1f\n',driver_weight/2);
+        fprintf(fid,'FK,19,FY,%.1f\n',-driver_weight/2);
+        fprintf(fid,'FK,22,FY,%.1f\n',-driver_weight/2);
         
         %%
         % Impact Loading
-        fprintf(fid,['FK,1,FY,-22875.0\n',...
-                     'FK,5,FY,-22875.0\n',...
-                     'FK,12,FY,-22875.0\n',...
-                     'FK,16,FY,-22875.0\n']);             
+        fprintf(fid,['FK,1,FY,22875.0\n',...
+                     'FK,5,FY,22875.0\n',...
+                     'FK,12,FY,22875.0\n',...
+                     'FK,16,FY,22875.0\n']);             
     otherwise
         warning(['Type of Simulation not recognized,',...
                  ' no loads or displacements inserted']);
@@ -207,7 +222,11 @@ try
     fclose(fid);
     fprintf(log_id,'\nWrote ANSYS input file for %s impact case\n',type);
 catch
-    fprintf(log_id,'\nCould not successfully write ANSYS input file\n');
+    if log_id ~= 0
+        fprintf(log_id,'\nCould not successfully write ANSYS input file\n');
+    else
+        fprintf('\nWrote ANSYS input file for %s impact case\n',type);
+    end
 end
 
 end
