@@ -13,8 +13,8 @@ if nargin < 8
     
     type = 'rollover';
     
-    POD = 28.575;
-    PWT = 4.7752;
+    POD = 31.75;
+    PWT = 3.9624;
     SOD = 25.4;
     SWT = 0.12*25.4;
     md = 110;
@@ -84,6 +84,7 @@ end
 %%
 % Declare Element Type and Section information
 fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
+fprintf(fid,'\n! Element key options\nKEYOPT,1,3,3\n');
 fprintf(fid,'\n! Set Section Information\n');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
     'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,12);
