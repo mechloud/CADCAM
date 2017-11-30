@@ -87,9 +87,9 @@ fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
 fprintf(fid,'\n! Element key options\nKEYOPT,1,3,3\n');
 fprintf(fid,'\n! Set Section Information\n');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],POD-2*PWT,POD,12);
+    'SECDATA,%.3f,%.3f,%i\n'],POD-2*PWT,POD,12);
 fprintf(fid,['\nSECTYPE,2,BEAM,CTUBE,Secondary\n',...
-    'SECDATA,%.1f,%.1f,%i\n'],SOD-2*SWT,SOD,12);
+    'SECDATA,%.3f,%.3f,%i\n'],SOD-2*SWT,SOD,12);
 % Last parameter in the last two fprintf's used to be 12
 
 %%
