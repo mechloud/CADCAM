@@ -17,13 +17,14 @@ cmap = jet(nelements);
 
 index = [1:nelements].';
 sigma = [index sigma];
-sigma = sort(sigma,'ascend');
+sigma = sortrows(sigma,2);
 
 for k = 1:nelements
-   
-    x = [nodes(elements(k,2),2),nodes(elements(k,3),2)];
-    y = [nodes(elements(k,2),3),nodes(elements(k,3),3)];
-    line(x,y,[0,0],'Color',cmap(sigma(k,1),:),'LineWidth',2.5);
+    
+    idx = sigma(k,1);
+    x = [nodes(elements(idx,2),2),nodes(elements(idx,3),2)];
+    y = [nodes(elements(idx,2),3),nodes(elements(idx,3),3)];
+    line(x,y,[0,0],'Color',cmap(k,:),'LineWidth',2.5);
     
 end
 view(0,90);

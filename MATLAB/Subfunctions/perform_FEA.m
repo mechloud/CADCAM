@@ -3,13 +3,14 @@
 function [axial,axial_n,buckling_n] = perform_FEA(nodes,elements,OD,WT,md)
 %%
 % If the number of input arguments is less than three, declare defaults.
-if nargin < 4
+if nargin < 5
+    warning('Using default settings');
     clc
     close all
-    addpath('Database');
+    addpath('C:\\Users\\Jonathan\\Documents\\UOttawa\\MCG4322 - CADCAM\\GitHub\\CADCAM\\MATLAB\\Database');
     load('2dfea.mat');
-    OD = 25.0;
-    WT = 3.0;
+    OD = 31.75;
+    WT = 3.9625;
     md = 110;
 end
 
@@ -76,18 +77,8 @@ for k = 1:nelements
     
     %%
     % Find direction cosines
-    if abs(xj-xi) <= 1.0e-6
-        l(k) = 0;
-    else
-        l(k) = (xj-xi)/L(k);
-    end
-    
-    if abs(yj-yi) <= 1.0e-6
-        m(k) = 0;
-    else
-        m(k) = (yj-yi)/L(k);
-    end
-    
+    l(k) = (xj-xi)/L(k);
+    m(k) = (yj-yi)/L(k);
     
     %%
     % Build Rotation Matrix
@@ -160,11 +151,9 @@ beta = (10^9)*max(max(Ka));
 Ka_sol = Ka;
 Ka_sol(16,16) = Ka(16,16) + beta;
 Ka_sol(17,17) = Ka(17,17) + beta;
-Ka_sol(18,18) = Ka(18,18) + beta;
 
 Ka_sol(19,19) = Ka(19,19) + beta;
 Ka_sol(20,20) = Ka(20,20) + beta;
-Ka_sol(21,21) = Ka(21,21) + beta;
 %% Solve System
 % The system can now be solved to find the displacement vector U.
 U = Ka_sol\F;
@@ -209,7 +198,7 @@ end
 
 %%
 % Find tensile stresses in elements $\sigma = E\epsilon$
-axial = E*epsilon;
+axial = -E*epsilon;
 
 %%
 % Find maximum stress
@@ -247,7 +236,6 @@ end
 %%
 % Calculate Buckling Safety Factor
 buckling_n = min(Scr./abs(axial));
-
 end % end function
 
 %% length
@@ -278,7 +266,7 @@ Ke = [(A*E)/L 0 0 -(A*E)/L 0 0;
     0 (12*E*I)/L^3 (6*E*I)/L^2 0 -(12*E*I)/L^3 (6*E*I)/L^2;
     0 (6*E*I)/L^2 (4*E*I)/L 0 -(6*E*I)/L^2 (2*E*I)/L;
     -(A*E)/L 0 0 (A*E)/L 0 0;
-    0 -(12*E*I)/L^3 -(6*E*I)/L^2 0 (12*E*I)/L^3 (6*E*I)/L^2;
+    0 -(12*E*I)/L^3 -(6*E*I)/L^2 0 (12*E*I)/L^3 -(6*E*I)/L^2;
     0 (6*E*I)/L^2 (2*E*I)/L 0 -(6*E*I)/L^2 (4*E*I)/L];
 
 end

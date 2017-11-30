@@ -7,12 +7,17 @@ if nargin < 8
     %%
     % Load the geometry
     addpath('Database');
-    nodal = load('baja_3D_geometry.mat');
+    
+    type = '2d';
+    
+    if ~strcmp(type,'2d')
+        nodal = load('baja_3D_geometry.mat');
+    else
+        nodal = load('2dfea.mat');
+    end
     nodes = nodal.nodes;
     elements = nodal.elements;
-    
-    type = 'side';
-    
+
     POD = 31.75;
     PWT = 3.9624;
     SOD = 25.4;
@@ -43,7 +48,12 @@ fprintf('Writing ANSYS input file for %s impact case\n',type);
 
 %% Pre-Processing
 % Create keypoints
-fprintf(fid,'/TITLE, 3D Analysis of Vehicle for %s impact\n',type);
+if ~strcmp(type,'2d')
+    fprintf(fid,'/TITLE, 3D Analysis of Vehicle for %s impact\n',type);
+else
+    fprintf(fid,'/TITLE, 2D Analysis of Vehicle for %s impact\n',type);
+end
+
 fprintf(fid,'/PREP7\n! Create nodes \n');
 for k = 1:nnodes
     if strcmp(type,'2d')
@@ -52,28 +62,28 @@ for k = 1:nnodes
         fprintf(fid,'K,%i,%.1f,%.1f,%.1f\n',k,nodes(k,2),nodes(k,3),nodes(k,4));
     end
 end
-
-%%
-% Sort array for faster processing by ANSYS
-elements = sortrows(elements,4);
-
-%%
-% Extract elements depending on material flag
-primaries = elements((elements(:,4) == 1),:);
-secondaries = elements((elements(:,4) == 2),:);
-[rp,~] = size(primaries);
-[rs,~] = size(secondaries);
-
-%%
-% Renumber the elements
-primaries(:,1) = 1:1:rp;
-secondaries(:,1) = (rp+1):1:(rs+rp);
-
-%%
-% Reconstruct elements vector
-elements = [primaries;
-            secondaries];
-
+if ~strcmp(type,'2d')
+    %%
+    % Sort array for faster processing by ANSYS
+    elements = sortrows(elements,4);
+    
+    %%
+    % Extract elements depending on material flag
+    primaries = elements((elements(:,4) == 1),:);
+    secondaries = elements((elements(:,4) == 2),:);
+    [rp,~] = size(primaries);
+    [rs,~] = size(secondaries);
+    
+    %%
+    % Renumber the elements
+    primaries(:,1) = 1:1:rp;
+    secondaries(:,1) = (rp+1):1:(rs+rp);
+    
+    %%
+    % Reconstruct elements vector
+    elements = [primaries;
+        secondaries];
+end
 %%
 % Create lines between nodes
 fprintf(fid,'\n! Create lines between nodes\n');
@@ -87,9 +97,9 @@ fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
 fprintf(fid,'\n! Element key options\nKEYOPT,1,3,3\n');
 fprintf(fid,'\n! Set Section Information\n');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
-    'SECDATA,%.3f,%.3f,%i\n'],POD-2*PWT,POD,12);
+    'SECDATA,%.3f,%.3f,%i\n'],(POD-2*PWT)/2,POD/2,12);
 fprintf(fid,['\nSECTYPE,2,BEAM,CTUBE,Secondary\n',...
-    'SECDATA,%.3f,%.3f,%i\n'],SOD-2*SWT,SOD,12);
+    'SECDATA,%.3f,%.3f,%i\n'],(SOD-2*SWT)/2,SOD/2,12);
 % Last parameter in the last two fprintf's used to be 12
 
 %%
@@ -101,10 +111,16 @@ fprintf(fid,'MP,PRXY,1,0.29\n');
 %%
 % Assign Properties to Lines
 fprintf(fid,'\n! Attribute line properties to elements\n');
-fprintf(fid,['LSEL,S,LINE,,1,%i,,0\n',...
-             'LATT,1,,1,,,,1\n!\n'],rp);
-fprintf(fid,['LSEL,S,LINE,,%i,%i,,0\n',...
-             'LATT,1,,1,,,,2\n!\n'],rp+1,rs+rp);
+if ~strcmp(type,'2d')
+    fprintf(fid,['LSEL,S,LINE,,1,%i,,0\n',...
+                 'LATT,1,,1,,,,1\n!\n'],rp);
+    fprintf(fid,['LSEL,S,LINE,,%i,%i,,0\n',...
+                 'LATT,1,,1,,,,2\n!\n'],rp+1,rs+rp);
+else
+    fprintf(fid,['LSEL,S,LINE,,1,%i,,0\n',...
+             'LATT,1,,1,,,,1\n!\n'],nelements);
+end
+
 
 %%
 % Select and mesh all lines
