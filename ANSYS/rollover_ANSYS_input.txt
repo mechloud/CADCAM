@@ -123,10 +123,13 @@ LSTR,37,35
 ! Declare Element Type
 ET,1,BEAM188
 
+! Element key options
+KEYOPT,1,3,3
+
 ! Set Section Information
 
 SECTYPE,1,BEAM,CTUBE,Primary
-SECDATA,19.0,28.6,12
+SECDATA,23.8,31.8,12
 
 SECTYPE,2,BEAM,CTUBE,Secondary
 SECDATA,19.3,25.4,12
