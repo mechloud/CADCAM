@@ -11,7 +11,7 @@ if nargin < 8
     nodes = nodal.nodes;
     elements = nodal.elements;
     
-    type = 'rollover';
+    type = 'side';
     
     POD = 31.75;
     PWT = 3.9624;
@@ -197,7 +197,8 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,'FK,29,FX,-22875.0\n');
+        fprintf(fid,'FK,26,FX,-22875.0\n');
+        fprintf(fid,'FK,5,FX,-22875.0\n');
     case 'rollover'
         fprintf(fid,'\n! Apply constraints\n');
         fprintf(fid,'DK,34,UX,0,,0\n');
