@@ -8,16 +8,18 @@ mw=14;
 
 %%
 % Mass of  the Vehicle Inlcuding the Drivetrain [kg]
-mv=195;
+mv=230;
 
 %%
 % Tire Spring Rate [N/m]
 k1=200000;
 %%
 % If the number of input arguments is less than three, declare defaults.
-if nargin < 4
+if nargin < 6
     clc
     close all
+    tag = 'gui';
+    log_id = 0;
     zeta = 0.3;     
     freq = 1.5; %Hz
     md = 110; %kg
