@@ -96,13 +96,13 @@ end
 
 %%mass_check
 %check to see if mass out of range and readjusts
-function md = mass_check(min,max,val)
-    if val > max/2.2
+function md = mass_check(min,max,md)
+    if md > max/2.2
         warning(['Mass of driver exceeds design spec, consider losing weight ',...
                  'or getting a smaller driver. Resetting to maximum value',...
                  ' of %.0f lbs'],max);
         md = max/2.2;
-    elseif val < min
+    elseif md < min
         warning(['You should know better than to have negative mass...',...
                  ' Resetting to 175 lbs']);
         md = 175/2.2;
