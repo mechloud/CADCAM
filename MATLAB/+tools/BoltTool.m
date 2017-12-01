@@ -7,7 +7,7 @@ function bdia = BoltTool(b,n)
 % If the number of input arguments is less than 2, declare defaults. This
 % is used for debugging and testing.
 if nargin < 2
-   b = struct('F',3000,...    % Shearing Force in N
+   b = struct('F',1400,...    % Shearing Force in N
               't',6.08,...    % Thickness of member
               'mxA',240,...   % Cross sectional area of weakeast connected member
               'SyM',250);     % Yield Strength of weakest member
@@ -17,11 +17,13 @@ end
 sizes = load('Bolt_Sizes.mat');
 bolt_size = sizes.Bolt_Sizes(:,1);
 k = 1; %counter
+blength = 63.5;
 
-nbB = 2;
-ntau = 4;
+nbB = 0;
+ntau = 0;
+nbend = 0;
 
-while (nbB < n) || (ntau < n)
+while (nbB < n) || (ntau < n) || (nbend < n)
 bdia = bolt_size(k);    
 %% Pure Shear Failure Mode
 % Find cross sectional area of bolt
@@ -58,6 +60,13 @@ Sp = 310;
 nbB = Sp/abs(bearing_sigmaB);
 ntau = Sp/tau;
 
+%%
+% Bending Stress
+Mmax=(blength*b.F)/4;
+sigmaB=(Mmax*(bdia/2))/((pi*bdia^4)/64);
+nbend = Sp/sigmaB;
+
+%%
 k = k + 1;
 end
 

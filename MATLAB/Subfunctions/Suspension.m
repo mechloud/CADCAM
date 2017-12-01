@@ -160,7 +160,7 @@ end
 %% Bolt Size
 % Checking to see if bolt size is correct
 F=k2*0.152; %Spring rate times maximum spring compression of 152 mm (6in)
-n=4.0;
+n=2.0;
 b = struct(   'F',F,...    % Shearing Force in N
               't',6.08,...    % Thickness of clamped parts
               'mxA',237.12,...   % Cross sectional area of weakeast connected member
