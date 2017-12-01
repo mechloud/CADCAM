@@ -140,7 +140,7 @@ end
 % Print values to file
 [n,~] = size(output);
 for k = 1:n
-    fprintf(efid,'"%s" = %s\n',output{k,1},output{k,2});
+    fprintf(efid,'"%s" = %s\n\n',output{k,1},output{k,2});
 end
 
 %%

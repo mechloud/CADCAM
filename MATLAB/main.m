@@ -102,7 +102,7 @@ function md = mass_check(min,max,val)
                  'or getting a smaller driver. Resetting to maximum value',...
                  ' of %.0f lbs'],max);
         md = max/2.2;
-    elseif val < 0
+    elseif val < min
         warning(['You should know better than to have negative mass...',...
                  ' Resetting to 175 lbs']);
         md = 175/2.2;
