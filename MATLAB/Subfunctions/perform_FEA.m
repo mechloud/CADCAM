@@ -135,7 +135,8 @@ end
 %%
 % Declare Force vector and assign known forces.
 F = zeros(nunknowns*nnodes,1);
-F(12*nunknowns-2) = 22875.0;
+F(5*nunknowns-2) = 20818.0;
+F(12*nunknowns-2) = 20818.0;
 F(13*nunknowns-1) = -md*9.81; % 110 kg * g
 F(8*nunknowns-1) = -26.0*9.81; % 26 kg * g
 
