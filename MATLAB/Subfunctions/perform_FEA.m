@@ -186,8 +186,8 @@ for k = 1:nelements
     
     %%
     % Find $u'_i$ and $u'_j$
-    ui_prime = l(k)*uj + m(k)*vj;
-    uj_prime = l(k)*ui + m(k)*vi;
+    ui_prime = l(k)*ui + m(k)*vi;
+    uj_prime = l(k)*uj + m(k)*vj;
     
     %%
     % Find $\delta$ and $\epsilon$
@@ -198,7 +198,7 @@ end
 
 %%
 % Find tensile stresses in elements $\sigma = E\epsilon$
-axial = -E*epsilon;
+axial = E*epsilon;
 
 %%
 % Find maximum stress

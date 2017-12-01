@@ -30,3 +30,4 @@ log.txt
 *.png
 /MATLAB/*ANSYS_input.txt
 /MATLAB/Equations.txt
+*.lgw

@@ -1,0 +1,96 @@
+/TITLE, 2D Analysis of Vehicle for 2d impact
+/PREP7
+! Create nodes 
+K,1,1642.3,1219.2,0.0
+K,2,700.0,1219.2,0.0
+K,3,0.0,457.2,0.0
+K,4,457.2,457.2,0.0
+K,5,1441.5,457.2,0.0
+K,6,1828.8,457.2,0.0
+K,7,1828.8,0.0,0.0
+K,8,1574.8,0.0,0.0
+K,9,1320.8,0.0,0.0
+K,10,889.0,0.0,0.0
+K,11,457.2,0.0,0.0
+K,12,0.0,0.0,0.0
+K,13,1104.9,0.0,0.0
+
+! Create lines between nodes
+LSTR,1,2
+LSTR,6,1
+LSTR,5,1
+LSTR,4,2
+LSTR,3,2
+LSTR,3,4
+LSTR,12,3
+LSTR,12,4
+LSTR,11,4
+LSTR,12,11
+LSTR,4,5
+LSTR,10,4
+LSTR,11,10
+LSTR,10,5
+LSTR,10,13
+LSTR,13,9
+LSTR,9,5
+LSTR,5,6
+LSTR,9,8
+LSTR,8,7
+LSTR,7,6
+
+! Declare Element Type
+ET,1,BEAM188
+
+! Element key options
+KEYOPT,1,3,3
+
+! Set Section Information
+
+SECTYPE,1,BEAM,CTUBE,Primary
+SECDATA,11.913,15.875,1
+
+! Assign Material Properties
+MP,EX,1,205e3
+MP,PRXY,1,0.29
+
+! Attribute line properties to elements
+LSEL,S,LINE,,1,21,,0
+LATT,1,,1,,,,1
+!
+
+! Select All Lines
+ALLSELL
+
+! Specifiy size on unmeshed lines
+LESIZE,ALL,,,1,,1,,,
+
+! Mesh all lines
+LMESH,ALL
+! Display elements
+/ESHAPE,1
+EPLOT
+
+/SOLU
+! Apply constraints
+DK,6,UX,0,,0
+DK,6,UY,0,,0
+DK,7,UX,0,,0
+DK,7,UY,0,,0
+DK,ALL,UZ,0,,0
+
+! Apply loads
+FK,13,FY,-1079.1
+FK,12,FX,22875
+FK,8,FY,-255.06
+
+! Solve
+SOLVE
+FINISH
+
+! Post-Processing
+/POST1
+/GLINE,ALL,-1
+ETABLE,AXIAL,SMISC,31
+PLETAB,AXIAL,NOAVG
+PRETAB,AXIAL
+FINISH
