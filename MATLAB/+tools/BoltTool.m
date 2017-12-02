@@ -7,11 +7,11 @@ function bdia = BoltTool(b,n)
 % If the number of input arguments is less than 2, declare defaults. This
 % is used for debugging and testing.
 if nargin < 2
-   b = struct('F',1400,...    % Shearing Force in N
+   b = struct('F',1500,...    % Shearing Force in N
               't',6.08,...    % Thickness of member
               'mxA',240,...   % Cross sectional area of weakeast connected member
               'SyM',250);     % Yield Strength of weakest member
-   n = 4.0;
+   n = 2.0;
 end
 
 sizes = load('Bolt_Sizes.mat');
@@ -57,7 +57,7 @@ nMemBearing = b.SyM/bearing_sigmaM;
 %%
 % Declare Proof Loads for Grade 4.8 Bolts
 Sp = 310;
-nbB = Sp/abs(bearing_sigmaB);
+nbB = b.SyM/abs(bearing_sigmaB);
 ntau = Sp/tau;
 
 %%
