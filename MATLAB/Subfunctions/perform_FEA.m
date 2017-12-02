@@ -9,8 +9,8 @@ if nargin < 5
     close all
     addpath('C:\\Users\\Jonathan\\Documents\\UOttawa\\MCG4322 - CADCAM\\GitHub\\CADCAM\\MATLAB\\Database');
     load('2dfea.mat');
-    OD = 31.75;
-    WT = 3.9625;
+    OD = 25.4;
+    WT = 3.2;
     md = 110;
 end
 
