@@ -8,7 +8,7 @@ mw=14;
 
 %%
 % Mass of  the Vehicle Inlcuding the Drivetrain [kg]
-mv=230;
+mv=215;
 
 %%
 % Tire Spring Rate [N/m]
