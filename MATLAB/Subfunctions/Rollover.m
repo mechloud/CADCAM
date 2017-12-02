@@ -14,7 +14,7 @@ end
 %%
 % Convert to meters
 track_width = track_width/1000;
-turning_radius = turning_radius/100;
+turning_radius = turning_radius/1000;
 gc = gc/1000;
 
 

@@ -80,7 +80,8 @@ DK,ALL,UZ,0,,0
 
 ! Apply loads
 FK,13,FY,-1079.1
-FK,12,FX,22875
+FK,3,FX,20818.0
+FK,12,FX,20818.0
 FK,8,FY,-255.06
 
 ! Solve

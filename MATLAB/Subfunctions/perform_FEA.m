@@ -9,8 +9,8 @@ if nargin < 5
     close all
     addpath('C:\\Users\\Jonathan\\Documents\\UOttawa\\MCG4322 - CADCAM\\GitHub\\CADCAM\\MATLAB\\Database');
     load('2dfea.mat');
-    OD = 31.75;
-    WT = 3.9625;
+    OD = 25.4;
+    WT = 3.2;
     md = 110;
 end
 
@@ -135,7 +135,8 @@ end
 %%
 % Declare Force vector and assign known forces.
 F = zeros(nunknowns*nnodes,1);
-F(12*nunknowns-2) = 22875.0;
+F(5*nunknowns-2) = 20818.0;
+F(12*nunknowns-2) = 20818.0;
 F(13*nunknowns-1) = -md*9.81; % 110 kg * g
 F(8*nunknowns-1) = -26.0*9.81; % 26 kg * g
 

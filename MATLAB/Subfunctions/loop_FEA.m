@@ -7,7 +7,13 @@ if nargin < 4
     FH = 1219.0;
     md = 110.0;
     log_id = 0;
-    addpath('Database');
+    switch getenv('username')
+        case ''
+            warning('John - Ubuntu');
+            addpath('../Database');
+        otherwise
+            warning('Unrecognized computer');
+    end
 end
 
 %%
@@ -49,11 +55,21 @@ if ctr == length(OD)
                     ' withstand the Front Impact forces subjected to it',...
                     ' with tube sizes up to 50.8 mm OD and 6.35 mm WT.']);
 else
-    OD = OD(ctr - 1);
-    WT = WT(ctr - 1);
+    if ctr == 1
+        OD = OD(1);
+        WT = WT(1);
+    else
+        OD = OD(ctr - 1);
+        WT = WT(ctr - 1);
+    end
     colour_plot(nodes,elements,res);
-    fprintf(log_id,['The required primary tube size is ',...
-             '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
+    if log_id ~= 0
+        fprintf(log_id,['The required primary tube size is ',...
+                 '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
+    else
+        fprintf(['The required primary tube size is ',...
+                 '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);
+    end
 end
 
 end
