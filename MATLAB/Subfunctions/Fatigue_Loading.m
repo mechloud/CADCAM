@@ -6,10 +6,10 @@ sigma_m = (sigma_max + sigma_min)/2;
 
 %%Find SF for modified goodman equation
 
-SF_mod = 1/(sigma_a/S_e + sigma_m/S_ut)
+SF_mod = 1/(sigma_a/S_e + sigma_m/S_ut);
 
 %%Find SF for Langer Yield
 
-SF_lan = S_y/(sigma_a + sigma_m)
+SF_lan = S_y/(sigma_a + sigma_m);
 
-End
+end

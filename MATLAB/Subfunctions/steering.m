@@ -130,7 +130,7 @@ R = (WB/tand(maxturn))+(track/2); %minimum turning radius from center of vehicle
 
 %%
 % Length of the tie rod
-Ltierod1 = sqrt((track/2-(12*0.0254 + framewidth/1000 - 0.9144)/2-Lkp-3*sind(ackangle))^2 ...
+Ltierod1 = 0.0254+sqrt((track/2-(12*0.0254 + framewidth/1000 - 0.9144)/2-Lkp-3*sind(ackangle))^2 ...
           +(abs(lff-roffset)^2));
 
 %% Motion needed from Rack
@@ -420,12 +420,18 @@ sigmar  = Fr/A;
 nt      = sigmat/Scr; %buckling safety factor of the tie rod 
 nr      = sigmar/Scr;
 
+su=310e6;
+se=96.5e6;
+[SF_modt, SF_lant] = Fatigue_Loading(sigmat, sigmat, se, su, Sy);
+[SF_modr, SF_lanr] = Fatigue_Loading(sigmar, sigmar, se, su, Sy);
+
+
 ctr = 1;
 
 %%
 % If safety factors are not acceptable, loop through and increase tube size
 % until they are acceptable
-while nt < 2 && nr < 2 && ctr < length(ID)-5
+while nt < 2 && nr < 2 && SF_modt < 2 && SF_modr < 2  && SF_lant < 2 && SF_lanr < 2 && ctr < length(ID)-5
     
     od = OD(5+ctr)*0.0254;
     id = ID(ctr+5)*0.0254;
@@ -448,6 +454,9 @@ while nt < 2 && nr < 2 && ctr < length(ID)-5
     nt = sigmat/Scr; %buckling safety factor of the tie rod 
     nr = sigmar/Scr;
     
+    [SF_modt, SF_lant] = Fatigue_Loading(sigmat, sigmat, se, su, Sy);
+    [SF_modr, SF_lanr] = Fatigue_Loading(sigmar, sigmar, se, su, Sy);
+    
     ctr = ctr + 1;
 end
 
@@ -464,10 +473,14 @@ nin   = ((Sy*.58)/tauin); % torsional stress safety factor of rod
 taur  = ((torr*R)/J); % torsional stress on rod 
 nr    = ((Sy*.58)/taur); % torsional stress safety factor of rod
 
+su=310e6;
+se=96.5e6;
+[SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+[SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
 %%
 % If safety factors are not acceptable, loop through and increase tube size
 % until they are acceptable
-while nin < 2 && nr < 2
+while nin < 2 && nr < 2 && SF_modt < 2 && SF_modr < 2 && SF_lant < 2 && SF_lanr < 2
     
     OD = OD + 0.001;
     R = OD/2;  %radius of rod 
@@ -476,6 +489,10 @@ while nin < 2 && nr < 2
     nin = ((Sy*.58)/tauin); %torsional stress safety factor of rod
     taur = ((torr*R)/J); %torsional stress on rod 
     nr = ((Sy*.58)/taur); %torsional stress safety factor of rod
+    
+    [SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+    [SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
+
 end
 
 end
@@ -506,12 +523,18 @@ nr    = ((Sy*.58)/taur); %torsional stress safety factor of rod
 tauin = ((torin*R)/J); % torsional stress on steering column upper sleeve
 nin   = ((Sy*.58)/tauin); %torsional stress safety factor of rod  
 
+su=310e6;
+se=96.5e6;
+[SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+[SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
+
+
 ctr = 1;
 
 %%
 % If safety factors are not acceptable, loop through and increase tube size
 % until they are acceptable
-while nr < 2 && nin < 2 && ctr < length(ID)
+while nr < 2 && nin < 2 && ctr < length(ID) && SF_modt < 2 && SF_modr < 2 && SF_lant < 2 && SF_lanr < 2
     od = OD(ctr + 1);
     id = ID(ctr + 1);
     R = od/2;
@@ -521,6 +544,9 @@ while nr < 2 && nin < 2 && ctr < length(ID)
     tauin = ((torr*R)/J);
     nin = ((Sy*.58)/tauin);
     
+    [SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+    [SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
+        
     ctr = ctr + 1;
 end % end while
 
@@ -553,11 +579,16 @@ nin   = ((Sy*.58)/tauin); %torsional stress on bigger sleeve safety factor
 taur  = ((torr*R)/J); %torsional stress on bigger sleeve
 nr    = ((Sy*.58)/taur); %torsional stress on bigger sleeve safety factor 
 
+su=310e6;
+se=96.5e6;
+[SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+[SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
+
 ctr = 1;
 %%
 % If safety factors are not acceptable, loop through and increase tube size
 % until they are acceptable
-while nin < 2 && nr < 2 && ctr < length(ID)
+while nin < 2 && nr < 2 && ctr < length(ID) && SF_modt < 2 && SF_modr < 2 && SF_lant < 2 && SF_lanr < 2
     od = OD(ctr + 1);
     id = ID(ctr + 1);
     R = OD/2;
@@ -566,6 +597,9 @@ while nin < 2 && nr < 2 && ctr < length(ID)
     nin = ((Sy*.58)/tauin);
     taur = ((torr*R)/J);
     nr = ((Sy*.58)/taur);
+    
+    [SF_modt, SF_lant] = Fatigue_Loading(tauin, tauin, se, su, Sy);
+    [SF_modr, SF_lanr] = Fatigue_Loading(taur, taur, se, su, Sy);
     
     ctr = ctr +1;
 end    
