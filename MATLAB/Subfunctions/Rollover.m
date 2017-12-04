@@ -3,12 +3,12 @@ function [track_width] = Rollover(log_id,track_width, turning_radius, Ks_f, Ks_r
 if nargin < 7
     warning('Not enough input arguments, using default settings.');
     log_id = 0;
-    md = 110;
+    md = 110; %mass of the driver
     track_width = 55*25.4;
     turning_radius = 2.3;
     Ks_f = 8143.4;
     Ks_r = 17598.7;
-    gc = 0.252;
+    gc = 0.252; %centre of gravity
 end
 
 %%
