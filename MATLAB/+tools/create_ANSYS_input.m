@@ -8,7 +8,7 @@ if nargin < 8
     % Load the geometry
     addpath('Database');
     
-    type = 'front';
+    type = 'rollover';
     
     if ~strcmp(type,'2d')
         nodal = load('baja_3D_geometry.mat');
@@ -18,10 +18,10 @@ if nargin < 8
     nodes = nodal.nodes;
     elements = nodal.elements;
 
-    POD = 25.4;
-    PWT = 3.048;
-    SOD = 25.4;
-    SWT = 0.89;
+    POD = 17.463*2;
+    PWT = (POD-14.415*2)/2;
+    SOD = 31.75;
+    SWT = 3.048;
     md = 110;
     
     
@@ -54,6 +54,21 @@ else
     fprintf(fid,'/TITLE, 2D Analysis of Vehicle for %s impact\n',type);
 end
 
+switch type
+    case '2d'
+        fprintf(fid,'/FILENAM,%s\n\n','2d_ANSYS_input');
+    case 'front'
+        fprintf(fid,'/FILENAM,%s\n\n','front_ANSYS_input');
+    case 'rear'
+        fprintf(fid,'/FILENAM,%s\n\n','rear_ANSYS_input');
+    case 'rollover'
+        fprintf(fid,'/FILENAM,%s\n\n','rollover_ANSYS_input');
+    case 'side'
+        fprintf(fid,'/FILENAM,%s\n\n','side_ANSYS_input');
+    otherwise
+        error('Unrecognized type');
+end
+
 fprintf(fid,'/PREP7\n! Create nodes \n');
 for k = 1:nnodes
     if strcmp(type,'2d')
@@ -82,7 +97,7 @@ if ~strcmp(type,'2d')
     %%
     % Reconstruct elements vector
     elements = [primaries;
-        secondaries];
+				secondaries];
 end
 %%
 % Create lines between nodes
@@ -95,7 +110,7 @@ end
 % Declare Element Type and Section information
 fprintf(fid,'\n! Declare Element Type\nET,1,BEAM188\n');
 fprintf(fid,'\n! Element key options\nKEYOPT,1,3,3\n');
-fprintf(fid,'\n! Set Section Information\n');
+fprintf(fid,'\n! Set Section Information');
 fprintf(fid,['\nSECTYPE,1,BEAM,CTUBE,Primary\n',...
     'SECDATA,%.3f,%.3f,%i\n'],(POD-2*PWT)/2,POD/2,12);
 fprintf(fid,['\nSECTYPE,2,BEAM,CTUBE,Secondary\n',...
@@ -124,13 +139,20 @@ end
 
 %%
 % Select and mesh all lines
-fprintf(fid,'\n! Select All Lines\nALLSELL\n');
-fprintf(fid,'\n! Specifiy size on unmeshed lines\nLESIZE,ALL,6,,,,1,,,\n');
-fprintf(fid,'\n! Mesh all lines\nLMESH,ALL');
+fprintf(fid,'\n! Select All Lines\nALLSEL,ALL\n');
+fprintf(fid,'\n! Specifiy size on unmeshed lines\nLESIZE,ALL,,,1,,1,,,0\n');
+fprintf(fid,'\n! Mesh all lines\nLMESH,ALL\n');
 
 %%
 % Display Elements in ANSYS Mechanical APDL GUI
 fprintf(fid,'\n! Display elements\n/ESHAPE,1\nEPLOT\n');
+
+%%
+% Change background colours in ANSYS Mechanical APDL GUI
+fprintf(fid,['\n! Change colours in GUI\n',...
+			 '/RGB,INDEX,0,0,0,15\n',...
+			 '/RGB,INDEX,100,100,100,0\n',...
+			 '/REPLOT\n']);
 
 %% Solution
 % Apply constraints and loads
@@ -159,7 +181,7 @@ switch type
         fprintf(fid,'DK,9,UY,0,,0\n');
         fprintf(fid,'DK,9,UZ,0,,0\n');
         driver_weight = -md*9.81;
-        fprintf(fid,'\n! Apply loads\n');
+        fprintf(fid,'\n! Apply loads\n*SET,FORCE,-20818.0\n');
         %%
         % Distribute mass of drivetrain between nodes 11 and 6
         fprintf(fid,'FK,6,FY,-127.53\n');
@@ -171,18 +193,25 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,['!FK,1,FZ,-45750.0\n',...
-                     '!FK,16,FZ,-45750.0\n',...
-                     'FK,24,FZ,-45750.0\n',...
-                     'FK,31,FZ,-45750.0\n']);
+        fprintf(fid,['!FK,1,FZ,FORCE\n',...
+                     '!FK,16,FZ,FORCE\n',...
+                     'FK,24,FZ,FORCE\n',...
+                     'FK,31,FZ,FORCE\n']);
     case 'rear'
         fprintf(fid,'\n! Apply constraints\n');
-        fprintf(fid,'DK,1,,0,,0,ALL\n');
-        fprintf(fid,'DK,16,,0,,0,ALL\n');
-        fprintf(fid,'DK,24,,0,,0,ALL\n');
-        fprintf(fid,'DK,31,,0,,0,ALL\n');
+        fprintf(fid,'DK,1,UX,0,,0\n');
+        fprintf(fid,'DK,1,UZ,0,,0\n');
+        fprintf(fid,'DK,16,UX,0,,0\n');
+        fprintf(fid,'DK,16,UY,0,,0\n');
+        fprintf(fid,'DK,16,UZ,0,,0\n');
+        fprintf(fid,'DK,24,UX,0,,0\n');
+		fprintf(fid,'DK,24,UY,0,,0\n');
+		fprintf(fid,'DK,24,UZ,0,,0\n');
+        fprintf(fid,'DK,31,UX,0,,0\n');
+		fprintf(fid,'DK,31,UY,0,,0\n');
+		fprintf(fid,'DK,31,UZ,0,,0\n');
         driver_weight = -md*9.81;
-        fprintf(fid,'\n! Apply loads\n');
+        fprintf(fid,'\n! Apply loads\n*SET,FORCE,-20818.0\n');
         %%
         % Distribute mass of drivetrain between nodes 11 and 6
         fprintf(fid,'FK,6,FY,-127.53\n');
@@ -194,18 +223,24 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,['FK,8,FZ,-22875.0\n',...
-                     'FK,9,FZ,-22875.0\n',...
-                     'FK,27,FZ,-22875.0\n',...
-                     'FK,29,FZ,-22875.0\n']);
+        fprintf(fid,['FK,27,FZ,FORCE\n',...
+                     'FK,28,FZ,FORCE\n']);
     case 'side'
         fprintf(fid,'\n! Apply constraints\n');
-        fprintf(fid,'DK,12,,0,,0,ALL\n');
-        fprintf(fid,'DK,16,,0,,0,ALL\n');
-        fprintf(fid,'DK,29,,0,,0,ALL\n');
-        fprintf(fid,'DK,31,,0,,0,ALL\n');
+        fprintf(fid,'DK,12,UX,0,,0\n');
+        fprintf(fid,'DK,16,UX,0,,0\n');
+        fprintf(fid,'DK,29,UX,0,,0\n');
+        fprintf(fid,'DK,31,UX,0,,0\n');
+		fprintf(fid,'DK,12,UY,0,,0\n');
+        fprintf(fid,'DK,16,UY,0,,0\n');
+        fprintf(fid,'DK,29,UY,0,,0\n');
+        fprintf(fid,'DK,31,UY,0,,0\n');
+		fprintf(fid,'DK,12,UZ,0,,0\n');
+        fprintf(fid,'DK,16,UZ,0,,0\n');
+        fprintf(fid,'DK,29,UZ,0,,0\n');
+        fprintf(fid,'DK,31,UZ,0,,0\n');
         driver_weight = -md*9.81;
-        fprintf(fid,'\n! Apply loads\n');
+        fprintf(fid,'\n! Apply loads\n*SET,FORCE,-20818.0\n');
         %%
         % Distribute mass of drivetrain between nodes 11 and 6
         fprintf(fid,'FK,6,FY,-127.53\n');
@@ -217,18 +252,22 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,'FK,26,FX,-22875.0\n');
-        fprintf(fid,'FK,5,FX,-22875.0\n');
+        fprintf(fid,'FK,26,FX,FORCE\n');
+        fprintf(fid,'FK,5,FX,FORCE\n');
     case 'rollover'
         fprintf(fid,'\n! Apply constraints\n');
         fprintf(fid,'DK,34,UX,0,,0\n');
         fprintf(fid,'DK,34,UY,0,,0\n');
-        fprintf(fid,'DK,35,ALL,0,,0\n');
-        fprintf(fid,'DK,36,ALL,0,,0\n');
+        fprintf(fid,'DK,35,UX,0,,0\n');
+		fprintf(fid,'DK,35,UY,0,,0\n');
+		fprintf(fid,'DK,35,UZ,0,,0\n');
+        fprintf(fid,'DK,36,UX,0,,0\n');
+		fprintf(fid,'DK,36,UY,0,,0\n');
+		fprintf(fid,'DK,36,UZ,0,,0\n');
         fprintf(fid,'DK,37,UX,0,,0\n');
         fprintf(fid,'DK,37,UY,0,,0\n');
         driver_weight = -md*9.81;
-        fprintf(fid,'\n! Apply loads\n');
+        fprintf(fid,'\n! Apply loads\n*SET,FORCE,6376.5\n');
         %%
         % Distribute mass of drivetrain between nodes 11 and 6
         fprintf(fid,'FK,6,FY,127.53\n');
@@ -240,10 +279,10 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,['FK,1,FY,22875.0\n',...
-                     'FK,5,FY,22875.0\n',...
-                     'FK,12,FY,22875.0\n',...
-                     'FK,16,FY,22875.0\n']);             
+        fprintf(fid,['FK,1,FY,FORCE\n',...
+                     'FK,5,FY,FORCE\n',...
+                     'FK,12,FY,FORCE\n',...
+                     'FK,16,FY,FORCE\n']);             
     otherwise
         warning(['Type of Simulation not recognized,',...
                  ' no loads or displacements inserted']);
@@ -251,13 +290,17 @@ end % end switch for load case
 
 %%
 % Solve
-fprintf(fid,'\n! Solve\nSOLVE\nFINISH\n');
+fprintf(fid,'\n! Solve\nSOLVE\nFINISH\n/VIEW,1,1,1,1\n');
 
 %% Post-Processing
 % Post-process
 fprintf(fid,['\n! Post-Processing\n/POST1\n',...
              'ETABLE,AXIAL,SMISC,31\n',...
-             'PLETAB,AXIAL,NOAV\nFINISH\n']);
+             'PRETAB,AXIAL\n',...
+			 '/GLINE,ALL,-1\n',...
+			 'PLNSOL,S,EQV,0\n',...
+			 '*GET,SMX,PLNSOL,0,MAX\n',...
+			 '!FINISH\n']);
 
 %%
 % Close the file
