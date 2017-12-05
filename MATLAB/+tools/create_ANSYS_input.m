@@ -8,7 +8,7 @@ if nargin < 8
     % Load the geometry
     addpath('Database');
     
-    type = '2d';
+    type = 'front';
     
     if ~strcmp(type,'2d')
         nodal = load('baja_3D_geometry.mat');
@@ -18,10 +18,10 @@ if nargin < 8
     nodes = nodal.nodes;
     elements = nodal.elements;
 
-    POD = 31.75;
-    PWT = 3.9624;
+    POD = 25.4;
+    PWT = 3.048;
     SOD = 25.4;
-    SWT = 0.12*25.4;
+    SWT = 0.89;
     md = 110;
     
     
@@ -150,10 +150,14 @@ switch type
         fprintf(fid,'FK,8,FY,-255.06\n');
     case 'front'
         fprintf(fid,'\n! Apply constraints\n');
-        fprintf(fid,'DK,27,,0,,0,ALL\n');
-        fprintf(fid,'DK,28,,0,,0,ALL\n');
-        fprintf(fid,'DK,8,,0,,0,ALL\n');
-        fprintf(fid,'DK,9,,0,,0,ALL\n');
+        fprintf(fid,'DK,27,UZ,0,,0\n');
+        fprintf(fid,'DK,28,UZ,0,,0\n');
+        fprintf(fid,'DK,8,UX,0,,0\n');
+        fprintf(fid,'DK,8,UY,0,,0\n');
+        fprintf(fid,'DK,8,UZ,0,,0\n');
+        fprintf(fid,'DK,9,UX,0,,0\n');
+        fprintf(fid,'DK,9,UY,0,,0\n');
+        fprintf(fid,'DK,9,UZ,0,,0\n');
         driver_weight = -md*9.81;
         fprintf(fid,'\n! Apply loads\n');
         %%
@@ -167,8 +171,8 @@ switch type
         
         %%
         % Impact Loading
-        fprintf(fid,['FK,1,FZ,-45750.0\n',...
-                     'FK,16,FZ,-45750.0\n',...
+        fprintf(fid,['!FK,1,FZ,-45750.0\n',...
+                     '!FK,16,FZ,-45750.0\n',...
                      'FK,24,FZ,-45750.0\n',...
                      'FK,31,FZ,-45750.0\n']);
     case 'rear'
@@ -251,7 +255,9 @@ fprintf(fid,'\n! Solve\nSOLVE\nFINISH\n');
 
 %% Post-Processing
 % Post-process
-fprintf(fid,'\n! Post-Processing\n/POST1\n/GLINE,ALL,-1\nETABLE,\nFINISH\n');
+fprintf(fid,['\n! Post-Processing\n/POST1\n',...
+             'ETABLE,AXIAL,SMISC,31\n',...
+             'PLETAB,AXIAL,NOAV\nFINISH\n']);
 
 %%
 % Close the file
