@@ -46,7 +46,7 @@ output{14,2} = '( "TrackWidth" / 2 ) - 7in - ( "FrameWidth" - 24in ) / 2';
 output{15,1} = 'ShockAngle';        output{15,2} = '60';
 
 output{16,1} = 'Beta';              
-output{16,2} = 'abs(atn ( (("TrackWidth"/2)-20in)/11in))';
+output{16,2} = 'abs(atn ( ( ("TrackWidth"/2) -7.25in- ( (25.6in+ ("FrameWidth"-36in))/2) )/11in))';
 
 output{17,1} = 'Theta';
 output{17,2} = 'abs(atn (5.5in /(("TrackWidth"/2)-10in) ))';
@@ -133,21 +133,22 @@ end
 try
     efid = fopen(fname,'w+');
 catch
-    error('Cannot write to %s\n',fname);
+    error('Cannot write to %s\r',fname);
 end
 
 %%
 % Print values to file
 [n,~] = size(output);
 for k = 1:n
-    fprintf(efid,'"%s" = %s\n\n',output{k,1},output{k,2});
+    fprintf(efid,'"%s" = %s\r',output{k,1},output{k,2});
+    fprintf(efid,'\n');
 end
 
 %%
 % Close the file
 try
     fclose(efid);
-    fprintf('Successfully wrote file %s\n',fname);
+    fprintf('Successfully wrote file %s\r',fname);
 catch
-    error('Not able to close file %s\n',fname);
+    error('Not able to close file %s\r',fname);
 end
