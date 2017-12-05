@@ -1,4 +1,7 @@
+FINISH
+/CLEAR
 /TITLE, 3D Analysis of Vehicle for front impact
+/FILENAM,front_ANSYS_input
 /PREP7
 ! Create nodes 
 K,1,152.4,0.0,0.0
@@ -119,6 +122,7 @@ LSTR,5,38
 LSTR,38,39
 LSTR,39,36
 LSTR,37,35
+LSTR,30,25
 
 ! Declare Element Type
 ET,1,BEAM188
@@ -129,10 +133,12 @@ KEYOPT,1,3,3
 ! Set Section Information
 
 SECTYPE,1,BEAM,CTUBE,Primary
-SECDATA,23.8,31.8,12
+SECDATA,14.415,17.463,12
+SECNUM,1
 
 SECTYPE,2,BEAM,CTUBE,Secondary
-SECDATA,19.3,25.4,12
+SECDATA,13.462,15.875,12
+SECNUM,2
 
 ! Assign Material Properties
 MP,EX,1,205e3
@@ -142,45 +148,59 @@ MP,PRXY,1,0.29
 LSEL,S,LINE,,1,33,,0
 LATT,1,,1,,,,1
 !
-LSEL,S,LINE,,34,77,,0
+LSEL,S,LINE,,34,78,,0
 LATT,1,,1,,,,2
 !
-
 ! Select All Lines
-ALLSELL
+ALLSEL
 
 ! Specifiy size on unmeshed lines
-LESIZE,ALL,6,,,,1,,,
+LESIZE,ALL,,,1,,1,,,
 
 ! Mesh all lines
 LMESH,ALL
+
 ! Display elements
 /ESHAPE,1
 EPLOT
+! /RGB,INDEX,0,0,0,15
+! /RGB,INDEX,100,100,100,0
+! /REPLOT
 
 /SOLU
 ! Apply constraints
-DK,27,,0,,0,ALL
-DK,28,,0,,0,ALL
-DK,8,,0,,0,ALL
-DK,9,,0,,0,ALL
+DK,27,UZ,0,,0
+DK,28,UZ,0,,0
+DK,8,UX,0,,0
+DK,8,UY,0,,0
+DK,8,UZ,0,,0
+DK,9,UX,0,,0
+DK,9,UY,0,,0
+DK,9,UZ,0,,0
+
+*SET,FORCE,-20818.0
 
 ! Apply loads
 FK,6,FY,-127.53
 FK,11,FY,-127.53
 FK,19,FY,-539.6
 FK,22,FY,-539.6
-FK,1,FZ,-45750.0
-FK,16,FZ,-45750.0
-FK,24,FZ,-45750.0
-FK,31,FZ,-45750.0
+FK,1,FZ,FORCE
+FK,16,FZ,FORCE
+FK,24,FZ,FORCE
+FK,31,FZ,FORCE
 
 ! Solve
 SOLVE
 FINISH
+/VIEW,1,1,1,1
 
 ! Post-Processing
 /POST1
+!ETABLE,AXIAL,SMISC,31
+!PLETAB,AXIAL,NOAV
+PLNSOL,S,EQV,0
 /GLINE,ALL,-1
-ETABLE,
-FINISH
+*GET,SMX,PLNSOL,0,MAX
+! FINISH
+
