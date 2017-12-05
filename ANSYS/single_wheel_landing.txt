@@ -154,8 +154,8 @@ LATT,1,,1,,,,2
 ALLSEL,ALL
 
 ! Specifiy size on unmeshed lines
-! LESIZE,ALL,,,1,,1,,,0
-LESIZE,ALL,6,,,,1,,,0
+LESIZE,ALL,,,1,,1,,,0
+
 ! Mesh all lines
 LMESH,ALL
 

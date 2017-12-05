@@ -31,4 +31,10 @@ log.txt
 /MATLAB/*ANSYS_input.txt
 /MATLAB/Equations.txt
 *.lgw
+
+*.lis
 ANSYS/PRETAB_front
+ANSYS/PRETAB_rear
+ANSYS/PRETAB_rollover
+ANSYS/PRETAB_side
+ANSYS/PRETAB_single_wheel
