@@ -1,4 +1,5 @@
 /TITLE, 2D Analysis of Vehicle for 2d impact
+/FILENAM, 2d_ANSYS_input
 /PREP7
 ! Create nodes 
 K,1,1642.3,1219.2,0.0
@@ -69,6 +70,11 @@ LMESH,ALL
 ! Display elements
 /ESHAPE,1
 EPLOT
+
+! Change colours in GUI
+/RGB,INDEX,0,0,0,15
+/RGB,INDEX,100,100,100,0
+/REPLOT
 
 /SOLU
 ! Apply constraints
