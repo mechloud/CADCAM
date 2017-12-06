@@ -52,7 +52,8 @@ mc=(m2+md)*dist/2;
 
 %%
 % Front Shock Spring Rate [N/m]
-k2=(omega_n^2)*mc;
+% From Equations \ref{eq:omeganf} and \ref{eq:omeganr}
+k2=(omega_n^2)*mc; 
 
 if ~strcmp(tag,'gui') && log_id ~= 0
     fprintf(log_id,'The desired %s spring rate is %.2f N/m.\n', string, k2);
@@ -61,6 +62,7 @@ else
 end
 %%
 % Front Damping Coefficient [Ns/m]
+% From Equation \ref{eq:dampingcoeff}
 c2 = 2*zeta*sqrt(k2*mc);
 
 %% Vibrational Analysis
@@ -102,6 +104,7 @@ y2 = k1*sqrt(c2.^2*x.^2+k2.^2)./(sqrt((m1*mc*x.^4-k1*mc*x.^2-k2*m1*x.^2-k2*mc*x.
 
 %% Systems approach
 % Declare State-Space Matrices
+% From Equation \ref{eq:statespace}
 A=[-c2/mc c2/mc -k2/mc k2/mc;
     c2/m1 -c2/m1 k2/m1 -(k2+k1)/m1
     1 0 0 0;
@@ -159,6 +162,7 @@ end
 
 %% Bolt Size
 % Checking to see if bolt size is correct
+% From Equation \ref{eq:maxspring}
 F=k2*0.152; %Spring rate times maximum spring compression of 152 mm (6in)
 n=2.0;
 b = struct(   'F',2*F,...    % Shearing Force in N
