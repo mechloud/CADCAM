@@ -63,8 +63,10 @@ nMemBearing = b.SyM/bearing_sigmaM;
 %%
 % Declare Proof Loads for Grade 4.8 Bolts
 Sp = 310;
+%%
 % From Equation (\ref{eq:nbearing})
 nbB = b.SyM/abs(bearing_sigmaB);
+%%
 % From Equation (\ref{eq:nshear})
 ntau = Sp/tau;
 
@@ -72,12 +74,15 @@ ntau = Sp/tau;
 % Bending Stress
 % From Equation (\ref{eq:moment})
 Mmax=(blength*b.F)/4;
+%%
 % From Equation (\ref{eq:bend})
 sigmaB=(Mmax*(bdia/2))/((pi*bdia^4)/64);
+%%
 % From Equation (\ref{eq:nbend})
 nbend = Sp/sigmaB;
 
 %%
+% Increment counter
 k = k + 1;
 end
 

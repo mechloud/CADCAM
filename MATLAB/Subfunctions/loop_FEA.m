@@ -38,13 +38,13 @@ nodes = change_frame_geometry(nodes,FL,FH);
 
 %%
 % Perform an initial FEA
-[res,ASF,BSF] = perform_FEA(nodes,elements,OD(1),WT(1),md);
+[~,ASF,BSF] = perform_FEA(nodes,elements,OD(1),WT(1),md);
 
 %%
 % Increase tube size until safety factors are satisfactory;
 ctr = 1;
 while ((ASF < SF) && (BSF < SF) && (ctr < length(OD)))
-    [res,ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1),md);
+    [~,ASF,BSF] = perform_FEA(nodes,elements,OD(ctr + 1),WT(ctr + 1),md);
     ctr = ctr + 1;
 end
 
@@ -62,7 +62,7 @@ else
         OD = OD(ctr - 1);
         WT = WT(ctr - 1);
     end
-    colour_plot(nodes,elements,res);
+    
     if log_id ~= 0
         fprintf(log_id,['The required primary tube size is ',...
                  '%.1f mm OD and %.1f mm wall thickness\n'],OD,WT);

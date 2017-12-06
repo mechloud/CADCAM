@@ -102,8 +102,9 @@ end
 Ka = zeros(nunknowns*nnodes,nunknowns*nnodes);
 
 %%
-% Loop through preprocessing cell array and build assemblage matrix 
-% for k = 1:nelements, as demonstrated with Equation (\ref{eq:ass_matrix_ex})
+% Loop through preprocessing cell array and build assemblage matrix as 
+% demonstrated with Equation (\ref{eq:ass_matrix_ex})
+for k = 1:nelements
    
     %%
     % Extract node numbers

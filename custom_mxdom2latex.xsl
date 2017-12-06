@@ -18,17 +18,15 @@ Copyright 1984-2013 The MathWorks, Inc.
   <xsl:output method="text" indent="no"/>
 
 <xsl:template match="mscript">
-% This LaTeX was auto-generated from MATLAB code.
+% This LaTeX was auto-generated from MATLAB code using a custom xsl file.
 % To make changes, update the MATLAB code and republish this document.
 
 \documentclass[../main.tex]{subfiles}
-\usepackage{graphicx}
-\usepackage{color}
-\usepackage{comment}
 
 \sloppy
 \definecolor{gray}{rgb}{0.5, 0.5, 0.5}
 \setlength{\parindent}{0pt}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
 
 \begin{document}
 
@@ -55,12 +53,13 @@ Copyright 1984-2013 The MathWorks, Inc.
         <xsl:if test="steptitle">
           <xsl:variable name="headinglevel">
             <xsl:choose>
-              <xsl:when test="steptitle[@style = 'document']">subsection</xsl:when>
-              <xsl:otherwise>subsubsection</xsl:otherwise>
+              <xsl:when test="steptitle[@style = 'document']">myparagraph</xsl:when>
+              <xsl:otherwise>myparagraph</xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
 
-\<xsl:value-of select="$headinglevel"/>*{<xsl:apply-templates select="steptitle"/>}
+<!-- \<xsl:value-of select="$headinglevel"/>*{<xsl:apply-templates select="steptitle"/>} -->
+\<xsl:value-of select="$headinglevel"/>{<xsl:apply-templates select="steptitle"/>}
 
 </xsl:if>
 
@@ -79,7 +78,6 @@ Copyright 1984-2013 The MathWorks, Inc.
 \end{flushright} \color{black} \normalsize \end{par}
 </xsl:if>
 
-
 \end{document}
 
 </xsl:template>
@@ -90,8 +88,8 @@ Copyright 1984-2013 The MathWorks, Inc.
 \begin{comment}
 \subsection*{Contents}
 
-\begin{itemize}
-\setlength{\itemsep}{-1ex}<xsl:for-each select="$body-cells">
+\begin{itemize}[noitemsep]
+<xsl:for-each select="$body-cells">
       <xsl:if test="./steptitle">
    \item <xsl:apply-templates select="steptitle"/>
       </xsl:if>
@@ -211,12 +209,13 @@ Copyright 1984-2013 The MathWorks, Inc.
   <replace><from>%</from><to>\%</to></replace>
   <replace><from>#</from><to>\#</to></replace>
   <replace><from>_</from><to>\_</to></replace>
-  <replace><from>{</from><to>\{</to></replace>
-  <replace><from>}</from><to>\}</to></replace>
+  <!-- <replace><from>{</from><to>\{</to></replace> -->
+  <!-- <replace><from>}</from><to>\}</to></replace> -->
   <!-- mainly in code -->
   <replace><from>~</from><to>\ensuremath{\tilde{\;}}</to></replace>
   <replace><from>^</from><to>\^{}</to></replace>
-  <replace><from>\</from><to>\ensuremath{\backslash}</to></replace>
+  <!-- Commentend this line to hopefully allow references to work -->
+  <!-- <replace><from>\</from><to>\ensuremath{\backslash}</to></replace> -->
   <!-- mainly in math -->
   <replace><from>|</from><to>\ensuremath{|}</to></replace>
   <replace><from>&lt;</from><to>\ensuremath{&lt;}</to></replace>
