@@ -81,11 +81,11 @@ for k = 1:nelements
     m(k) = (yj-yi)/L(k);
     
     %%
-    % Build Rotation Matrix
+    % Build Rotation Matrix, Equation (\ref{eq:R_matrix_FEA})
     R = build_rotation_matrix(l(k),m(k));
     
     %%
-    % Build Local Stiffness Matrix
+    % Build Local Stiffness Matrix, Equation (\ref{eq:Ke_matrix_FEA})
     Ke_prime = build_local_stiffness_matrix(A,E,L(k),I);
     
     %%
@@ -102,8 +102,8 @@ end
 Ka = zeros(nunknowns*nnodes,nunknowns*nnodes);
 
 %%
-% Loop through preprocessing cell array and build assemblage matrix
-for k = 1:nelements
+% Loop through preprocessing cell array and build assemblage matrix 
+% for k = 1:nelements, as demonstrated with Equation (\ref{eq:ass_matrix_ex})
    
     %%
     % Extract node numbers
@@ -170,7 +170,7 @@ epsilon = zeros(nelements,1);
 
 %%
 % Find strains $\epsilon = \frac{\delta}{L}$ where $\delta = u_j' - u_i'$
-% and $u'_j = lu_j + mv_j$ and $u'_i = lu_i + mv_i$
+% and $u'_j = lu_j + mv_j$ and $u'_i = lu_i + mv_i$, from Equations (ref{eq:delta_FEA}), (ref{eq:disp_FEA}) and (ref{eq:strain_FEA})
 for k = 1:nelements
    
     %%
@@ -214,11 +214,11 @@ axial_n = Sy/abs(max_stress);
 
 %% Buckling Analysis
 % Equivalent lengths for both ends fixed as per AISC's Manual of Steel
-% Construction
+% Construction, Equation (\ref{eq:equivalentlength})
 Le = L*0.65;
 
 %%
-% Find critical stress $\frac{\pi^2EI}{AL_e^2}$
+% Find critical stress $\frac{\pi^2EI}{AL_e^2}$, Equations (\ref{eq:buckratio}), (\ref{eq:euler}) and (\ref{eq:johnson})
 critical_stress = ((pi*pi*E*I)./(A*Le.*Le));
 EulerBuckling = critical_stress;
 JohnsonBuckling = Sy*(1-(Sy*A*Le.*Le)./(4*pi*pi*E*I));
@@ -240,14 +240,14 @@ buckling_n = min(Scr./abs(axial));
 end % end function
 
 %% length
-% LENGTH Returns the element length for inputs 1 (node i) and 2 (node j)
+% LENGTH Returns the element length for inputs 1 (node i) and 2 (node j), from Equation (\ref{eq:beamlength})
 function L = get_length(x1,y1,x2,y2)
 L = sqrt((x2-x1)^2 + (y2-y1)^2);
 end
 
 %% build_rotation_matrix
 % BUILD_ROTATION_MATRIX Takes the direction cosines as inputs and returns
-% the rotation matrix
+% the rotation matrix, from Equation (\ref{eq:R_matrix_FEA})
 function R = build_rotation_matrix(l,m)
 R = [l m 0 0 0 0;
     -m l 0 0 0 0;
@@ -260,7 +260,7 @@ end
 %% build_local_stiffness_matrix
 % BUILD_LOCAL_STIFFNESS_MATRIX Takes the cross-sectional area, Young's
 % Modulus, length and section inertia of the element and returns the local
-% stiffness matrix
+% stiffness matrix, from Equation (\ref{eq:Ke_matrix_FEA})
 function Ke = build_local_stiffness_matrix(A,E,L,I)
 
 Ke = [(A*E)/L 0 0 -(A*E)/L 0 0;
