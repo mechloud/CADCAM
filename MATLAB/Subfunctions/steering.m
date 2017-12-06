@@ -63,7 +63,7 @@ end
 
 %%
 % Calculate required thickness of steering arm on knuckle
-h = steering_knuckle(Fr,Ft,Sy) ;
+h = steering_knuckle(torin,torr,Sy) ;
 
 %%
 % Calculates forces on tie rods. Returns safety factors, OD and ID of
@@ -249,6 +249,10 @@ end
 
 function [sf,sh] = gear_calculations(wt,DP,N,PD,F,Pa)
 
+
+%%
+% The following Equations can be found in Section (\ref{sec:gear-calcs})
+
 %%
 % Initialize constants
 Mn  = 1;                                % Constant for spur gears
@@ -316,12 +320,19 @@ assumed_force = 750;    % Set impact force hitting the side of the tire
 % ** outputed values **
 Ft      = ((Weight * CG * G * mu * Lkp)/Lknuckle);
 Fr      = (2225 * (11 * 0.0254))/(Lkp); %2225 N is a set value that i chose 
+
+%%
+% Using Equation (\ref{eq:torque_driver}), we can find the torque required to dry steer the vehicle
 torin   = Ft * (Pr * 0.0254);
+
+
+%%
+% Using Equation (\ref{eq:torque_road}), we can find the torque created by an impact onto the tire
 torr    = (Pr * 0.0254) * Fr;
 
 end
 
-function h = steering_knuckle(Fr,Ft,Sy)
+function h = steering_knuckle(torin,torr,Sy)
 
 %% Bending in Initially Curved Beams
 % Declare variables
@@ -329,8 +340,8 @@ h  = 1.25*0.0254;        %height of cross section on the arm connecting to the t
 b  = 1*0.0254;          %width of base of the cross section 
 ro = 0.0508;            %outer radius of initially curved beam
 ri = 0.0254;            %inner radius of initially curved beam 
-Ft = 174;               %force acting on arm ((will alter later))
-Fr = 200;
+Ft = 12;               %force acting on arm ((will alter later))
+Fr = 50;
 rn = b/(log(ro/ri));    %radius of the neutral axis
 rc = ri+(b/2);          %radius of the centroidal axis
 Ci = rn-ri;             %distance from neutral axis to inner fiber
@@ -341,22 +352,46 @@ A = b*h;                %area of cross section
 
 %%
 % Calculate bending stresses for torque input from driver
-sigmait = Ft*Ci/(A*e*ri); % inner fiber stress
-sigmaot = -Ft*Co/(A*e*ro); %outer fiber stress
+
+%%
+% Using Equation (\ref{eq:Inside_stresses}), we can find the stress on the inner fiber of the beam
+sigmait = torin*Ci/(A*e*ri); % inner fiber stress
+
+%%
+% Using Equation (\ref{eq:Outside_stress}), we can find the stress on the outer fiber of the beam
+sigmaot = -torin*Co/(A*e*ro); %outer fiber stress
 
 %%
 % Calculate bending stresses for torque input from the road
-sigmair = Fr*Ci/(A*e*ri);
-sigmaor = -Fr*Co/(A*e*ro);
+
+%%
+% Using Equation (\ref{eq:Inside_stresses}), we can find the stress on the inner fiber of the beam
+sigmair = torr*Ci/(A*e*ri);
+
+%%
+% Using Equation (\ref{eq:Outside_stress}), we can find the stress on the outer fiber of the beam
+sigmaor = -torr*Co/(A*e*ro);
 
 %%
 % Calculate safety factors for torque input from the driver
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 nit = abs(Sy/sigmait); %safety factor of inner fiber 
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 not = abs(Sy/sigmaot); %safety factor of outer fiber
 
 %%
 % Calculate safety factors for torque input from the road
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 nir = abs(Sy/sigmair);
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 nor = abs(Sy/sigmaor);
 
 %%
@@ -370,10 +405,10 @@ while nir < 2 && nor < 2 && nit < 2 && not < 2
 
     %%
     % Recalculate Stresses
-    sigmaid = Ft*Ci/(A*e*ri); % inner fiber stress
-    sigmaod = -Ft*Co/(A*e*ri); %outer fiber stress
-    sigmair = Fr*Ci/(A*e*ri);
-    sigmaor = -Fr*Co/(A*e*ri);
+    sigmaid = torin*Ci/(A*e*ri); % inner fiber stress
+    sigmaod = -torin*Co/(A*e*ri); %outer fiber stress
+    sigmair = torr*Ci/(A*e*ri);
+    sigmaor = -torr*Co/(A*e*ri);
     
     %%
     % Recalculate Safety Factors
@@ -402,8 +437,11 @@ id = ID(5)*0.0254;
 % Calculate ratio for buckling
 A = ((pi*od^2)/4)-((pi*id^2)/4); %cross sectional area
 I = pi/64*(od^4-id^4); %momment of inertia 
-Lc = Ltierod; %corrected buckling tie rod length (tie rod length)
+Lc = Ltierod/1000; %corrected buckling tie rod length (tie rod length)
 E = 68.9e9;
+
+%%
+% Using Equation (\ref{eq:comparison}), we can determine weither to use johnsons or eulers critical strength
 ratio = pi^2*E*I/(A*Lc^2); %comparisson to be compared with Sy/2
 
 
@@ -415,9 +453,21 @@ end
 
 %%
 % Calculate stresses and safety factors
+
+%%
+% Using Equation (\ref{eq:Buckling}), we can determine the buckling stress
 sigmat  = Ft/A; %buckling stress on the tie rod 
+
+%%
+% Using Equation (\ref{eq:Buckling}), we can determine the buckling stress
 sigmar  = Fr/A;
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 nt      = sigmat/Scr; %buckling safety factor of the tie rod 
+
+%%
+% Using Equation (\ref{eq:safety_fct}), we can find the safety factor
 nr      = sigmar/Scr;
 
 su=310e6;
@@ -468,9 +518,21 @@ function [OD,nin,nr] = column_inner(torin,torr,Sy,slotsize)
 OD    = 25.4/1000; % m outer diameter of rod
 R     = OD/2;  % radius of rod 
 J     = ((pi*OD^4)/32)-(2*(slotsize^4/6)); % polar moment of inertia of rod 
+
+%%
+% Using Equation (\ref{eq:torque_inner}), we find the torsional stress
 tauin = ((torin*R)/J); % torsional stress on rod 
+
+%%
+% Using Equation (\ref{eq:safety_fct_ti}), we can find the safety factor
 nin   = ((Sy*.58)/tauin); % torsional stress safety factor of rod
+
+%%
+% Using Equation (\ref{eq:torque_inner}), we can find the safety factor
 taur  = ((torr*R)/J); % torsional stress on rod 
+
+%%
+% Using Equation (\ref{eq:safety_fct_ti}), we find the torsional stress
 nr    = ((Sy*.58)/taur); % torsional stress safety factor of rod
 
 su=310e6;
@@ -516,11 +578,23 @@ id = ID(1);
 
 %%
 % Compute variables
-R     = OD(1)/2; %radius of steering column sleeve
-J     = ((pi*OD(1)^4)/32)-((pi*ID(1)^4)/32); %polar moment of inertia on steering column sleeve
+R     = od/2; %radius of steering column sleeve
+J     = ((pi*od^4)/32)-((pi*id^4)/32); %polar moment of inertia on steering column sleeve
+
+%%
+% Using Equation (\ref{eq:torque_outer}), we find the torsional stress
 taur  = ((torin*R)/J); % torsional stress on steering column upper sleeve
+
+%%
+% Using Equation (\ref{eq:safety_fct_to}), we find the safety factor
 nr    = ((Sy*.58)/taur); %torsional stress safety factor of rod  
+
+%%
+% Using Equation (\ref{eq:torque_outer}), we find the torsional stress
 tauin = ((torin*R)/J); % torsional stress on steering column upper sleeve
+
+%%
+% Using Equation (\ref{eq:safety_fct_to}), we find the safety factor
 nin   = ((Sy*.58)/tauin); %torsional stress safety factor of rod  
 
 su=310e6;
@@ -571,12 +645,23 @@ id = ID(1);
 % Calculate variables
 b  = 1.48/1000; % bolt hole thickness 
 d  = 12/1000;  %bolt hole diameter
-R  = OD(1)/2; % radius of bigger sleeve
+R  = od/2; % radius of bigger sleeve
 J  = ((pi*od^4)/32)-((pi*id^4)/32)-(((b*d)*(b^2+d^2))/12); %polar momment of inertia of bigger sleeve 
 
+%%
+% Using Equation (\ref{eq:torque_sleeve}), we find the torsional stress
 tauin = ((torin*R)/J); %torsional stress on bigger sleeve
+
+%%
+% Using Equation (\ref{eq:safety_fct_ts}), we find the safety factor
 nin   = ((Sy*.58)/tauin); %torsional stress on bigger sleeve safety factor 
+
+%%
+% Using Equation (\ref{eq:torque_sleeve}), we find the torsional stress 
 taur  = ((torr*R)/J); %torsional stress on bigger sleeve
+
+%%
+% Using Equation (\ref{eq:safety_fct_ts}), we find the safety factor
 nr    = ((Sy*.58)/taur); %torsional stress on bigger sleeve safety factor 
 
 su=310e6;
@@ -613,9 +698,21 @@ OD    = 10/1000;  %m outer diameter of bolt
 R     = OD/2;  %of outer tube sleeve
 r     = 6.35/1000; %m radius of slot 
 A     = pi*r^2; % area of cross section of the bolt
+
+%%
+% Using Equation (\ref{eq:torque_pin}), we find the shear stress on the bolt
 tauin = ((torin/R)/A); %shear stress on the bolt
+
+%%
+% Using Equation (\ref{eq:safety_shear_pin}), we can find the safety factor
 nin   = ((syb*.58)/tauin); %coresponding safety factor of the bolt
+
+%%
+% Using Equation (\ref{eq:torque_pin}), we find the shear stress on the bolt
 taur  = ((torr/R)/A); %shear stress on the bolt
+
+%%
+% Using Equation (\ref{eq:safety_shear_pin}), we can find the safety factor
 nr    = ((syb*.58)/taur); %coresponding safety factor of the bolt
 
 
