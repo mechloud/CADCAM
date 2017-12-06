@@ -160,8 +160,8 @@ fdiffx = framewidth/1000 - 0.9144;
 
 %%
 % Length of steering column
-stclength = (sqrt((0.70229+(fdiffz))^2+((0.32766)^2))/2);
-stcangle = 2.0*atand(0.32766/(0.70229+fdiffz));
+stclength = 2.0*(sqrt((0.70229+(fdiffz))^2+((0.32766)^2))/2);
+stcangle = atand(0.32766/(0.70229+fdiffz));
 
 %%
 % Length of rack
