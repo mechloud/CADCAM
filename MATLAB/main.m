@@ -116,46 +116,53 @@ function BTN_generate_Callback(hObject, eventdata, handles)
 if(isempty(handles))
     Wrong_File();
 else
-    logfname = 'log.txt';
-    log_id = fopen(logfname,'w+');
+
     
-    fprintf(log_id,['|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|                       Inputs to Code                         |\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n\n']);
-                
+    fname = ['Z:\\2017\\MCG4322A\\Digital Files\\BSAE2B\\Log\\',datestr(now,'mm-dd-yyyy HH-MM'),'-log.txt'];
+    log_id = fopen(fname,'w+');
+    
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|                       Inputs to Code                         |');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');                    
+    fprintf(log_id,'\n');            
     % Get the values from the GUI
     frame_width = get(handles.slider_frame_width,'Value');
-    fprintf(log_id,'Frame Width = %.0f mm\n',frame_width);
-    
+    fprintf(log_id,'Frame Width = %.0f mm',frame_width);
+    fprintf(log_id,'\n');
     frame_height = get(handles.slider_frame_height,'Value');
-    fprintf(log_id,'Frame Height = %.0f mm\n',frame_height);
-    
+    fprintf(log_id,'Frame Height = %.0f mm',frame_height);
+    fprintf(log_id,'\n');
     wheelbase = get(handles.slider_wheelbase,'Value');
-    fprintf(log_id,'Wheelbase = %.0f mm \n',wheelbase);
-    
+    fprintf(log_id,'Wheelbase = %.0f mm ',wheelbase);
+    fprintf(log_id,'\n');
     frame_length = wheelbase + 8*25.4;
-    fprintf(log_id,'Frame Length = %.0f mm \n',frame_length);
-    
+    fprintf(log_id,'Frame Length = %.0f mm',frame_length);
+    fprintf(log_id,'\n');
     track_width = get(handles.slider_trackwidth,'Value');
-    fprintf(log_id,'Track Width = %.0f mm \n',track_width);
-    
+    fprintf(log_id,'Track Width = %.0f mm',track_width);
+    fprintf(log_id,'\n');
     ground_clearance = get(handles.slider_ground_clearance,'Value');
-    fprintf(log_id,'Ground Clearance = %.0f mm \n',ground_clearance);
-    
+    fprintf(log_id,'Ground Clearance = %.0f mm',ground_clearance);
+    fprintf(log_id,'\n');
     front_omegan = get(handles.slider_front_omegan,'Value');
-    fprintf(log_id,'Front Natural Frequency = %.2f Hz\n',front_omegan);
-    
+    fprintf(log_id,'Front Natural Frequency = %.2f Hz',front_omegan);
+    fprintf(log_id,'\n');
     rear_omegan = get(handles.slider_rear_omegan,'Value');
-    fprintf(log_id,'Rear Natural Frequency = %.2f Hz\n',rear_omegan);
-    
+    fprintf(log_id,'Rear Natural Frequency = %.2f Hz',rear_omegan);
+    fprintf(log_id,'\n');
     zeta = get(handles.slider_zeta,'Value');
-    fprintf(log_id,'Damping Ratio = %.2f\n',zeta);
-    
+    fprintf(log_id,'Damping Ratio = %.2f',zeta);
+    fprintf(log_id,'\n');
     steering_ratio = get(handles.slider_steering_ratio,'Value');
-    fprintf(log_id,'Steering Ratio = %.1f\n',steering_ratio);
-    
+    fprintf(log_id,'Steering Ratio = %.1f',steering_ratio);
+    fprintf(log_id,'\n');
     md = get(handles.box_mass_driver,'Value');
     if get(handles.rb_lbs,'Value') == 1
         %if the mass is in lbs, convert to kg
@@ -164,13 +171,20 @@ else
         md = mass_check(0,250,md); 
     end
     
-    fprintf(log_id,'Mass of the driver = %.1f kg\n',md);
-    
-    fprintf(log_id,['\n\n|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|                        Suspension                            |\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n\n']);
+    fprintf(log_id,'Mass of the driver = %.1f kg',md);
+    fprintf(log_id,'\n');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|                         Suspension                           |');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');                    
+    fprintf(log_id,'\n');       
     
     % Suspension Codes
 %     if get(handles.rb_front,'Value') == 1
@@ -182,12 +196,18 @@ else
     [fbdia,Ks_f] = Suspension('main',log_id,'f',front_omegan,zeta,md);
     [rbdia,Ks_r] = Suspension('main',log_id,'r',rear_omegan,zeta,md);
     
-    
-    fprintf(log_id,['\n\n|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|                          Frame                               |\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n\n']);
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|                            Frame                             |');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');                    
+    fprintf(log_id,'\n'); 
     
     % Frame Codes
     [POD,PWT] = loop_FEA(log_id,frame_length,frame_height,md);
@@ -220,12 +240,18 @@ else
             end
         end
     end
-    
-    fprintf(log_id,['\n\n|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|                        Steering                              |\n',...
-                    '|--------------------------------------------------------------|\n',...
-                    '|--------------------------------------------------------------|\n\n']);
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|                          Steering                            |');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');
+    fprintf(log_id,'|--------------------------------------------------------------|');
+    fprintf(log_id,'\n');                    
+    fprintf(log_id,'\n'); 
     
     % Steering Codes - NEED TO RETURN VALUES TO WRITE IN FILE
     [turning_radius,ackangle,h,odt,idt,ltr,rbl,Pr,N,PD,bore,...
@@ -247,7 +273,7 @@ else
     % Close the log file
     try
         fclose(log_id);
-        fprintf('Successfully wrote log file %s\n',logfname);
+        fprintf('Successfully wrote log file %s\n',fname);
     catch
         fprintf('Unable to write log file\n');
     end
