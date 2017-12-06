@@ -125,6 +125,7 @@ switch getenv('username')
         % Justin home computer
      %   fname = 'C:\Users\just-\Google Drive\University\8 - Fall 2017\MCG4322\GrabCAD\CADCAM\Equations.txt';
     otherwise
+        fname = 'Z:\2017\MCG4322A\Digital Files\BSAE2B\Solidworks\Parts\Equations.txt';
 end
 
 %%
