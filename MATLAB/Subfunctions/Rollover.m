@@ -44,16 +44,16 @@ sep_f = 1.016;
 sep_r = 1.016;
 
 %% 
-% Find front and back roll stiffness
+% Find front and back roll stiffness from Equation (\ref{eq:K_roll})
 K_f = 0.5*Ks_f*sep_f^2;
 K_r = 0.5*Ks_r*sep_r^2;
 
 %% 
-% Find roll rate
+% Find roll rate from Equation (\ref{eq:R_roll})
 Roll_rate = (mass*9.81*h_r)/(K_f + K_r - mass*9.81*h_r);
 
 %%
-% Ratio of lateral acceleration to gravitational acceleration
+% Ratio of lateral acceleration to gravitational acceleration from Equation (\ref{eq:ratio_roll})
 Ratio = (track_width/(2*COG_y) * 1/(1+Roll_rate*(1-(h_r/COG_y))));
 
 %% 
