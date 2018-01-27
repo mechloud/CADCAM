@@ -64,7 +64,7 @@ namespace BAJA2B
                 get_steering_ratio();
             }
         }
-        
+
         private void tb_steering_ratio_Scroll(object sender, EventArgs e)
         {
             box_steering_ratio.Text = Convert.ToString(tb_steering_ratio.Value);
@@ -80,7 +80,7 @@ namespace BAJA2B
             }
             catch (System.FormatException e)
             {
-                if(box_steering_ratio.Text.GetType() != typeof(Int32))
+                if (box_steering_ratio.Text.GetType() != typeof(Int32))
                 {
                     MessageBox.Show("Entries must be integers.");
                 }
@@ -95,7 +95,7 @@ namespace BAJA2B
             tb_steering_ratio.Value = steering_ratio;
             box_steering_ratio.Text = Convert.ToString(steering_ratio);
         }
-        
+
         // Ground Clearance
         private void tb_ground_clearance_Scroll(object sender, EventArgs e)
         {
@@ -106,10 +106,9 @@ namespace BAJA2B
         {
             if (e.KeyChar == (char)13)
             {
-                MessageBox.Show("Pete de plote");
                 get_ground_clearance();
             }
-            
+
         }
 
         private void box_ground_clearance_Leave(object sender, EventArgs e)
@@ -142,7 +141,144 @@ namespace BAJA2B
             tb_ground_clearance.Value = ground_clearance;
             box_ground_clearance.Text = Convert.ToString(ground_clearance);
         }
-        
-   
+
+
+        // Frame Height
+        private void tb_frame_height_Scroll(object sender, EventArgs e)
+        {
+            box_frame_height.Text = Convert.ToString(tb_frame_height.Value);
+        }
+
+        private void box_frame_height_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                get_frame_height();
+            }
+        }
+
+        private void box_frame_height_Leave(object sender, EventArgs e)
+        {
+            get_frame_height();
+        }
+
+        private void get_frame_height()
+        {
+            int frame_height;
+
+            try
+            {
+                frame_height = Convert.ToInt32(box_frame_height.Text);
+            }
+            catch
+            {
+                if (box_frame_height.Text.GetType() != typeof(Int32))
+                {
+                    MessageBox.Show("Entries must be integers.");
+                }
+                frame_height = 4;
+            }
+
+            int fh_max = tb_frame_height.Maximum;
+            int fh_min = tb_frame_height.Minimum;
+
+            frame_height = boundary_check(frame_height, fh_max, fh_min);
+
+            tb_frame_height.Value = frame_height;
+            box_frame_height.Text = Convert.ToString(frame_height);
+        }
+
+        // Frame Width
+        private void tb_frame_width_Scroll(object sender, EventArgs e)
+        {
+            box_frame_width.Text = Convert.ToString(tb_frame_width.Value);
+        }
+
+        private void box_frame_width_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                get_frame_width();
+            }
+        }
+
+        private void box_frame_width_Leave(object sender, EventArgs e)
+        {
+            get_frame_width();
+        }
+
+        private void get_frame_width()
+        {
+            int frame_width;
+
+            try
+            {
+                frame_width = Convert.ToInt32(box_frame_width.Text);
+            }
+            catch
+            {
+                if (box_frame_width.Text.GetType() != typeof(Int32))
+                {
+                    MessageBox.Show("Entries must be integers.");
+                }
+                frame_width = 4;
+            }
+
+            int fw_max = tb_frame_width.Maximum;
+            int fw_min = tb_frame_width.Minimum;
+
+            frame_width = boundary_check(frame_width, fw_max, fw_min);
+
+            tb_frame_width.Value = frame_width;
+            box_frame_width.Text = Convert.ToString(frame_width);
+        }
+
+        // Wheel Base
+        private void tb_wheelbase_Scroll(object sender, EventArgs e)
+        {
+            box_wheelbase.Text = Convert.ToString(tb_wheelbase.Value);
+        }
+
+        private void box_wheelbase_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                get_wheelbase();
+            }
+        }
+
+        private void box_wheelbase_Leave(object sender, EventArgs e)
+        {
+            get_wheelbase();
+        }
+
+        private void get_wheelbase()
+        {
+            int wheelbase;
+
+            try
+            {
+                wheelbase = Convert.ToInt32(box_wheelbase.Text);
+            }
+            catch
+            {
+                if (box_wheelbase.Text.GetType() != typeof(Int32))
+                {
+                    MessageBox.Show("Entries must be integers.");
+                }
+                wheelbase = 4;
+            }
+
+            int wb_max = tb_wheelbase.Maximum;
+            int wb_min = tb_wheelbase.Minimum;
+
+            wheelbase = boundary_check(wheelbase, wb_max, wb_min);
+
+            tb_wheelbase.Value = wheelbase;
+            box_wheelbase.Text = Convert.ToString(wheelbase);
+        }
+
     }
+   
 }
+

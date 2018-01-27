@@ -151,6 +151,7 @@
             this.tb_wheelbase.SmallChange = 20;
             this.tb_wheelbase.TabIndex = 8;
             this.tb_wheelbase.Value = 1624;
+            this.tb_wheelbase.Scroll += new System.EventHandler(this.tb_wheelbase_Scroll);
             // 
             // tb_frame_width
             // 
@@ -161,6 +162,7 @@
             this.tb_frame_width.Size = new System.Drawing.Size(200, 45);
             this.tb_frame_width.TabIndex = 9;
             this.tb_frame_width.Value = 914;
+            this.tb_frame_width.Scroll += new System.EventHandler(this.tb_frame_width_Scroll);
             // 
             // tb_frame_height
             // 
@@ -171,6 +173,7 @@
             this.tb_frame_height.Size = new System.Drawing.Size(200, 45);
             this.tb_frame_height.TabIndex = 10;
             this.tb_frame_height.Value = 1219;
+            this.tb_frame_height.Scroll += new System.EventHandler(this.tb_frame_height_Scroll);
             // 
             // tb_ground_clearance
             // 
@@ -232,6 +235,8 @@
             this.box_wheelbase.TabIndex = 16;
             this.box_wheelbase.Tag = "";
             this.box_wheelbase.Text = "1624";
+            this.box_wheelbase.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.box_wheelbase_KeyPress);
+            this.box_wheelbase.Leave += new System.EventHandler(this.box_wheelbase_Leave);
             // 
             // box_frame_width
             // 
@@ -240,6 +245,8 @@
             this.box_frame_width.Size = new System.Drawing.Size(44, 20);
             this.box_frame_width.TabIndex = 17;
             this.box_frame_width.Text = "914";
+            this.box_frame_width.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.box_frame_width_KeyPress);
+            this.box_frame_width.Leave += new System.EventHandler(this.box_frame_width_Leave);
             // 
             // box_frame_height
             // 
@@ -248,6 +255,8 @@
             this.box_frame_height.Size = new System.Drawing.Size(44, 20);
             this.box_frame_height.TabIndex = 18;
             this.box_frame_height.Text = "1219";
+            this.box_frame_height.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.box_frame_height_KeyPress);
+            this.box_frame_height.Leave += new System.EventHandler(this.box_frame_height_Leave);
             // 
             // box_ground_clearance
             // 
