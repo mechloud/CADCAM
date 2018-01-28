@@ -8,7 +8,6 @@ C:\Users\Jonathan\Documents\Visual Studio 2017\Projects\CSharpProjects\BAJA2B\BA
 C:\Users\Jonathan\Documents\Visual Studio 2017\Projects\CSharpProjects\BAJA2B\BAJA2B\obj\Release\BAJA2B.exe
 C:\Users\Jonathan\Documents\Visual Studio 2017\Projects\CSharpProjects\BAJA2B\BAJA2B\obj\Release\BAJA2B.pdb
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.csprojResolveAssemblyReference.cache
-C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.Form1.resources
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.Properties.Resources.resources
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.csproj.GenerateResource.Cache
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.exe
@@ -16,3 +15,5 @@ C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\bin\Release\BAJA2B.exe.config
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\bin\Release\BAJA2B.exe
 C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\bin\Release\BAJA2B.pdb
+C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.ANSYS_popup.resources
+C:\Users\Jonathan\Documents\UOttawa\MCG4322 - CADCAM\GitHub\CADCAM\BAJA2B\BAJA2B\obj\Release\BAJA2B.Main.resources

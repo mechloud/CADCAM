@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace BAJA2B
 {
-    public partial class Form1 : Form
+    public partial class Main : Form
     {
-        public Form1()
+        public Main()
         {
             InitializeComponent();
         }
@@ -46,9 +46,25 @@ namespace BAJA2B
             }
         }
 
-        private void rb_ansys_CheckedChanged(object sender, EventArgs e)
+        private void cb_ANSYS_script_CheckedChanged(object sender, EventArgs e)
         {
-            MessageBox.Show("Need to give options in a new form or something");
+            var form = new ANSYS_popup();
+            if (cb_ANSYS_script.Checked == true)
+            {
+                form.front = false;
+                form.rear = false;
+                form.side = false;
+                form.roll = false;
+                form.ShowDialog(this);
+            }
+            else
+            {
+                form.front = false;
+                form.rear = false;
+                form.side = false;
+                form.roll = false;
+            }
+            
         }
 
         // Steering Ratio

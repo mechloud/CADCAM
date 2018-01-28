@@ -1,6 +1,6 @@
 ﻿namespace BAJA2B
 {
-    partial class Form1
+    partial class Main
     {
         /// <summary>
         /// Required designer variable.
@@ -44,12 +44,12 @@
             this.tb_steering_ratio = new System.Windows.Forms.TrackBar();
             this.box_mass = new System.Windows.Forms.TextBox();
             this.units = new System.Windows.Forms.DomainUpDown();
-            this.rb_ansys = new System.Windows.Forms.RadioButton();
             this.box_wheelbase = new System.Windows.Forms.TextBox();
             this.box_frame_width = new System.Windows.Forms.TextBox();
             this.box_frame_height = new System.Windows.Forms.TextBox();
             this.box_ground_clearance = new System.Windows.Forms.TextBox();
             this.box_steering_ratio = new System.Windows.Forms.TextBox();
+            this.cb_ANSYS_script = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.tb_wheelbase)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_width)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_height)).BeginInit();
@@ -215,18 +215,6 @@
             this.units.TabIndex = 14;
             this.units.Text = "lbs";
             // 
-            // rb_ansys
-            // 
-            this.rb_ansys.AutoSize = true;
-            this.rb_ansys.Location = new System.Drawing.Point(12, 406);
-            this.rb_ansys.Name = "rb_ansys";
-            this.rb_ansys.Size = new System.Drawing.Size(244, 17);
-            this.rb_ansys.TabIndex = 15;
-            this.rb_ansys.TabStop = true;
-            this.rb_ansys.Text = "Generate 3D ANSYS Mechanical APDL Script";
-            this.rb_ansys.UseVisualStyleBackColor = true;
-            this.rb_ansys.CheckedChanged += new System.EventHandler(this.rb_ansys_CheckedChanged);
-            // 
             // box_wheelbase
             // 
             this.box_wheelbase.Location = new System.Drawing.Point(218, 39);
@@ -277,17 +265,28 @@
             this.box_steering_ratio.Text = "4";
             this.box_steering_ratio.Leave += new System.EventHandler(this.box_steering_ratio_Leave);
             // 
-            // Form1
+            // cb_ANSYS_script
+            // 
+            this.cb_ANSYS_script.AutoSize = true;
+            this.cb_ANSYS_script.Location = new System.Drawing.Point(27, 407);
+            this.cb_ANSYS_script.Name = "cb_ANSYS_script";
+            this.cb_ANSYS_script.Size = new System.Drawing.Size(245, 17);
+            this.cb_ANSYS_script.TabIndex = 21;
+            this.cb_ANSYS_script.Text = "Generate 3D ANSYS Mechanical APDL Script";
+            this.cb_ANSYS_script.UseVisualStyleBackColor = true;
+            this.cb_ANSYS_script.CheckedChanged += new System.EventHandler(this.cb_ANSYS_script_CheckedChanged);
+            // 
+            // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(555, 447);
+            this.Controls.Add(this.cb_ANSYS_script);
             this.Controls.Add(this.box_steering_ratio);
             this.Controls.Add(this.box_ground_clearance);
             this.Controls.Add(this.box_frame_height);
             this.Controls.Add(this.box_frame_width);
             this.Controls.Add(this.box_wheelbase);
-            this.Controls.Add(this.rb_ansys);
             this.Controls.Add(this.units);
             this.Controls.Add(this.box_mass);
             this.Controls.Add(this.tb_steering_ratio);
@@ -304,7 +303,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btn_close);
             this.Controls.Add(this.btn_generate);
-            this.Name = "Form1";
+            this.Name = "Main";
             this.Text = "Fluent Design - CADCAM 2017";
             ((System.ComponentModel.ISupportInitialize)(this.tb_wheelbase)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_width)).EndInit();
@@ -334,12 +333,12 @@
         private System.Windows.Forms.TrackBar tb_steering_ratio;
         private System.Windows.Forms.TextBox box_mass;
         private System.Windows.Forms.DomainUpDown units;
-        private System.Windows.Forms.RadioButton rb_ansys;
         private System.Windows.Forms.TextBox box_wheelbase;
         private System.Windows.Forms.TextBox box_frame_width;
         private System.Windows.Forms.TextBox box_frame_height;
         private System.Windows.Forms.TextBox box_ground_clearance;
         private System.Windows.Forms.TextBox box_steering_ratio;
+        private System.Windows.Forms.CheckBox cb_ANSYS_script;
     }
 }
 
