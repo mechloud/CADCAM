@@ -20,7 +20,15 @@ namespace BAJA2B
         // Generate CAD model
         private void btn_generate_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("I think this worked!");
+
+            // Write ANSYS output file if desired
+            if (cb_ANSYS_script.Checked == true)
+            {
+                output_ansys.write_to_file("front");
+            }
+            
+            // Close the form after generating the Solidworks model, this is temporary.
+            this.Close();
         }
 
         // Close the window
@@ -64,7 +72,6 @@ namespace BAJA2B
                 form.side = false;
                 form.roll = false;
             }
-            
         }
 
         // Steering Ratio
