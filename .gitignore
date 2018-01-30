@@ -40,3 +40,4 @@ ANSYS/PRETAB_side
 ANSYS/PRETAB_single_wheel
 ANSYS/buckling_analysis.m
 *.cache
+*.txt
