@@ -301,6 +301,60 @@ namespace BAJA2B
             box_wheelbase.Text = Convert.ToString(wheelbase);
         }
 
+        // Damping Ratio
+        private void tb_damping_ratio_Scroll(object sender, EventArgs e)
+        {
+            double dr = Convert.ToDouble(tb_damping_ratio.Value)/1000;
+            box_damping_ratio.Text = Convert.ToString(dr);
+        }
+
+        private void box_damping_ratio_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                get_damping_ratio();
+            }
+        }
+
+        private void box_damping_ratio_Leave(object sender, EventArgs e)
+        {
+            get_damping_ratio();
+        }
+
+        private void get_damping_ratio()
+        {
+            double damping_ratio;
+
+            try
+            {
+                damping_ratio = Convert.ToDouble(box_damping_ratio.Text);
+            }
+            catch
+            {
+                if ((box_damping_ratio.Text.GetType() != typeof(Double)) || (box_damping_ratio.Text.GetType() != typeof(Int32)))
+                {
+                    MessageBox.Show("Entries must be numerical");
+                }
+                damping_ratio = 0.707;
+            }
+
+            double dr_max = tb_damping_ratio.Maximum/1000;
+            double dr_min = tb_damping_ratio.Minimum/1000;
+
+            if (damping_ratio > dr_max)
+            {
+                damping_ratio = dr_max;
+            }
+            if (damping_ratio < dr_min)
+            {
+                damping_ratio = dr_max;
+            }
+
+            tb_damping_ratio.Value = Convert.ToInt32(damping_ratio*1000);
+            box_damping_ratio.Text = Convert.ToString(damping_ratio);
+        }
+
+      
     }
    
 }

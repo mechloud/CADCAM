@@ -50,11 +50,23 @@
             this.box_ground_clearance = new System.Windows.Forms.TextBox();
             this.box_steering_ratio = new System.Windows.Forms.TextBox();
             this.cb_ANSYS_script = new System.Windows.Forms.CheckBox();
+            this.tb_damping_ratio = new System.Windows.Forms.TrackBar();
+            this.tn_rear_omegan = new System.Windows.Forms.TrackBar();
+            this.tb_front_omegan = new System.Windows.Forms.TrackBar();
+            this.box_damping_ratio = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tb_wheelbase)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_width)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_height)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_ground_clearance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_steering_ratio)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tb_damping_ratio)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tn_rear_omegan)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tb_front_omegan)).BeginInit();
             this.SuspendLayout();
             // 
             // btn_generate
@@ -114,7 +126,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(57, 215);
+            this.label5.Location = new System.Drawing.Point(57, 227);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(118, 13);
             this.label5.TabIndex = 5;
@@ -123,7 +135,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(76, 279);
+            this.label6.Location = new System.Drawing.Point(76, 295);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(74, 13);
             this.label6.TabIndex = 6;
@@ -132,7 +144,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(75, 341);
+            this.label7.Location = new System.Drawing.Point(75, 354);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(75, 13);
             this.label7.TabIndex = 7;
@@ -177,7 +189,7 @@
             // 
             // tb_ground_clearance
             // 
-            this.tb_ground_clearance.Location = new System.Drawing.Point(12, 231);
+            this.tb_ground_clearance.Location = new System.Drawing.Point(12, 243);
             this.tb_ground_clearance.Maximum = 350;
             this.tb_ground_clearance.Minimum = 152;
             this.tb_ground_clearance.Name = "tb_ground_clearance";
@@ -188,7 +200,7 @@
             // 
             // tb_steering_ratio
             // 
-            this.tb_steering_ratio.Location = new System.Drawing.Point(13, 293);
+            this.tb_steering_ratio.Location = new System.Drawing.Point(13, 309);
             this.tb_steering_ratio.Maximum = 5;
             this.tb_steering_ratio.Minimum = 1;
             this.tb_steering_ratio.Name = "tb_steering_ratio";
@@ -199,7 +211,7 @@
             // 
             // box_mass
             // 
-            this.box_mass.Location = new System.Drawing.Point(27, 368);
+            this.box_mass.Location = new System.Drawing.Point(27, 381);
             this.box_mass.Name = "box_mass";
             this.box_mass.Size = new System.Drawing.Size(44, 20);
             this.box_mass.TabIndex = 13;
@@ -209,7 +221,7 @@
             // 
             this.units.Items.Add("lbs");
             this.units.Items.Add("kg");
-            this.units.Location = new System.Drawing.Point(92, 368);
+            this.units.Location = new System.Drawing.Point(92, 381);
             this.units.Name = "units";
             this.units.Size = new System.Drawing.Size(120, 20);
             this.units.TabIndex = 14;
@@ -248,7 +260,7 @@
             // 
             // box_ground_clearance
             // 
-            this.box_ground_clearance.Location = new System.Drawing.Point(218, 231);
+            this.box_ground_clearance.Location = new System.Drawing.Point(218, 243);
             this.box_ground_clearance.Name = "box_ground_clearance";
             this.box_ground_clearance.Size = new System.Drawing.Size(44, 20);
             this.box_ground_clearance.TabIndex = 19;
@@ -258,7 +270,7 @@
             // 
             // box_steering_ratio
             // 
-            this.box_steering_ratio.Location = new System.Drawing.Point(218, 293);
+            this.box_steering_ratio.Location = new System.Drawing.Point(218, 309);
             this.box_steering_ratio.Name = "box_steering_ratio";
             this.box_steering_ratio.Size = new System.Drawing.Size(44, 20);
             this.box_steering_ratio.TabIndex = 20;
@@ -268,7 +280,7 @@
             // cb_ANSYS_script
             // 
             this.cb_ANSYS_script.AutoSize = true;
-            this.cb_ANSYS_script.Location = new System.Drawing.Point(27, 407);
+            this.cb_ANSYS_script.Location = new System.Drawing.Point(27, 418);
             this.cb_ANSYS_script.Name = "cb_ANSYS_script";
             this.cb_ANSYS_script.Size = new System.Drawing.Size(245, 17);
             this.cb_ANSYS_script.TabIndex = 21;
@@ -276,11 +288,101 @@
             this.cb_ANSYS_script.UseVisualStyleBackColor = true;
             this.cb_ANSYS_script.CheckedChanged += new System.EventHandler(this.cb_ANSYS_script_CheckedChanged);
             // 
+            // tb_damping_ratio
+            // 
+            this.tb_damping_ratio.Location = new System.Drawing.Point(287, 309);
+            this.tb_damping_ratio.Maximum = 1000;
+            this.tb_damping_ratio.Name = "tb_damping_ratio";
+            this.tb_damping_ratio.Size = new System.Drawing.Size(200, 45);
+            this.tb_damping_ratio.TabIndex = 22;
+            this.tb_damping_ratio.Value = 707;
+            this.tb_damping_ratio.Scroll += new System.EventHandler(this.tb_damping_ratio_Scroll);
+            // 
+            // tn_rear_omegan
+            // 
+            this.tn_rear_omegan.Location = new System.Drawing.Point(287, 243);
+            this.tn_rear_omegan.Maximum = 30;
+            this.tn_rear_omegan.Minimum = 5;
+            this.tn_rear_omegan.Name = "tn_rear_omegan";
+            this.tn_rear_omegan.Size = new System.Drawing.Size(200, 45);
+            this.tn_rear_omegan.TabIndex = 1;
+            this.tn_rear_omegan.Value = 17;
+            // 
+            // tb_front_omegan
+            // 
+            this.tb_front_omegan.Location = new System.Drawing.Point(287, 167);
+            this.tb_front_omegan.Maximum = 30;
+            this.tb_front_omegan.Minimum = 5;
+            this.tb_front_omegan.Name = "tb_front_omegan";
+            this.tb_front_omegan.Size = new System.Drawing.Size(200, 45);
+            this.tb_front_omegan.TabIndex = 24;
+            this.tb_front_omegan.Value = 15;
+            // 
+            // box_damping_ratio
+            // 
+            this.box_damping_ratio.Location = new System.Drawing.Point(494, 309);
+            this.box_damping_ratio.Name = "box_damping_ratio";
+            this.box_damping_ratio.Size = new System.Drawing.Size(44, 20);
+            this.box_damping_ratio.TabIndex = 25;
+            this.box_damping_ratio.Text = "0.707";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(352, 295);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(77, 13);
+            this.label8.TabIndex = 26;
+            this.label8.Text = "Damping Ratio";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(296, 227);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(181, 13);
+            this.label9.TabIndex = 27;
+            this.label9.Text = "Desired Rear Natural Frequency (Hz)";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(494, 243);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(44, 20);
+            this.textBox1.TabIndex = 28;
+            this.textBox1.Text = "1.7";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(494, 167);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(44, 20);
+            this.textBox2.TabIndex = 29;
+            this.textBox2.Text = "1.5";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(299, 148);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(182, 13);
+            this.label10.TabIndex = 30;
+            this.label10.Text = "Desired Front Natural Frequency (Hz)";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(555, 447);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.box_damping_ratio);
+            this.Controls.Add(this.tb_front_omegan);
+            this.Controls.Add(this.tn_rear_omegan);
+            this.Controls.Add(this.tb_damping_ratio);
             this.Controls.Add(this.cb_ANSYS_script);
             this.Controls.Add(this.box_steering_ratio);
             this.Controls.Add(this.box_ground_clearance);
@@ -310,6 +412,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.tb_frame_height)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_ground_clearance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tb_steering_ratio)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tb_damping_ratio)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tn_rear_omegan)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tb_front_omegan)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -339,6 +444,15 @@
         private System.Windows.Forms.TextBox box_ground_clearance;
         private System.Windows.Forms.TextBox box_steering_ratio;
         private System.Windows.Forms.CheckBox cb_ANSYS_script;
+        private System.Windows.Forms.TrackBar tb_damping_ratio;
+        private System.Windows.Forms.TrackBar tn_rear_omegan;
+        private System.Windows.Forms.TrackBar tb_front_omegan;
+        private System.Windows.Forms.TextBox box_damping_ratio;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label10;
     }
 }
 
