@@ -43,3 +43,5 @@ ANSYS/buckling_analysis.m
 *.txt
 *.exe
 *.pdb
+vgcore*
+feanalysis
