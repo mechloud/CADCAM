@@ -6,6 +6,8 @@
 #include<fstream>
 #include<algorithm>
 
+#define TESTING
+
 struct Node{
   int id;
   double x;
@@ -19,6 +21,79 @@ struct Element{
   int node1;
   int matflag;
 };
+
+auto read_csv(const std::string& nodal, const std::string& elemental){
+
+  std::ifstream nin(nodal);
+  if(!nin){
+    throw std::runtime_error("Cannot open : " + nodal + ".");
+  }
+
+  std::ifstream ein(elemental);
+  if(!ein){
+    throw std::runtime_error("Cannot open : " + elemental + ".");
+  }
+  
+  std::vector<Node> nodes;
+  std::vector<Element> elements;
+
+  int nnodes;
+  nin >> nnodes;
+  
+  for (int i = 0; i < nnodes; ++i){
+
+    std::string s;
+    do {
+      std::getline(nin,s);
+      std::replace(s.begin(),s.end(),',',' ');
+    } while (s.empty());
+
+    std::istringstream ss(s);
+
+    Node n;
+    
+    ss >> n.id >> n.x >> n.y >> n.z;
+    
+    // if (fabs(n.y) > 1.0e-12){
+    //   throw std::runtime_error("Error, node has y component. Code is not ready for 3D analysis yet.");
+    // }
+
+    nodes.push_back(n);
+    
+  } // end loop through nodes
+
+  int nelements;
+  ein >> nelements;
+
+  for (int i = 0; i < nelements; ++i){
+
+    std::string s;
+    do {
+      std::getline(ein,s);
+      std::replace(s.begin(),s.end(),',',' ');
+    }while (s.empty());
+
+    std::istringstream ss(s);
+    
+    Element e;
+
+    ss >> e.id >> e.node0 >> e.node1 >> e.matflag;
+
+    if (e.id != (i + 1)){
+      throw std::runtime_error("Error reading element number");
+    }
+
+    if (e.matflag == 0){
+      throw std::runtime_error("Error reading material type for element number " + std::to_string(e.id) + ".");      
+    }
+
+    elements.push_back(e);
+    
+  } // end loop through elements
+
+  return std::make_pair(nodes,elements);
+  
+} // end read_csv function
 
 class TwoDBeam {
 public:
@@ -122,7 +197,13 @@ public:
 		  const TT0& x2,const TT0& y2){
     TT0 dx = x2-x1;
     TT0 dy = y2-y1;
-    return sqrt(dx*dx + dy*dy);
+    TT0 L = sqrt(dx*dx + dy*dy);
+
+    if(L <= 0){
+      throw std::runtime_error("Zero-length or negative length element");
+    } else {
+      return L;
+    }
   }
 
   // Returns the cross sectional area of a tubular section
@@ -143,8 +224,6 @@ private:
   T SOD = 25.4;
   T SID = 20.638;
   T md  = 110;
-	       
-
 };
 
 template<typename Equations>
@@ -157,116 +236,117 @@ public:
   Solver& operator=(const Solver&) = default;
   Solver& operator=(Solver&&) = default;
 
-  void rotate_matrix(){
-    double l = 2.0;
-    double m = 5.0;
+  Solver(double POD_in, double PID_in, double SOD_in, double SID_in, double md_in) :
+    POD(POD_in),
+    PID(PID_in),
+    SOD(SOD_in),
+    SID(SID_in),
+    md(md_in)
+  {};
+
+  
+  void preprocessing(const std::vector<Node>& nodes,const std::vector<Element>& elements){
+
+    operations<double> op;
 
     typename Equations::matrix_type rotated;
     typename Equations::matrix_type assembled;
 
-    rotated = Equations::rotation(l,m);
-    std::cout << "Rotation matrix\n" << rotated << '\n';
+    double nelements = elements.size();
+    R.resize(nelements);
+    Ke.resize(nelements);
 
-    assembled = Equations::stiffness(1.0,2.0,3.0,1.0);
-    std::cout << "Assemblage matrix\n" << assembled << '\n';
+    for (int i = 0; i < nelements; ++ i){
+
+      // Find nodes corresponding to element i
+      int nodei = elements[i].node0;
+      int nodej = elements[i].node1;
+
+      // Find nodal coordinates for nodes i and j for element i 
+      double xi = nodes[nodei].x;
+      double yi = nodes[nodei].y;
+      double xj = nodes[nodej].x;
+      double yj = nodes[nodej].y;
+
+      // Get length and find direction cosines
+      L.push_back(op.get_length(xi,yi,xj,yj));
+      l.push_back((xj-xi)/L[i]);
+      m.push_back((yj-yi)/L[i]);
+
+      // Get rotation matrices
+      R[i] = Equations::rotation(l[i],m[i]);
+
+      // Get local stiffness matrix;
+      Eigen::MatrixXd Ke_prime = Equations::stiffness(op.area(POD,PID),E,L[i],op.inertia(POD,PID));
+
+      Ke[i] = R[i].transpose() * Ke_prime * R[i];
+
+      std::cout << Ke[i] << "\n\n";
+    }
+
   }
 
 private:
-  double E  = 205e3; // MPa
-  double Sy = 435;   // MPa
+  double                       E  = 205e3; // MPa
+  double                       Sy = 435;   // MPa
+  std::vector<Node>            nodes;
+  std::vector<Element>         elements;
+  std::vector<double>          L;
+  std::vector<double>          l;
+  std::vector<double>          m;
+  std::vector<Eigen::MatrixXd> R;
+  std::vector<Eigen::MatrixXd> Ke;
+  double POD = 25.4;
+  double PID = 19.304;
+  double SOD = 25.4;
+  double SID = 20.638;
+  double md  = 110;
+  
+  /*
+  struct Node{
+    int id;
+    double x;
+    double y;
+    double z;
+  };
+  
+  struct Element{
+    int id;
+    int node0;
+    int node1;
+    int matflag;
+  };
+  */
 
 };
 
-auto read_csv(const std::string& nodal, std::string& elemental){
-
-  std::ifstream nin(nodal);
-  if(!nin){
-    throw std::runtime_error("Cannot open : " + nodal + ".");
-  }
-
-  std::ifstream ein(elemental);
-  if(!ein){
-    throw std::runtime_error("Cannot open : " + elemental + ".");
-  }
-  
-  std::vector<Node> nodes;
-  std::vector<Element> elements;
-
-  int nnodes;
-  nin >> nnodes;
-  
-  for (int i = 0; i < nnodes; ++i){
-
-    std::string s;
-    do {
-      std::getline(nin,s);
-      std::replace(s.begin(),s.end(),',',' ');
-    } while (s.empty());
-
-    std::istringstream ss(s);
-
-    Node n;
-    
-    ss >> n.id >> n.x >> n.y >> n.z;
-    
-    // if (fabs(n.y) > 1.0e-12){
-    //   throw std::runtime_error("Error, node has y component. Code is not ready for 3D analysis yet.");
-    // }
-
-    nodes.push_back(n);
-    
-  } // end loop through nodes
-
-  int nelements;
-  ein >> nelements;
-
-  for (int i = 0; i < nelements; ++i){
-
-    std::string s;
-    do {
-      std::getline(ein,s);
-      std::replace(s.begin(),s.end(),',',' ');
-    }while (s.empty());
-
-    std::istringstream ss(s);
-    
-    Element e;
-
-    ss >> e.id >> e.node0 >> e.node1 >> e.matflag;
-
-    if (e.id != (i + 1)){
-      throw std::runtime_error("Error reading element number");
-    }
-
-    if (e.matflag == 0){
-      throw std::runtime_error("Error reading material type for element number " + std::to_string(e.id) + ".");      
-    }
-
-    elements.push_back(e);
-    
-  } // end loop through elements
-  
-} // end read_csv function
 
 
 int main()
 {
-  auto newsol = Solver<TwoDBeam>();
-  newsol.rotate_matrix();
-  auto operators = operations<double>();
-  
-  double len = operators.get_length(2.0, 4.0, 0.0, 0.0);
-  std::cout << "Length = " << len << '\n';
-  
-  double area = operators.area(25.4,19.304);
-  std::cout << "Area = " << area << '\n';
-  
-  double inertia = operators.inertia(25.4,19.304);
-  std::cout << "Inertia = " << inertia << '\n';
 
-  std::string nodal_filename = "nodes.csv";
-  std::string elemental_filename = "elements.csv";
-  read_csv(nodal_filename,elemental_filename);
-  
+#ifdef TESTING
+  double POD = 25.4;
+  double PID = 19.304;
+  double SOD = 25.4;
+  double SID = 20.638;
+  double md  = 110;
+
+  auto newsol = Solver<TwoDBeam>(POD,PID,SOD,SID,md);
+#else
+  auto newsol = Solver<TwoDBeam>();
+#endif
+ 
+#ifdef TESTING
+    std::vector<Node> nodes;
+    std::vector<Element> elements;
+    std::string nodal_filename = "nodes.csv";
+    std::string elemental_filename = "elements.csv";
+    std::tie(nodes,elements) = read_csv(nodal_filename,elemental_filename);
+#endif
+
+    newsol.preprocessing(nodes,elements);
+    auto operators = operations<double>();
+
   return 0;
 }
